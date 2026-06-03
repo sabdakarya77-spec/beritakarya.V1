@@ -45,6 +45,14 @@ async function main() {
       monthlyBudget: 2.00,
       allowedFeatures: JSON.stringify(['readability']),
       modelRestriction: 'gpt-3.5-turbo'
+    },
+    {
+      role: Role.advertiser,
+      dailyRequests: 10,
+      dailyTokens: 5000,
+      monthlyBudget: 2.00,
+      allowedFeatures: JSON.stringify([]),
+      modelRestriction: null
     }
   ]
 

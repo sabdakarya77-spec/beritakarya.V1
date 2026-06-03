@@ -55,6 +55,14 @@ async function seedQuotas() {
       monthlyBudget: 0.00,
       allowedFeatures: JSON.stringify([]),
       modelRestriction: null
+    },
+    {
+      role: Role.advertiser,
+      dailyRequests: 10,
+      dailyTokens: 5000,
+      monthlyBudget: 2.00,
+      allowedFeatures: JSON.stringify([]),
+      modelRestriction: null
     }
   ]
 
