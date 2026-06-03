@@ -1,79 +1,117 @@
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
 import { getSignedUrl as getS3SignedUrl } from '@aws-sdk/s3-request-presigner'
 import fs from 'fs/promises'
 import { logger } from '../lib/logger'
 
-export class StorageService {
-  private static s3 = new S3Client({
-    endpoint: process.env.S3_ENDPOINT,
-    region: process.env.S3_REGION || 'auto',
-    credentials: {
-      accessKeyId: process.env.S3_ACCESS_KEY || '',
-      secretAccessKey: process.env.S3_SECRET_KEY || '',
-    },
-    forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
-  })
+const s3 = new S3Client({
+  endpoint: process.env.S3_ENDPOINT,
+  region: process.env.S3_REGION || 'ap-southeast-1',
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY || '',
+    secretAccessKey: process.env.S3_SECRET_KEY || '',
+  },
+  forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
+})
 
-  private static bucket = process.env.S3_BUCKET || 'beritakarya-kyc'
+const KYC_BUCKET = process.env.S3_BUCKET || 'kyc'
+const MEDIA_BUCKET = process.env.S3_MEDIA_BUCKET || 'media'
+
+// Base URL for Supabase public CDN, e.g. https://<ref>.supabase.co/storage/v1/object/public
+const SUPABASE_STORAGE_PUBLIC_URL = process.env.SUPABASE_STORAGE_PUBLIC_URL || ''
+
+export class StorageService {
+  /**
+   * Upload from a local file path to S3 (legacy — used by migration scripts).
+   * Prefer uploadBuffer() in serverless contexts.
+   */
+  static async uploadFile(
+    localPath: string,
+    remoteKey: string,
+    contentType: string,
+    bucket: string = KYC_BUCKET
+  ): Promise<string> {
+    const fileBuffer = await fs.readFile(localPath)
+    return StorageService.uploadBuffer(fileBuffer, remoteKey, contentType, bucket)
+  }
 
   /**
-   * Upload a file to S3
+   * Upload directly from a Buffer — serverless-safe, no filesystem writes.
    */
-  static async uploadFile(localPath: string, remoteKey: string, contentType: string): Promise<string> {
+  static async uploadBuffer(
+    buffer: Buffer,
+    remoteKey: string,
+    contentType: string,
+    bucket: string = KYC_BUCKET,
+    options: { isPublic?: boolean } = {}
+  ): Promise<string> {
     try {
-      const fileBuffer = await fs.readFile(localPath)
-
-      await this.s3.send(
+      await s3.send(
         new PutObjectCommand({
-          Bucket: this.bucket,
+          Bucket: bucket,
           Key: remoteKey,
-          Body: fileBuffer,
+          Body: buffer,
           ContentType: contentType,
-          // For KYC documents, we keep them private by default
-          ACL: 'private',
+          ACL: options.isPublic ? 'public-read' : 'private',
         })
       )
-      logger.info(`File uploaded to S3: ${remoteKey}`)
+      logger.info(`[Storage] Uploaded to ${bucket}/${remoteKey}`)
       return remoteKey
     } catch (error) {
-      logger.error(`Error uploading file to S3: ${error}`)
+      logger.error(`[Storage] uploadBuffer failed for ${bucket}/${remoteKey}:`, error)
       throw error
     }
   }
 
   /**
-   * Generate a signed URL for private file access
+   * Build a public CDN URL for files in a public Supabase Storage bucket.
+   * Pattern: <SUPABASE_STORAGE_PUBLIC_URL>/<bucket>/<key>
    */
-  static async getSignedUrl(key: string, expiresSeconds: number = 3600): Promise<string> {
+  static getPublicUrl(bucket: string, key: string): string {
+    if (!SUPABASE_STORAGE_PUBLIC_URL) {
+      throw new Error('SUPABASE_STORAGE_PUBLIC_URL is not configured')
+    }
+    const base = SUPABASE_STORAGE_PUBLIC_URL.replace(/\/$/, '')
+    return `${base}/${bucket}/${key}`
+  }
+
+  /**
+   * Generate a short-lived signed URL for private file access (e.g. KYC docs).
+   */
+  static async getSignedUrl(
+    key: string,
+    expiresSeconds: number = 3600,
+    bucket: string = KYC_BUCKET
+  ): Promise<string> {
     try {
       return await getS3SignedUrl(
-        this.s3,
-        new GetObjectCommand({
-          Bucket: this.bucket,
-          Key: key,
-        }),
+        s3,
+        new GetObjectCommand({ Bucket: bucket, Key: key }),
         { expiresIn: expiresSeconds }
       )
     } catch (error) {
-      logger.error(`Error generating signed URL: ${error}`)
+      logger.error(`[Storage] getSignedUrl failed for ${bucket}/${key}:`, error)
       throw error
     }
   }
 
   /**
-   * Delete a file from S3
+   * Delete a file from a bucket.
    */
-  static async deleteFile(key: string): Promise<void> {
+  static async deleteFile(key: string, bucket: string = KYC_BUCKET): Promise<void> {
     try {
-      await this.s3.send(
-        new DeleteObjectCommand({
-          Bucket: this.bucket,
-          Key: key,
-        })
-      )
-      logger.info(`File deleted from S3: ${key}`)
+      await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }))
+      logger.info(`[Storage] Deleted ${bucket}/${key}`)
     } catch (error) {
-      logger.error(`Error deleting file from S3: ${error}`)
+      logger.error(`[Storage] deleteFile failed for ${bucket}/${key}:`, error)
     }
   }
+
+  // Convenience accessors for bucket names
+  static get kycBucket() { return KYC_BUCKET }
+  static get mediaBucket() { return MEDIA_BUCKET }
 }

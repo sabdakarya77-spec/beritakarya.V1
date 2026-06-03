@@ -1,56 +1,78 @@
 import rateLimit from 'express-rate-limit'
-import RedisStore from 'rate-limit-redis'
-import { redis } from './redis'
+import { logger } from './logger'
 
-// Fungsi pembantu untuk membuat instance store baru dengan prefix unik
-const createStore = (prefix: string) => 
-  process.env.REDIS_HOST 
-    ? new RedisStore({ 
+/**
+ * Rate Limit Store Strategy:
+ *
+ * - Development lokal tanpa Redis: menggunakan MemoryStore (default express-rate-limit)
+ * - Produksi dengan Upstash/Redis: menggunakan RedisStore (rate-limit-redis)
+ *
+ * Di serverless (Vercel), MemoryStore tidak persistent antar invokasi,
+ * sehingga rate-limiting akan "longgar". Untuk produksi yang ketat,
+ * pastikan REDIS_HOST atau UPSTASH_REDIS_REST_URL diset.
+ */
+
+let createStore: ((prefix: string) => any) | undefined
+
+// Only attempt Redis store if REDIS_HOST is explicitly configured
+if (process.env.REDIS_HOST) {
+  try {
+    // Dynamic import to avoid crash if ioredis is not available
+    const RedisStore = require('rate-limit-redis').default
+    const { redis } = require('./redis')
+    createStore = (prefix: string) => {
+      if (!redis) return undefined
+      return new RedisStore({
         prefix: `rl:${prefix}:`,
-        // @ts-expect-error - ioredis type signature mismatch with spread operator
-        sendCommand: (...args: string[]) => redis.call(...args) 
-      }) 
-    : undefined
+        sendCommand: (...args: string[]) => redis.call(...args),
+      })
+    }
+    logger.info('[RateLimit] Using Redis store')
+  } catch {
+    logger.info('[RateLimit] Redis store unavailable, using in-memory store')
+  }
+}
+
+const getStore = (prefix: string) => createStore?.(prefix) ?? undefined
 
 export const authLimiter = rateLimit({
-  store: createStore('auth'),
+  store: getStore('auth'),
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 30, // 30 percobaan per 15 menit per IP
-  skipSuccessfulRequests: true, // hanya hitung request yang gagal (4xx/5xx)
+  max: 30,
+  skipSuccessfulRequests: true,
   message: {
     success: false,
     error: {
       code: 'RATE_LIMITED',
-      message: 'Terlalu banyak percobaan login. Coba lagi dalam 15 menit.'
-    }
+      message: 'Terlalu banyak percobaan login. Coba lagi dalam 15 menit.',
+    },
   },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 })
 
 export const apiLimiter = rateLimit({
-  store: createStore('api'),
+  store: getStore('api'),
   windowMs: 60 * 1000,
   max: 1000,
   message: {
     success: false,
     error: {
       code: 'RATE_LIMITED',
-      message: 'Terlalu banyak request. Coba lagi sebentar.'
-    }
+      message: 'Terlalu banyak request. Coba lagi sebentar.',
+    },
   },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 })
 
-/** Limit article create bursts per authenticated user (or IP). */
 const articleRateLimitKey = (req: { ip?: string; user?: { userId?: string } }) => {
   const user = (req as { user?: { userId?: string } }).user
   return user?.userId ? `user:${user.userId}` : `ip:${req.ip}`
 }
 
 export const articleWriteLimiter = rateLimit({
-  store: createStore('article-write'),
+  store: getStore('article-write'),
   windowMs: 60 * 60 * 1000,
   max: 30,
   keyGenerator: articleRateLimitKey,
@@ -58,15 +80,15 @@ export const articleWriteLimiter = rateLimit({
     success: false,
     error: {
       code: 'RATE_LIMITED',
-      message: 'Terlalu banyak pembuatan artikel. Coba lagi dalam 1 jam.'
-    }
+      message: 'Terlalu banyak pembuatan artikel. Coba lagi dalam 1 jam.',
+    },
   },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 })
 
 export const articleUpdateLimiter = rateLimit({
-  store: createStore('article-update'),
+  store: getStore('article-update'),
   windowMs: 60 * 60 * 1000,
   max: 120,
   keyGenerator: articleRateLimitKey,
@@ -74,24 +96,24 @@ export const articleUpdateLimiter = rateLimit({
     success: false,
     error: {
       code: 'RATE_LIMITED',
-      message: 'Terlalu banyak pembaruan artikel. Coba lagi dalam 1 jam.'
-    }
+      message: 'Terlalu banyak pembaruan artikel. Coba lagi dalam 1 jam.',
+    },
   },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 })
 
 export const aiLimiter = rateLimit({
-  store: createStore('ai'),
+  store: getStore('ai'),
   windowMs: 60 * 60 * 1000,
   max: 20,
   message: {
     success: false,
     error: {
       code: 'AI_RATE_LIMITED',
-      message: 'Batas penggunaan AI tercapai. Coba lagi dalam 1 jam.'
-    }
+      message: 'Batas penggunaan AI tercapai. Coba lagi dalam 1 jam.',
+    },
   },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 })
