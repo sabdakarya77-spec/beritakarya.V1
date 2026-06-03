@@ -85,50 +85,50 @@ async function main() {
   const subCategoriesData = [
     // Nasional
     { name: 'Politik', slug: 'politik', parentSlug: 'nasional', order: 1, color: 'violet', description: 'Dinamika politik tanah air, legislatif, dan eksekutif.' },
-    { name: 'Hukum & Keadilan', slug: 'hukum', parentSlug: 'nasional', order: 2, color: 'slate', description: 'Kasus peradilan, investigasi kriminal, dan penegakan hukum.' },
+    { name: 'Hukum & Keadilan', slug: 'hukum-keadilan', parentSlug: 'nasional', order: 2, color: 'slate', description: 'Kasus peradilan, investigasi kriminal, dan penegakan hukum.' },
     { name: 'Pendidikan', slug: 'pendidikan', parentSlug: 'nasional', order: 3, color: 'emerald', description: 'Kabar pendidikan, riset, dan akademisi.' },
     { name: 'Peristiwa', slug: 'peristiwa', parentSlug: 'nasional', order: 4, color: 'rose', description: 'Kejadian penting dan berita hangat hari ini.' },
     // Daerah
-    { name: 'DKI Jakarta & Banten', slug: 'jakarta', parentSlug: 'daerah', order: 1, color: 'blue', description: 'Kabar ibu kota dan wilayah Banten.' },
-    { name: 'Jawa Barat & Tengah', slug: 'jawa', parentSlug: 'daerah', order: 2, color: 'teal', description: 'Informasi seputar Jawa Barat dan Jawa Tengah.' },
-    { name: 'Jawa Timur & Bali', slug: 'bali', parentSlug: 'daerah', order: 3, color: 'amber', description: 'Berita Jawa Timur dan Pulau Dewata.' },
-    { name: 'Sumatera & Kalimantan', slug: 'sumatera', parentSlug: 'daerah', order: 4, color: 'orange', description: 'Berita dari wilayah Sumatera dan Kalimantan.' },
-    { name: 'Sulawesi & Papua', slug: 'sulawesi', parentSlug: 'daerah', order: 5, color: 'indigo', description: 'Informasi dari Sulawesi, Maluku, dan Papua.' },
-    { name: 'Kabar Desa', slug: 'desa', parentSlug: 'daerah', order: 6, color: 'emerald', description: 'Rangkuman aktivitas dan dinamika pedesaan.' },
+    { name: 'DKI Jakarta & Banten', slug: 'dki-jakarta-banten', parentSlug: 'daerah', order: 1, color: 'blue', description: 'Kabar ibu kota dan wilayah Banten.' },
+    { name: 'Jawa Barat & Tengah', slug: 'jawa-barat-tengah', parentSlug: 'daerah', order: 2, color: 'teal', description: 'Informasi seputar Jawa Barat dan Jawa Tengah.' },
+    { name: 'Jawa Timur & Bali', slug: 'jawa-timur-bali', parentSlug: 'daerah', order: 3, color: 'amber', description: 'Berita Jawa Timur dan Pulau Dewata.' },
+    { name: 'Sumatera & Kalimantan', slug: 'sumatera-kalimantan', parentSlug: 'daerah', order: 4, color: 'orange', description: 'Berita dari wilayah Sumatera dan Kalimantan.' },
+    { name: 'Sulawesi & Papua', slug: 'sulawesi-papua', parentSlug: 'daerah', order: 5, color: 'indigo', description: 'Informasi dari Sulawesi, Maluku, dan Papua.' },
+    { name: 'Kabar Desa', slug: 'kabar-desa', parentSlug: 'daerah', order: 6, color: 'emerald', description: 'Rangkuman aktivitas dan dinamika pedesaan.' },
     // Ekonomi
-    { name: 'Makro & Keuangan', slug: 'keuangan', parentSlug: 'ekonomi', order: 1, color: 'emerald', description: 'Ekonomi makro, perbankan, dan kebijakan keuangan.' },
-    { name: 'Bisnis & Saham', slug: 'bisnis', parentSlug: 'ekonomi', order: 2, color: 'violet', description: 'Dinamika pasar saham, investasi, dan korporasi.' },
+    { name: 'Makro & Keuangan', slug: 'makro-keuangan', parentSlug: 'ekonomi', order: 1, color: 'emerald', description: 'Ekonomi makro, perbankan, dan kebijakan keuangan.' },
+    { name: 'Bisnis & Saham', slug: 'bisnis-saham', parentSlug: 'ekonomi', order: 2, color: 'violet', description: 'Dinamika pasar saham, investasi, dan korporasi.' },
     { name: 'UMKM', slug: 'umkm', parentSlug: 'ekonomi', order: 3, color: 'amber', description: 'Perkembangan usaha mikro, kecil, dan menengah.' },
     { name: 'Industrial', slug: 'industrial', parentSlug: 'ekonomi', order: 4, color: 'blue', description: 'Sektor manufaktur, komoditas, dan industri.' },
     // Olahraga
     { name: 'Piala Dunia', slug: 'piala-dunia', parentSlug: 'olahraga', order: 1, color: 'amber', description: 'Liputan khusus turnamen akbar sepak bola sejagat.' },
-    { name: 'Timnas Garuda', slug: 'timnas', parentSlug: 'olahraga', order: 2, color: 'red', description: 'Perjuangan punggawa Tim Nasional Indonesia.' },
+    { name: 'Timnas Garuda', slug: 'timnas-garuda', parentSlug: 'olahraga', order: 2, color: 'red', description: 'Perjuangan punggawa Tim Nasional Indonesia.' },
     { name: 'Sepak Bola', slug: 'sepak-bola', parentSlug: 'olahraga', order: 3, color: 'blue', description: 'Kompetisi liga domestik dan internasional.' },
     { name: 'Ragam Olahraga', slug: 'ragam-olahraga', parentSlug: 'olahraga', order: 4, color: 'slate', description: 'Berita bulutangkis, otomotif, basket, dan lainnya.' },
     // Teknologi
-    { name: 'Gadget & Review', slug: 'gadget', parentSlug: 'teknologi', order: 1, color: 'blue', description: 'Ulasan gawai, smartphone, dan perangkat cerdas terbaru.' },
-    { name: 'AI & Inovasi', slug: 'ai', parentSlug: 'teknologi', order: 2, color: 'purple', description: 'Kecerdasan buatan, riset ilmiah, dan robotika.' },
-    { name: 'Startups & Digital', slug: 'startups', parentSlug: 'teknologi', order: 3, color: 'teal', description: 'Ekosistem startup dan bisnis digital tanah air.' },
-    { name: 'Game & Esports', slug: 'game', parentSlug: 'teknologi', order: 4, color: 'violet', description: 'Dunia gaming, turnamen esports, dan konsol game.' },
+    { name: 'Gadget & Review', slug: 'gadget-review', parentSlug: 'teknologi', order: 1, color: 'blue', description: 'Ulasan gawai, smartphone, dan perangkat cerdas terbaru.' },
+    { name: 'AI & Inovasi', slug: 'ai-inovasi', parentSlug: 'teknologi', order: 2, color: 'purple', description: 'Kecerdasan buatan, riset ilmiah, dan robotika.' },
+    { name: 'Startups & Digital', slug: 'startups-digital', parentSlug: 'teknologi', order: 3, color: 'teal', description: 'Ekosistem startup dan bisnis digital tanah air.' },
+    { name: 'Game & Esports', slug: 'game-esports', parentSlug: 'teknologi', order: 4, color: 'violet', description: 'Dunia gaming, turnamen esports, dan konsol game.' },
     // Opini
-    { name: 'Kolom & Esai', slug: 'kolom', parentSlug: 'opini', order: 1, color: 'indigo', description: 'Sumbangan tulisan dari para pemikir dan akademisi.' },
-    { name: 'Tajuk Rencana', slug: 'tajuk', parentSlug: 'opini', order: 2, color: 'slate', description: 'Sikap redaksi terhadap isu-isu krusial nasional.' },
+    { name: 'Kolom & Esai', slug: 'kolom-esai', parentSlug: 'opini', order: 1, color: 'indigo', description: 'Sumbangan tulisan dari para pemikir dan akademisi.' },
+    { name: 'Tajuk Rencana', slug: 'tajuk-rencana', parentSlug: 'opini', order: 2, color: 'slate', description: 'Sikap redaksi terhadap isu-isu krusial nasional.' },
     { name: 'Wawancara', slug: 'wawancara', parentSlug: 'opini', order: 3, color: 'rose', description: 'Tanya jawab mendalam dengan tokoh inspiratif.' },
     // Investigasi
     { name: 'Laporan Investigasi', slug: 'laporan-investigasi', parentSlug: 'investigasi', order: 1, color: 'red', description: 'Laporan eksklusif hasil investigasi tim redaksi.' },
-    { name: 'Sorotan Khusus', slug: 'sorotan', parentSlug: 'investigasi', order: 2, color: 'amber', description: 'Liputan mendalam mengenai isu sosial kemasyarakatan.' },
+    { name: 'Sorotan Khusus', slug: 'sorotan-khusus', parentSlug: 'investigasi', order: 2, color: 'amber', description: 'Liputan mendalam mengenai isu sosial kemasyarakatan.' },
     // Gaya Hidup (lifestyle)
-    { name: 'Wisata & Kuliner', slug: 'wisata', parentSlug: 'lifestyle', order: 1, color: 'teal', description: 'Rekomendasi destinasi wisata dan petualangan rasa kuliner.' },
-    { name: 'Kesehatan & Wellness', slug: 'kesehatan', parentSlug: 'lifestyle', order: 2, color: 'green', description: 'Tips hidup sehat, nutrisi, dan kebugaran mental.' },
-    { name: 'Seni, Film & Fesyen', slug: 'seni', parentSlug: 'lifestyle', order: 3, color: 'rose', description: 'Resensi seni pertunjukan, perfilman, dan gaya busana.' },
+    { name: 'Wisata & Kuliner', slug: 'wisata-kuliner', parentSlug: 'lifestyle', order: 1, color: 'teal', description: 'Rekomendasi destinasi wisata dan petualangan rasa kuliner.' },
+    { name: 'Kesehatan & Wellness', slug: 'kesehatan-wellness', parentSlug: 'lifestyle', order: 2, color: 'green', description: 'Tips hidup sehat, nutrisi, dan kebugaran mental.' },
+    { name: 'Seni, Film & Fesyen', slug: 'seni-film-fesyen', parentSlug: 'lifestyle', order: 3, color: 'rose', description: 'Resensi seni pertunjukan, perfilman, dan gaya busana.' },
     { name: 'Otomotif', slug: 'otomotif', parentSlug: 'lifestyle', order: 4, color: 'slate', description: 'Modifikasi, review kendaraan baru, dan tren transportasi.' },
     // Advertorial
     { name: 'Info Bisnis', slug: 'info-bisnis', parentSlug: 'advertorial', order: 1, color: 'yellow', description: 'Ulasan produk and strategi perkembangan bisnis.' },
     { name: 'Rilis Pers', slug: 'rilis-pers', parentSlug: 'advertorial', order: 2, color: 'orange', description: 'Pernyataan resmi perusahaan dan lembaga.' },
     // Video
-    { name: 'Dokumenter & Reportase', slug: 'dokumenter', parentSlug: 'video', order: 1, color: 'sky', description: 'Liputan audio-visual eksklusif di lapangan.' },
+    { name: 'Dokumenter & Reportase', slug: 'dokumenter-reportase', parentSlug: 'video', order: 1, color: 'sky', description: 'Liputan audio-visual eksklusif di lapangan.' },
     { name: 'Galeri Foto', slug: 'galeri-foto', parentSlug: 'video', order: 2, color: 'pink', description: 'Karya jurnalistik dalam lensa fotografi.' },
-    { name: 'Podcast & Audio', slug: 'podcast', parentSlug: 'video', order: 3, color: 'indigo', description: 'Obrolan santai dan informatif seputar isu terhangat.' }
+    { name: 'Podcast & Audio', slug: 'podcast-audio', parentSlug: 'video', order: 3, color: 'indigo', description: 'Obrolan santai dan informatif seputar isu terhangat.' }
   ]
 
   for (const sub of subCategoriesData) {
@@ -217,7 +217,7 @@ async function main() {
     {
       title: 'KPK Usut Dugaan Korupsi Pengadaan Infrastruktur Jalan Lintas Sumatera Timur',
       slug: 'kpk-usut-dugaan-korupsi-jalan-sumatera',
-      categoryId: categoriesMap['hukum'],
+      categoryId: categoriesMap['hukum-keadilan'],
       featuredImage: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=60',
       featuredImageColor: '#1a1d20',
       excerpt: 'Penyidik mulai menggeledah sejumlah kantor dinas pekerjaan umum menyusul laporan kerugian negara yang ditaksir mencapai ratusan miliar rupiah.',
