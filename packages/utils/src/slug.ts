@@ -1,5 +1,7 @@
 export function generateSlug(title: string): string {
   return title
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim()
     // Convert spaces to dashes first
