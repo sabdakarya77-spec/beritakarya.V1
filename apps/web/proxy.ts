@@ -18,10 +18,20 @@ export function proxy(req: NextRequest) {
       subdomain = parts[0]
     }
   } else {
-    // Handle bandung.beritakarya.co or beritakarya.co
+    // Handle bandung.beritakarya.co, beritakarya.co, and Vercel/Railway default domains
     const parts = hostname.split('.')
-    if (parts.length > 2) {
-      subdomain = parts[0]
+    if (hostname.endsWith('.vercel.app')) {
+      if (parts.length > 3) {
+        subdomain = parts[0]
+      }
+    } else if (hostname.endsWith('.up.railway.app')) {
+      if (parts.length > 4) {
+        subdomain = parts[0]
+      }
+    } else {
+      if (parts.length > 2) {
+        subdomain = parts[0]
+      }
     }
   }
 
