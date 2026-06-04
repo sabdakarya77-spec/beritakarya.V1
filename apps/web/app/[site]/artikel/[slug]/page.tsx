@@ -174,8 +174,8 @@ export default async function ArticlePage({ params }: Props) {
   const badgeVariant = resolveArticleBadge(article);
   const readingTime = article.readingTimeMin || Math.max(1, Math.ceil((article.wordCount || 0) / 200)) || 3;
   const articleRailClassName = 'xl:grid xl:grid-cols-[minmax(0,1.75fr)_20rem] 2xl:grid-cols-[minmax(0,1.75fr)_22.5rem] xl:justify-between xl:gap-12 2xl:gap-16'
-  const sidebarCardClass = 'rounded-[1.75rem] border border-gray-100 bg-white p-5 shadow-[0_20px_60px_rgba(15,23,42,0.06)] dark:border-white/5 dark:bg-white/[0.02] dark:shadow-[0_20px_60px_rgba(0,0,0,0.28)]'
-  const sidebarLabelClass = 'flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400'
+  const sidebarCardClass = 'rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.03)] dark:border-white/5 dark:bg-white/[0.02]'
+  const sidebarLabelClass = 'flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400'
 
   return (
     <PublicSiteLayout siteConfig={siteConfig}>
@@ -185,19 +185,19 @@ export default async function ArticlePage({ params }: Props) {
       <ImageLightboxWrapper>
         <article className="min-h-screen bg-[var(--bg-main)] dark:bg-[#020617]">
           {/* --- HEADER SECTION --- */}
-          <header className="w-full pt-8 pb-8 md:pt-12 md:pb-12 border-b border-gray-100 dark:border-white/5">
+          <header className="w-full pt-6 pb-6 md:pt-8 md:pb-8 border-b border-gray-100 dark:border-white/5">
             <Container>
               <div className="max-w-5xl 2xl:max-w-[68rem]">
-                <div className="flex flex-col items-start gap-4 mb-8 md:mb-10 lg:mb-12">
+                <div className="flex flex-col items-start gap-3.5 mb-6 md:mb-8">
                   <div className="flex flex-wrap items-center gap-3 md:gap-4">
                     {badgeVariant && (
                       <EditorialBadge
                         variant={badgeVariant}
                         size="sm"
-                        className="rounded-full px-3 py-1 shadow-sm shadow-black/5"
+                        className="rounded-full px-2.5 py-0.5 shadow-sm shadow-black/5"
                       />
                     )}
-                    <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-wide">
+                    <div className="flex items-center gap-2.5 text-[10px] font-semibold uppercase tracking-wide">
                       <span className="text-brand-red">
                         {article.category?.name || 'NASIONAL'}
                       </span>
@@ -211,50 +211,50 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
                 </div>
 
-                <h1 className="text-2xl md:text-4xl lg:text-5xl font-serif font-black text-brand-black dark:text-white leading-[1.1] tracking-tighter mb-8 md:mb-10 lg:mb-12">
+                <h1 className="text-xl md:text-3xl lg:text-[2.2rem] font-sans font-extrabold text-brand-black dark:text-white leading-[1.15] tracking-tight mb-6 md:mb-8">
                   {article.title}
                 </h1>
 
-                <div className="border-t border-gray-100 pt-8 dark:border-white/10 md:pt-10">
-                  <div className="space-y-5 md:space-y-6">
-                    <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between xl:gap-12">
-                      <div className="flex items-start gap-4 md:gap-5 xl:min-w-[19rem]">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-red text-lg font-serif italic text-white shadow-lg shadow-brand-red/20">
+                <div className="border-t border-gray-100 pt-6 dark:border-white/10 md:pt-8">
+                  <div className="space-y-4 md:space-y-5">
+                    <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between xl:gap-10">
+                      <div className="flex items-start gap-3.5 md:gap-4 xl:min-w-[19rem]">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-red text-md font-sans font-bold text-white shadow-md">
                         {article.author?.name?.[0] || 'R'}
                         </div>
                         <div className="min-w-0 text-left">
-                          <div className="text-[11px] font-bold text-brand-black dark:text-white">{article.author?.name || 'Redaksi'}</div>
-                          <div className="mt-0.5 text-[10px] font-medium text-brand-text-muted">Staf Redaksi BeritaKarya</div>
+                          <div className="text-[10px] font-bold text-brand-black dark:text-white">{article.author?.name || 'Redaksi'}</div>
+                          <div className="mt-0.5 text-[9px] font-medium text-brand-text-muted">Staf Redaksi BeritaKarya</div>
                           {article.author?.id && (
                             <Link
                               href={`/${siteParam}/penulis/${article.author.id}`}
-                              className="mt-2.5 inline-flex text-[10px] font-black uppercase tracking-[0.18em] text-brand-red transition-colors hover:text-brand-black dark:hover:text-white"
+                              className="mt-1.5 inline-flex text-[9px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors hover:text-brand-black dark:hover:text-white"
                             >
                               Lihat Profil
                             </Link>
                           )}
                         </div>
                       </div>
-                      <div className="flex flex-wrap items-center gap-3 md:gap-4 xl:ml-auto xl:flex-nowrap xl:justify-end">
-                        <div className="inline-flex h-11 items-center gap-2.5 rounded-full border border-black/[0.06] bg-white/80 px-4.5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-text-muted shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:text-gray-300 dark:shadow-none">
-                          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-red/10 text-brand-red dark:bg-brand-red/15">
-                            <BookOpen size={13} />
+                      <div className="flex flex-wrap items-center gap-2.5 md:gap-3 xl:ml-auto xl:flex-nowrap xl:justify-end">
+                        <div className="inline-flex h-9 items-center gap-2 rounded-lg border border-black/[0.06] bg-white/80 px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text-muted shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:text-gray-300 dark:shadow-none">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-red/10 text-brand-red dark:bg-brand-red/15">
+                            <BookOpen size={11} />
                           </span>
                           <span>{readingTime} Menit Baca</span>
                         </div>
-                        <div className="inline-flex h-11 items-center gap-2.5 rounded-full border border-black/[0.06] bg-white/80 px-4.5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-text-muted shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:text-gray-300 dark:shadow-none">
-                          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-red/10 text-brand-red dark:bg-brand-red/15">
-                            <Printer size={13} />
+                        <div className="inline-flex h-9 items-center gap-2 rounded-lg border border-black/[0.06] bg-white/80 px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text-muted shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:text-gray-300 dark:shadow-none">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-red/10 text-brand-red dark:bg-brand-red/15">
+                            <Printer size={11} />
                           </span>
                           <span>{article.wordCount || 0} Kata</span>
                         </div>
                         <ArticleBookmarkButton
                           article={article}
                           site={siteParam}
-                          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] bg-white/80 shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-black/[0.06] bg-white/80 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none"
                           activeClassName="border-brand-red/40 bg-brand-red/6 text-brand-red"
                           idleClassName="text-brand-text-muted hover:text-brand-red hover:border-brand-red/30"
-                          iconSize={16}
+                          iconSize={14}
                         />
                       </div>
                     </div>
@@ -266,11 +266,11 @@ export default async function ArticlePage({ params }: Props) {
           </header>
 
           {/* --- HERO IMAGE --- */}
-          <div className="mb-16 md:mb-20">
+          <div className="mb-10 md:mb-12">
             <Container>
-              <figure className="mx-auto max-w-3xl space-y-4 md:space-y-5">
-                <div className="rounded-2xl border border-black/[0.06] bg-white/95 p-3 shadow-[0_28px_90px_rgba(15,23,42,0.08)] dark:border-white/[0.08] dark:bg-white/[0.03] dark:shadow-[0_28px_90px_rgba(0,0,0,0.45)] md:p-4">
-                  <div className="relative w-full overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-900">
+              <figure className="mx-auto max-w-2xl space-y-3">
+                <div className="rounded-xl border border-black/[0.06] bg-white/95 p-1.5 shadow-[0_12px_30px_rgba(15,23,42,0.04)] dark:border-white/[0.08] dark:bg-white/[0.03] md:p-2">
+                  <div className="relative w-full overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-900">
                     <SmartImage 
                       src={coverImage} 
                       blur={article.featuredImageBlur}
@@ -278,8 +278,8 @@ export default async function ArticlePage({ params }: Props) {
                       context="article_cover"
                       alt={article.title}
                       fill={false}
-                      width={900}
-                      height={600}
+                      width={750}
+                      height={450}
                       className="w-full h-auto object-contain"
                       priority
                     />
@@ -288,11 +288,11 @@ export default async function ArticlePage({ params }: Props) {
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/18 to-transparent dark:from-black/28" />
                   </div>
                 </div>
-                <figcaption className="mt-4 grid gap-2 text-brand-text-muted dark:text-gray-400 md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-4">
-                  <p className="text-sm italic leading-relaxed">
+                <figcaption className="mt-2.5 grid gap-1.5 text-brand-text-muted dark:text-gray-400 md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-4">
+                  <p className="text-xs italic leading-relaxed">
                     {coverImageCaption || ''}
                   </p>
-                  <span className="text-[9px] font-black uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500 md:justify-self-end">
+                  <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 md:justify-self-end">
                     Foto / Dokumentasi Redaksi
                   </span>
                 </figcaption>
@@ -302,17 +302,17 @@ export default async function ArticlePage({ params }: Props) {
 
           {/* --- CONTENT SECTION --- */}
           <Container>
-            <div className={cn(articleRailClassName, 'mb-20 md:mb-28')}>
+            <div className={cn(articleRailClassName, 'mb-12 md:mb-16')}>
               {/* Main Content */}
-              <div className="min-w-0 xl:grid xl:grid-cols-[4.25rem_minmax(0,43rem)] xl:gap-8 2xl:grid-cols-[4.5rem_minmax(0,45rem)]">
+              <div className="min-w-0 xl:grid xl:grid-cols-[4.25rem_minmax(0,40rem)] xl:gap-8 2xl:grid-cols-[4.5rem_minmax(0,42rem)]">
                 <div className="hidden xl:block">
                   <div className="sticky top-32">
                     <ArticleFloatingTools title={article.title} url={articleUrl} />
                   </div>
                 </div>
                 <div className="min-w-0">
-                  <div className="space-y-12">
-                    <div className="article-content max-w-[43rem] space-y-12 text-left transition-all duration-300 xl:max-w-none 2xl:max-w-none">
+                  <div className="space-y-8">
+                    <div className="article-content max-w-[40rem] space-y-8 text-left transition-all duration-300 xl:max-w-none 2xl:max-w-none">
                       {(article.blocks as Block[]).map((block: Block, i: number) => (
                         <PublicBlock key={i} block={block} />
                       ))}
@@ -320,7 +320,7 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
 
                   {/* Share & Save Section (Inline at the end of article) */}
-                  <div className="mt-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-y border-gray-100 py-6 dark:border-white/5">
+                  <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-y border-gray-100 py-4 dark:border-white/5">
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Bagikan:</span>
                       <ArticleShareActions title={article.title} url={articleUrl} variant="inline" />
@@ -330,21 +330,21 @@ export default async function ArticlePage({ params }: Props) {
                       <ArticleBookmarkButton
                         article={article}
                         site={siteParam}
-                        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition-all hover:scale-105 active:scale-95 dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-black/[0.06] bg-white shadow-sm transition-all hover:scale-105 active:scale-95 dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none"
                         activeClassName="border-brand-red/40 bg-brand-red/10 text-brand-red"
                         idleClassName="text-brand-text-muted hover:text-brand-red hover:border-brand-red/30"
-                        iconSize={16}
+                        iconSize={14}
                       />
                     </div>
                   </div>
 
                   {/* Tags */}
-                  <div className="mt-16 flex flex-wrap gap-3 border-t border-gray-100 pt-10 dark:border-white/5 md:mt-20 md:pt-12">
+                  <div className="mt-10 flex flex-wrap gap-2 border-t border-gray-100 pt-6 dark:border-white/5 md:mt-12 md:pt-8">
                     {(article.tags || ['Investigasi', 'KaryaNyata', 'Nusantara', 'Politik']).map((tag: string) => (
                       <Link 
                         key={tag} 
                         href={`/${siteParam}?q=${encodeURIComponent(tag)}`}
-                        className="px-5 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-[10px] font-black text-brand-text-muted dark:text-gray-400 uppercase tracking-[0.2em] hover:bg-brand-red hover:text-white hover:border-brand-red transition-all rounded-full"
+                        className="px-3.5 py-1.5 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-[9px] font-bold text-brand-text-muted dark:text-gray-400 uppercase tracking-[0.2em] hover:bg-brand-red hover:text-white hover:border-brand-red transition-all rounded-md"
                       >
                         #{tag}
                       </Link>
@@ -357,27 +357,27 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
 
                   {/* Recommended Articles */}
-                  <section className="mt-16 border-t border-gray-100 pt-12 dark:border-white/5 md:mt-20 md:pt-14">
-                    <div className="mb-10 flex items-center gap-3">
-                      <div className="h-8 w-1 bg-brand-red" />
+                  <section className="mt-10 border-t border-gray-100 pt-8 dark:border-white/5 md:mt-12 md:pt-10">
+                    <div className="mb-6 flex items-center gap-2.5">
+                      <div className="h-5 w-0.75 bg-brand-red" />
                       <div>
-                        <h3 className="text-xl font-black uppercase tracking-tight text-brand-black dark:text-white">
+                        <h3 className="text-lg font-bold uppercase tracking-tight text-brand-black dark:text-white">
                           Rekomendasi Artikel
                         </h3>
-                        <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">
+                        <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-gray-400">
                           Lanjutkan bacaan terkait topik ini
                         </p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                       {relatedArticles.length > 0 ? (
                         relatedArticles.map((rel: any) => (
                           <NewsCard key={rel.id} article={rel} variant="medium" site={siteParam} />
                         ))
                       ) : (
-                        <div className="col-span-full rounded-3xl border border-dashed border-gray-200 px-6 py-12 text-center dark:border-white/10">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        <div className="col-span-full rounded-2xl border border-dashed border-gray-200 px-4 py-8 text-center dark:border-white/10">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
                             Belum ada rekomendasi artikel terkait.
                           </p>
                         </div>
@@ -389,45 +389,45 @@ export default async function ArticlePage({ params }: Props) {
 
               {/* Sidebar */}
               <aside className="hidden xl:block">
-                <div className="sticky top-32 space-y-6">
-                  <div className={cn(sidebarCardClass, 'space-y-4')}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
+                <div className="sticky top-32 space-y-4">
+                  <div className={cn(sidebarCardClass, 'space-y-3.5')}>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400">
                       Bagikan & Simpan
                     </p>
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2.5">
                       <ArticleShareActions title={article.title} url={articleUrl} />
                       <ArticleBookmarkButton
                         article={article}
                         site={siteParam}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white dark:border-white/10 dark:bg-white/[0.03]"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white dark:border-white/10 dark:bg-white/[0.03]"
                         activeClassName="border-brand-red/40 bg-brand-red/5 text-brand-red"
                         idleClassName="text-brand-text-muted hover:text-brand-red hover:border-brand-red/40"
-                        iconSize={16}
+                        iconSize={14}
                       />
                     </div>
                   </div>
 
-                  <div className={cn(sidebarCardClass, 'space-y-4')}>
+                  <div className={cn(sidebarCardClass, 'space-y-3.5')}>
                     <div className={sidebarLabelClass}>
-                      <Sparkles size={14} className="text-brand-red" />
+                      <Sparkles size={12} className="text-brand-red" />
                       Info Artikel
                     </div>
-                    <div className="rounded-[1.35rem] border border-gray-100 bg-gray-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
-                      <div className="flex items-start gap-3.5">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-red text-sm font-serif font-black text-white shadow-lg shadow-brand-red/20">
+                    <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-3 dark:border-white/5 dark:bg-white/[0.03]">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-red text-xs font-sans font-bold text-white shadow-md shadow-brand-red/10">
                           {article.author?.name?.[0] || 'R'}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">
+                          <p className="text-[8px] font-bold uppercase tracking-[0.16em] text-gray-400">
                             Penulis
                           </p>
-                          <p className="mt-1.5 text-sm font-black leading-snug text-brand-black dark:text-white">
+                          <p className="mt-1 text-xs font-bold leading-snug text-brand-black dark:text-white">
                             {article.author?.name || 'Redaksi'}
                           </p>
                           {authorProfilePath && (
                             <Link
                               href={authorProfilePath}
-                              className="mt-2 inline-flex items-center rounded-full bg-brand-red/8 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-brand-red transition-colors hover:bg-brand-red hover:text-white dark:bg-brand-red/12"
+                              className="mt-1.5 inline-flex items-center rounded-md bg-brand-red/8 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-brand-red transition-colors hover:bg-brand-red hover:text-white dark:bg-brand-red/12"
                             >
                               Lihat Profil
                             </Link>
@@ -435,31 +435,31 @@ export default async function ArticlePage({ params }: Props) {
                         </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3.5 dark:border-white/5 dark:bg-white/[0.03]">
-                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-                          <BookOpen size={12} className="text-brand-red" />
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-white/5 dark:bg-white/[0.03]">
+                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                          <BookOpen size={10} className="text-brand-red" />
                           Baca
                         </div>
-                        <p className="mt-2.5 text-sm font-black text-brand-black dark:text-white">
+                        <p className="mt-2 text-xs font-bold text-brand-black dark:text-white">
                           {readingTime} menit
                         </p>
                       </div>
-                      <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3.5 dark:border-white/5 dark:bg-white/[0.03]">
-                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-                          <Printer size={12} className="text-brand-red" />
+                      <div className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-white/5 dark:bg-white/[0.03]">
+                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                          <Printer size={10} className="text-brand-red" />
                           Kata
                         </div>
-                        <p className="mt-2.5 text-sm font-black text-brand-black dark:text-white">
+                        <p className="mt-2 text-xs font-bold text-brand-black dark:text-white">
                           {(article.wordCount || 0).toLocaleString('id-ID')}
                         </p>
                       </div>
-                      <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3.5 dark:border-white/5 dark:bg-white/[0.03]">
-                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-                          <CalendarDays size={12} className="text-brand-red" />
+                      <div className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-white/5 dark:bg-white/[0.03]">
+                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                          <CalendarDays size={10} className="text-brand-red" />
                           Terbit
                         </div>
-                        <p className="mt-2.5 text-sm font-black text-brand-black dark:text-white">
+                        <p className="mt-2 text-xs font-bold text-brand-black dark:text-white">
                           {new Date(article.publishedAt).toLocaleDateString('id-ID', {
                             day: 'numeric',
                             month: 'short',
@@ -467,41 +467,41 @@ export default async function ArticlePage({ params }: Props) {
                           })}
                         </p>
                       </div>
-                      <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3.5 dark:border-white/5 dark:bg-white/[0.03]">
-                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-                          <User2 size={12} className="text-brand-red" />
+                      <div className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-white/5 dark:bg-white/[0.03]">
+                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                          <User2 size={10} className="text-brand-red" />
                           Kanal
                         </div>
-                        <p className="mt-2.5 text-sm font-black text-brand-black dark:text-white">
+                        <p className="mt-2 text-xs font-bold text-brand-black dark:text-white">
                           {article.category?.name || 'Umum'}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className={cn(sidebarCardClass, 'space-y-5')}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
+                  <div className={cn(sidebarCardClass, 'space-y-4')}>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400">
                       Kategori Terkait
                     </p>
-                    <div className="space-y-5">
+                    <div className="space-y-4">
                       {sidebarRelatedArticles.length > 0 ? (
                         sidebarRelatedArticles.map((rel: any) => (
                           <NewsCard key={rel.id} article={rel} variant="minimal" site={siteParam} />
                         ))
                       ) : (
-                        <div className="rounded-[1.35rem] border border-dashed border-gray-200 bg-gray-50/70 px-5 py-7 text-center dark:border-white/10 dark:bg-white/[0.03]">
-                          <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-red/8 text-brand-red dark:bg-brand-red/12">
-                            <BookOpen size={16} />
+                        <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50/70 px-4 py-5 text-center dark:border-white/10 dark:bg-white/[0.03]">
+                          <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-brand-red/8 text-brand-red dark:bg-brand-red/12">
+                            <BookOpen size={14} />
                           </div>
-                          <p className="mt-4 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
+                          <p className="mt-3 text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400">
                             Belum Ada Artikel Lain
                           </p>
-                          <p className="mt-2 text-xs leading-relaxed text-brand-text-muted dark:text-gray-400">
+                          <p className="mt-1 text-xs leading-relaxed text-brand-text-muted dark:text-gray-400">
                             Jelajahi berita terbaru untuk menemukan artikel lain dari kategori ini.
                           </p>
                           <Link
                             href={`/${siteParam}${article.category?.name ? `?cat=${encodeURIComponent(article.category.name)}` : ''}`}
-                            className="mt-4 inline-flex rounded-full bg-brand-red px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-brand-red/90"
+                            className="mt-3 inline-flex rounded-md bg-brand-red px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-brand-red/90"
                           >
                             Lihat Kategori Ini
                           </Link>
@@ -511,9 +511,9 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
 
                   {(article.tags || []).length > 0 && (
-                    <div className={cn(sidebarCardClass, 'space-y-4')}>
+                    <div className={cn(sidebarCardClass, 'space-y-3.5')}>
                       <div className={sidebarLabelClass}>
-                        <Tags size={14} className="text-brand-red" />
+                        <Tags size={12} className="text-brand-red" />
                         Topik Terkait
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -521,7 +521,7 @@ export default async function ArticlePage({ params }: Props) {
                           <Link
                             key={tag}
                             href={`/${siteParam}?q=${encodeURIComponent(tag)}`}
-                            className="rounded-full border border-gray-100 bg-gray-50 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-gray-500 transition-colors hover:border-brand-red/20 hover:bg-brand-red/5 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-300"
+                            className="rounded-md border border-gray-100 bg-gray-50 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-gray-500 transition-colors hover:border-brand-red/20 hover:bg-brand-red/5 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-300"
                           >
                             #{tag}
                           </Link>
@@ -542,10 +542,9 @@ export default async function ArticlePage({ params }: Props) {
     </PublicSiteLayout>
   )
 }
-
 function PublicBlock({ block }: { block: Block }) {
   const bodyTextClass =
-    'font-sans text-[calc(1.05rem*var(--article-font-scale,1))] leading-[calc(2rem*var(--article-font-scale,1))] antialiased text-left md:text-[calc(1.125rem*var(--article-font-scale,1))] md:leading-[calc(2.08rem*var(--article-font-scale,1))]';
+    'font-sans text-[calc(1rem*var(--article-font-scale,1))] leading-[calc(1.75rem*var(--article-font-scale,1))] antialiased text-left md:text-[calc(1.05rem*var(--article-font-scale,1))] md:leading-[calc(1.85rem*var(--article-font-scale,1))]';
 
   switch (block.type) {
     case 'paragraph':
@@ -559,14 +558,14 @@ function PublicBlock({ block }: { block: Block }) {
       const Tag = `h${block.level}` as any
       const headingSizeClass =
         block.level === 2
-          ? 'text-[calc(1.5rem*var(--article-font-scale,1))] md:text-[calc(2.35rem*var(--article-font-scale,1))]'
+          ? 'text-[calc(1.35rem*var(--article-font-scale,1))] md:text-[calc(1.75rem*var(--article-font-scale,1))]'
           : block.level === 3
-            ? 'text-[calc(1.25rem*var(--article-font-scale,1))] md:text-[calc(1.9rem*var(--article-font-scale,1))]'
-            : 'text-[calc(1.125rem*var(--article-font-scale,1))] md:text-[calc(1.5rem*var(--article-font-scale,1))]'
+            ? 'text-[calc(1.15rem*var(--article-font-scale,1))] md:text-[calc(1.45rem*var(--article-font-scale,1))]'
+            : 'text-[calc(1rem*var(--article-font-scale,1))] md:text-[calc(1.25rem*var(--article-font-scale,1))]'
       return (
         <Tag
           className={cn(
-            'mt-16 mb-8 font-serif font-black leading-tight tracking-tight text-balance text-brand-black dark:text-white md:mt-20 md:mb-10',
+            'mt-10 mb-5 font-sans font-extrabold leading-tight tracking-tight text-balance text-brand-black dark:text-white md:mt-12 md:mb-6',
             headingSizeClass
           )}
           dangerouslySetInnerHTML={{ __html: block.content || '' }}
@@ -574,20 +573,20 @@ function PublicBlock({ block }: { block: Block }) {
       )
     case 'quote':
       return (
-        <div className="relative my-16 rounded-r-2xl border-l-4 border-brand-red bg-gray-50 px-6 py-10 dark:bg-white/[0.03] md:px-10 md:py-12 lg:px-16">
-          <span className="absolute left-5 top-5 text-7xl font-serif leading-none text-brand-red opacity-10 select-none md:left-8 md:top-6 md:text-8xl">“</span>
-          <blockquote className="relative z-10 font-serif text-[calc(1.25rem*var(--article-font-scale,1))] italic leading-[calc(1.9rem*var(--article-font-scale,1))] text-brand-black dark:text-white md:text-[calc(1.65rem*var(--article-font-scale,1))] md:leading-[calc(2.5rem*var(--article-font-scale,1))]">
+        <div className="relative my-10 rounded-r-xl border-l-4 border-brand-red bg-gray-50 px-5 py-8 dark:bg-white/[0.03] md:px-8 md:py-10 lg:px-12">
+          <span className="absolute left-4 top-4 text-6xl font-serif leading-none text-brand-red opacity-10 select-none md:left-6 md:top-5 md:text-7xl">“</span>
+          <blockquote className="relative z-10 font-sans text-[calc(1.1rem*var(--article-font-scale,1))] italic leading-[calc(1.7rem*var(--article-font-scale,1))] text-brand-black dark:text-white md:text-[calc(1.35rem*var(--article-font-scale,1))] md:leading-[calc(2.1rem*var(--article-font-scale,1))]">
             <span dangerouslySetInnerHTML={{ __html: block.content || '' }} />
             {block.attribution && (
-              <footer className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-red mt-6">— {block.attribution}</footer>
+              <footer className="text-[9px] font-bold uppercase tracking-[0.2em] text-brand-red mt-4">— {block.attribution}</footer>
             )}
           </blockquote>
         </div>
       )
     case 'image':
       return (
-        <figure className="my-16">
-          <div className="relative aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-100 dark:border-white/5">
+        <figure className="my-10">
+          <div className="relative aspect-video rounded-xl overflow-hidden shadow-md border border-gray-100 dark:border-white/5">
             <SmartImage 
               src={block.url} 
               context="article_block"
@@ -597,9 +596,9 @@ function PublicBlock({ block }: { block: Block }) {
             />
           </div>
           {block.caption && (
-            <figcaption className="mt-6 flex justify-between items-start border-b border-gray-100 dark:border-white/5 pb-6">
-              <span className="text-sm text-brand-text-muted dark:text-gray-400 italic leading-relaxed max-w-[80%]">{block.caption}</span>
-              <span className="text-[9px] text-brand-text-muted dark:text-gray-500 uppercase tracking-widest font-black shrink-0">Foto / BeritaKarya</span>
+            <figcaption className="mt-4 flex justify-between items-start border-b border-gray-100 dark:border-white/5 pb-4">
+              <span className="text-xs text-brand-text-muted dark:text-gray-400 italic leading-relaxed max-w-[80%]">{block.caption}</span>
+              <span className="text-[8px] text-brand-text-muted dark:text-gray-500 uppercase tracking-widest font-bold shrink-0">Foto / BeritaKarya</span>
             </figcaption>
           )}
         </figure>
@@ -607,12 +606,12 @@ function PublicBlock({ block }: { block: Block }) {
     case 'imageGrid':
       return (
         <div className={cn(
-          "grid gap-4 my-16",
+          "grid gap-4 my-10",
           block.columns === 3 ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2"
         )}>
           {block.images.map((img, i) => (
             <figure key={i} className="m-0">
-              <div className="relative aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-100 dark:border-white/5">
+              <div className="relative aspect-video rounded-xl overflow-hidden shadow-md border border-gray-100 dark:border-white/5">
                 <SmartImage 
                   src={img.url} 
                   context="article_block"
@@ -622,7 +621,7 @@ function PublicBlock({ block }: { block: Block }) {
                 />
               </div>
               {img.caption && (
-                <figcaption className="mt-3 text-xs text-brand-text-muted dark:text-gray-400 italic text-center">
+                <figcaption className="mt-2 text-xs text-brand-text-muted dark:text-gray-400 italic text-center">
                   {img.caption}
                 </figcaption>
               )}
@@ -632,7 +631,7 @@ function PublicBlock({ block }: { block: Block }) {
       )
     case 'gallery':
       return (
-        <div className="my-16 space-y-4">
+        <div className="my-10 space-y-3">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {block.images.map((img, i) => (
               <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-gray-100 dark:border-white/5">
@@ -646,7 +645,7 @@ function PublicBlock({ block }: { block: Block }) {
               </div>
             ))}
           </div>
-          <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-muted text-center italic">
+          <p className="text-[9px] font-bold uppercase tracking-widest text-brand-text-muted text-center italic">
             Klik gambar untuk memperbesar galeri
           </p>
         </div>
@@ -655,7 +654,7 @@ function PublicBlock({ block }: { block: Block }) {
       const ListTag = block.ordered ? 'ol' : 'ul'
       return (
         <ListTag className={cn(
-          "my-12 space-y-4 pl-8",
+          "my-8 space-y-3 pl-6",
           block.ordered ? "list-decimal" : "list-disc"
         )}>
           {block.items.map((item, i) => (
@@ -678,7 +677,7 @@ function PublicBlock({ block }: { block: Block }) {
       return (
         <div 
           className={cn(
-            "my-16 rounded-2xl border-l-4 p-7 font-serif text-[calc(1.05rem*var(--article-font-scale,1))] leading-[calc(2rem*var(--article-font-scale,1))] antialiased text-left md:p-10 md:text-[calc(1.2rem*var(--article-font-scale,1))] md:leading-[calc(2.25rem*var(--article-font-scale,1))] shadow-sm",
+            "my-10 rounded-xl border-l-4 p-5 font-sans text-[calc(1rem*var(--article-font-scale,1))] leading-[calc(1.75rem*var(--article-font-scale,1))] antialiased text-left md:p-8 md:text-[calc(1.1rem*var(--article-font-scale,1))] md:leading-[calc(1.9rem*var(--article-font-scale,1))] shadow-sm",
             variants[block.variant as keyof typeof variants] || variants.editorial
           )}
           dangerouslySetInnerHTML={{ __html: block.content || '' }}
@@ -686,8 +685,8 @@ function PublicBlock({ block }: { block: Block }) {
       )
     case 'embed':
       return (
-        <div className="my-16">
-          <div className="relative aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 flex items-center justify-center">
+        <div className="my-10">
+          <div className="relative aspect-video rounded-xl overflow-hidden shadow-md border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 flex items-center justify-center">
             {block.embedType === 'youtube' ? (
               <iframe
                 src={block.url.replace('watch?v=', 'embed/')}
@@ -701,21 +700,21 @@ function PublicBlock({ block }: { block: Block }) {
               </a>
             )}
           </div>
-          {block.title && <p className="mt-4 text-center text-xs text-brand-text-muted uppercase tracking-widest font-black">{block.title}</p>}
+          {block.title && <p className="mt-3 text-center text-xs text-brand-text-muted uppercase tracking-widest font-black">{block.title}</p>}
         </div>
       )
     case 'mediaText':
       return (
         <div 
           className={cn(
-            "flex flex-col gap-8 my-16 items-center w-full",
+            "flex flex-col gap-6 my-10 items-center w-full",
             block.align === 'right' ? "md:flex-row-reverse" : "md:flex-row"
           )}
         >
           {/* Image Column */}
           <div className="w-full md:w-1/2 min-w-0">
             <figure className="m-0">
-              <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg border border-gray-100 dark:border-white/5">
+              <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-md border border-gray-100 dark:border-white/5">
                 <SmartImage 
                   src={block.url || '/placeholder.jpg'} 
                   context="media_text"
@@ -725,7 +724,7 @@ function PublicBlock({ block }: { block: Block }) {
                 />
               </div>
               {block.caption && (
-                <figcaption className="mt-3 text-xs text-brand-text-muted dark:text-gray-400 italic text-center">
+                <figcaption className="mt-2.5 text-xs text-brand-text-muted dark:text-gray-400 italic text-center">
                   {block.caption}
                 </figcaption>
               )}

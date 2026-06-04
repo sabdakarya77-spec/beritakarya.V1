@@ -45,15 +45,15 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
         <ArticleBookmarkButton
           article={article}
           site={site}
-          className="absolute right-5 top-5 z-10 h-11 w-11 justify-center rounded-full border border-white/10 bg-black/45 text-white backdrop-blur-sm hover:border-white/20 hover:text-white"
-          activeClassName="absolute right-5 top-5 z-10 h-11 w-11 justify-center rounded-full border border-brand-red/40 bg-brand-red/20 text-white"
-          idleClassName="absolute right-5 top-5 z-10 h-11 w-11 justify-center rounded-full border border-white/10 bg-black/45 text-white/80 hover:border-white/20 hover:text-white"
-          iconSize={16}
+          className="absolute right-4 top-4 z-10 h-9 w-9 justify-center rounded-full border border-white/10 bg-black/45 text-white backdrop-blur-sm hover:border-white/20 hover:text-white"
+          activeClassName="absolute right-4 top-4 z-10 h-9 w-9 justify-center rounded-full border border-brand-red/40 bg-brand-red/20 text-white"
+          idleClassName="absolute right-4 top-4 z-10 h-9 w-9 justify-center rounded-full border border-white/10 bg-black/45 text-white/80 hover:border-white/20 hover:text-white"
+          iconSize={14}
         />
         <Link href={articleHref} onMouseEnter={() => prefetchImage(imageUrl)}>
           <motion.article 
             whileHover={{ y: -2 }}
-            className="group relative h-[550px] min-h-[450px] w-full cursor-pointer overflow-hidden rounded-3xl bg-slate-900 shadow-2xl lg:h-[700px]"
+            className="group relative h-[420px] min-h-[380px] w-full cursor-pointer overflow-hidden rounded-2xl bg-slate-900 shadow-xl lg:h-[480px]"
           >
             <SmartImage 
               src={imageUrl} 
@@ -67,28 +67,28 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-transparent" />
             
-            <div className="absolute bottom-0 left-0 w-full max-w-4xl p-8 pb-32 md:p-12 md:pb-16 lg:p-14">
-              <div className="mb-5 flex items-center gap-3">
-                {badgeVariant && <EditorialBadge variant={badgeVariant} size="md" />}
-                <span className="inline-block rounded-sm bg-brand-red px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white shadow-sm">
+            <div className="absolute bottom-0 left-0 w-full max-w-3xl p-6 pb-20 md:p-8 md:pb-12">
+              <div className="mb-3.5 flex items-center gap-2">
+                {badgeVariant && <EditorialBadge variant={badgeVariant} size="sm" />}
+                <span className="inline-block rounded-sm bg-brand-red px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-white shadow-sm">
                   {article.category?.name || 'UMUM'}
                 </span>
               </div>
-              <h2 className="mb-5 max-w-[12ch] text-balance font-serif text-[2.35rem] font-black leading-[1.02] tracking-[-0.045em] text-white md:text-[3.15rem] lg:text-[4.05rem]">
+              <h2 className="mb-3.5 max-w-[20ch] text-balance font-sans text-xl font-extrabold leading-[1.15] tracking-tight text-white md:text-2xl lg:text-[2rem]">
                 {article.title}
               </h2>
-              <p className="mb-7 max-w-3xl line-clamp-2 text-base font-normal leading-relaxed text-gray-300 opacity-90 md:text-[1.05rem]">
+              <p className="mb-5 max-w-2xl line-clamp-2 text-xs leading-relaxed text-gray-300 opacity-90 md:text-sm">
                 {excerpt}
               </p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-white/10 pt-5 text-[11px] font-semibold text-white/70">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-red text-[11px] font-black text-white">
+              <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2 border-t border-white/10 pt-4 text-[10px] font-semibold text-white/70">
+                <div className="flex items-center gap-1.5">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-red text-[10px] font-black text-white">
                     {authorName[0] || 'R'}
                   </div>
                   <span>{authorName}</span>
                 </div>
-                <span className="flex items-center gap-1.5"><Clock size={14}/> {date}</span>
-                <span className="flex items-center gap-1.5"><BookOpen size={14}/> {readTime}</span>
+                <span className="flex items-center gap-1"><Clock size={12}/> {date}</span>
+                <span className="flex items-center gap-1"><BookOpen size={12}/> {readTime}</span>
               </div>
             </div>
           </motion.article>
@@ -103,24 +103,24 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
         <ArticleBookmarkButton
           article={article}
           site={site}
-          className="absolute right-0 top-4 z-10 h-10 w-10 justify-center rounded-full border border-gray-200 bg-white dark:border-white/10 dark:bg-white/[0.03]"
-          activeClassName="absolute right-0 top-4 z-10 h-10 w-10 justify-center rounded-full border border-brand-red/40 bg-brand-red/5 text-brand-red"
-          idleClassName="absolute right-0 top-4 z-10 h-10 w-10 justify-center rounded-full border border-gray-200 bg-white text-brand-text-muted hover:text-brand-red hover:border-brand-red/40 dark:border-white/10 dark:bg-white/[0.03]"
-          iconSize={15}
+          className="absolute right-0 top-3 z-10 h-8 w-8 justify-center rounded-full border border-gray-200 bg-white dark:border-white/10 dark:bg-white/[0.03]"
+          activeClassName="absolute right-0 top-3 z-10 h-8 w-8 justify-center rounded-full border border-brand-red/40 bg-brand-red/5 text-brand-red"
+          idleClassName="absolute right-0 top-3 z-10 h-8 w-8 justify-center rounded-full border border-gray-200 bg-white text-brand-text-muted hover:text-brand-red hover:border-brand-red/40 dark:border-white/10 dark:bg-white/[0.03]"
+          iconSize={13}
         />
         <Link href={articleHref} onMouseEnter={() => prefetchImage(imageUrl)}>
-          <div className="py-5 pr-14 border-b border-gray-100 dark:border-white/5 last:border-0 group cursor-pointer flex justify-between items-start gap-4">
+          <div className="py-3.5 pr-12 border-b border-gray-100 dark:border-white/5 last:border-0 group cursor-pointer flex justify-between items-start gap-4">
             <div className="flex-1">
-              <div className="mb-2.5 flex items-center gap-2">
+              <div className="mb-2 flex items-center gap-2">
                 {badgeVariant && <EditorialBadge variant={badgeVariant} size="sm" />}
                 <span className={categoryLabelClass}>
                   {article.category?.name || 'UMUM'}
                 </span>
               </div>
-              <h3 className="line-clamp-3 font-serif text-[1.12rem] font-black leading-[1.18] tracking-[-0.03em] text-brand-black transition-colors group-hover:text-brand-red dark:text-white md:text-[1.2rem]">
+              <h3 className="line-clamp-3 font-sans text-[0.92rem] font-bold leading-[1.2] tracking-tight text-brand-black transition-colors group-hover:text-brand-red dark:text-white md:text-[1rem]">
                 {article.title}
               </h3>
-              <div className={cn(calmMetaClass, "mt-3")}>
+              <div className={cn(calmMetaClass, "mt-2.5")}>
                 <span>{authorName}</span>
                 <span className="opacity-30">•</span>
                 <span>{date}</span>
@@ -138,17 +138,17 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
         <ArticleBookmarkButton
           article={article}
           site={site}
-          className="absolute right-0 top-0 z-10 h-10 w-10 justify-center rounded-full border border-gray-200 bg-white dark:border-white/10 dark:bg-white/[0.03]"
-          activeClassName="absolute right-0 top-0 z-10 h-10 w-10 justify-center rounded-full border border-brand-red/40 bg-brand-red/5 text-brand-red"
-          idleClassName="absolute right-0 top-0 z-10 h-10 w-10 justify-center rounded-full border border-gray-200 bg-white text-brand-text-muted hover:text-brand-red hover:border-brand-red/40 dark:border-white/10 dark:bg-white/[0.03]"
-          iconSize={15}
+          className="absolute right-0 top-0 z-10 h-8 w-8 justify-center rounded-full border border-gray-200 bg-white dark:border-white/10 dark:bg-white/[0.03]"
+          activeClassName="absolute right-0 top-0 z-10 h-8 w-8 justify-center rounded-full border border-brand-red/40 bg-brand-red/5 text-brand-red"
+          idleClassName="absolute right-0 top-0 z-10 h-8 w-8 justify-center rounded-full border border-gray-200 bg-white text-brand-text-muted hover:text-brand-red hover:border-brand-red/40 dark:border-white/10 dark:bg-white/[0.03]"
+          iconSize={13}
         />
         <Link href={articleHref} onMouseEnter={() => prefetchImage(imageUrl)}>
           <motion.article 
             whileHover={{ x: 2 }}
-            className="group flex cursor-pointer gap-5 border-b border-gray-100 pb-6 pr-14 dark:border-white/5 md:gap-6 last:border-0"
+            className="group flex cursor-pointer gap-4 border-b border-gray-100 pb-4 pr-12 dark:border-white/5 md:gap-5 last:border-0"
           >
-            <div className="relative aspect-[4/3] w-32 flex-shrink-0 overflow-hidden rounded-2xl bg-gray-100 shadow-sm dark:bg-white/5 md:w-44">
+            <div className="relative aspect-[16/10] w-28 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100 shadow-sm dark:bg-white/5 md:w-36">
               <SmartImage 
                 src={imageUrl} 
                 blur={article.featuredImageBlur}
@@ -160,20 +160,20 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
                 priority={priority}
               />
             </div>
-            <div className="flex flex-1 flex-col justify-center gap-2">
+            <div className="flex flex-1 flex-col justify-center gap-1.5">
               <div className="flex items-center gap-2">
-                {badgeVariant && <EditorialBadge variant={badgeVariant} />}
+                {badgeVariant && <EditorialBadge variant={badgeVariant} size="sm" />}
                 <span className={categoryLabelClass}>
                   {article.category?.name || 'UMUM'}
                 </span>
               </div>
-              <h3 className="line-clamp-3 font-serif text-[1.24rem] font-black leading-[1.15] tracking-[-0.035em] text-brand-black transition-colors group-hover:text-brand-red dark:text-white md:text-[1.4rem]">
+              <h3 className="line-clamp-3 font-sans text-[0.98rem] font-bold leading-[1.2] tracking-tight text-brand-black transition-colors group-hover:text-brand-red dark:text-white md:text-[1.1rem]">
                 {article.title}
               </h3>
-              <p className="hidden line-clamp-2 text-sm leading-relaxed text-brand-text-muted/90 dark:text-gray-400 md:block">
+              <p className="hidden line-clamp-2 text-xs leading-relaxed text-brand-text-muted/90 dark:text-gray-400 md:block">
                 {excerpt}
               </p>
-              <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-brand-text-muted dark:text-gray-400">
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[10px] text-brand-text-muted dark:text-gray-400">
                  <span className="flex min-w-0 items-center gap-1"><User size={10}/> <span className="truncate">{authorName}</span></span>
                  <span>{date}</span>
               </div>
@@ -189,17 +189,17 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
       <ArticleBookmarkButton
         article={article}
         site={site}
-        className="absolute right-3 top-3 z-10 h-10 w-10 justify-center rounded-full border border-white/20 bg-black/45 text-white backdrop-blur-sm"
-        activeClassName="absolute right-3 top-3 z-10 h-10 w-10 justify-center rounded-full border border-brand-red/40 bg-brand-red/20 text-white"
-        idleClassName="absolute right-3 top-3 z-10 h-10 w-10 justify-center rounded-full border border-white/20 bg-black/45 text-white/85 hover:text-white hover:border-white/35"
-        iconSize={15}
+        className="absolute right-3 top-3 z-10 h-8 w-8 justify-center rounded-full border border-white/20 bg-black/45 text-white backdrop-blur-sm"
+        activeClassName="absolute right-3 top-3 z-10 h-8 w-8 justify-center rounded-full border border-brand-red/40 bg-brand-red/20 text-white"
+        idleClassName="absolute right-3 top-3 z-10 h-8 w-8 justify-center rounded-full border border-white/20 bg-black/45 text-white/85 hover:text-white hover:border-white/35"
+        iconSize={13}
       />
       <Link href={articleHref} onMouseEnter={() => prefetchImage(imageUrl)}>
         <motion.article 
-          whileHover={{ y: -4 }}
-          className="group relative flex cursor-pointer flex-col gap-4 md:gap-5"
+          whileHover={{ y: -3 }}
+          className="group relative flex cursor-pointer flex-col gap-3 md:gap-4"
         >
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100 shadow-sm dark:bg-white/5">
+          <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 shadow-sm dark:bg-white/5">
             <SmartImage 
               src={imageUrl} 
               blur={article.featuredImageBlur}
@@ -210,25 +210,25 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
               className={defaultImageClass}
               priority={priority}
             />
-            <div className="absolute left-4 top-4 flex flex-col gap-2">
-              {badgeVariant && <EditorialBadge variant={badgeVariant} />}
+            <div className="absolute left-3.5 top-3.5 flex flex-col gap-1.5">
+              {badgeVariant && <EditorialBadge variant={badgeVariant} size="sm" />}
             </div>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             <div className="flex items-center">
               <span className={categoryLabelClass}>
                 {article.category?.name || 'UMUM'}
               </span>
             </div>
-            <h3 className="line-clamp-3 font-serif text-[1.55rem] font-black leading-[1.12] tracking-[-0.035em] text-brand-black transition-colors group-hover:text-brand-red dark:text-white md:text-[1.68rem]">
+            <h3 className="line-clamp-3 font-sans text-[1.08rem] font-extrabold leading-[1.2] tracking-tight text-brand-black transition-colors group-hover:text-brand-red dark:text-white md:text-[1.18rem]">
               {article.title}
             </h3>
-            <p className="line-clamp-2 text-sm font-normal leading-relaxed text-brand-text-muted opacity-80 dark:text-gray-400">
+            <p className="line-clamp-2 text-[13px] font-normal leading-relaxed text-brand-text-muted opacity-80 dark:text-gray-400">
               {excerpt}
             </p>
-            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] text-brand-text-muted dark:text-gray-400">
-               <div className="flex min-w-0 items-center gap-1.5">
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-100 text-[10px] font-semibold dark:bg-white/10">
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[10px] text-brand-text-muted dark:text-gray-400">
+               <div className="flex min-w-0 items-center gap-1">
+                  <div className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-gray-100 text-[9px] font-semibold dark:bg-white/10">
                     {authorName[0] || 'R'}
                   </div>
                  <span className="truncate">{authorName}</span>
@@ -236,7 +236,7 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
                <span className="opacity-30">•</span>
                <span>{date}</span>
                <span className="opacity-30">•</span>
-               <span className="flex items-center gap-1"><BookOpen size={12}/> {readTime}</span>
+               <span className="flex items-center gap-1"><BookOpen size={10}/> {readTime}</span>
             </div>
           </div>
         </motion.article>

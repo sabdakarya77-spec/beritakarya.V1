@@ -59,10 +59,10 @@ export function MagazineBentoHero({ articles, site }: { articles: any[], site: s
   const sideArticles = articles.slice(1, 4);
 
   return (
-    <section className="relative mb-14 w-full md:mb-16 overflow-hidden">
+    <section className="relative mb-10 w-full md:mb-12 overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-[85%] bg-brand-red/5 dark:bg-brand-red/10 blur-[80px] -z-10 rounded-full" />
       
-      <div className="grid h-auto grid-cols-1 gap-4 lg:h-[450px] lg:grid-cols-12 lg:gap-5 xl:h-[470px]">
+      <div className="grid h-auto grid-cols-1 gap-3 lg:h-[380px] lg:grid-cols-12 lg:gap-4 xl:h-[400px]">
         
         {lead && (
           <Link href={`/${site}/artikel/${lead.slug}`} className="group/lead relative block h-[300px] overflow-hidden rounded-2xl lg:col-span-8 lg:h-full">
@@ -87,7 +87,7 @@ export function MagazineBentoHero({ articles, site }: { articles: any[], site: s
                   </span>
                 </div>
                 
-                <h1 className="max-w-[16ch] sm:max-w-[18ch] md:max-w-[20ch] text-balance font-serif text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black leading-[1.1] tracking-[-0.03em] sm:tracking-[-0.04em] text-white">
+                <h1 className="max-w-[16ch] sm:max-w-[18ch] md:max-w-[20ch] text-balance font-sans text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-extrabold leading-[1.15] tracking-tight text-white">
                   {lead.title}
                 </h1>
               </motion.div>
@@ -95,7 +95,7 @@ export function MagazineBentoHero({ articles, site }: { articles: any[], site: s
           </Link>
         )}
 
-        <div className="flex h-full flex-col gap-4 lg:col-span-4 lg:gap-5">
+        <div className="flex h-full flex-col gap-3 lg:col-span-4 lg:gap-4">
           {sideArticles.map((article: any) => (
             <Link 
               key={article.id} 
@@ -120,7 +120,7 @@ export function MagazineBentoHero({ articles, site }: { articles: any[], site: s
                     {article.category?.name || 'Terkini'}
                   </span>
                 </div>
-                <h3 className="line-clamp-2 font-serif text-[0.8rem] sm:text-[0.9rem] lg:text-[0.95rem] font-black leading-[1.15] tracking-tight text-white">
+                <h3 className="line-clamp-2 font-sans text-[0.75rem] sm:text-[0.82rem] lg:text-[0.88rem] font-bold leading-[1.2] tracking-tight text-white">
                   {article.title}
                 </h3>
               </div>
