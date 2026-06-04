@@ -15,6 +15,7 @@ const nextConfig = {
     // Curated breakpoints tuned for news content delivery
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384, 600],
+    qualities: [75, 80, 85],
     // Cache optimized images for 30 days (immutable in production)
     minimumCacheTTL: 2592000,
     // Note: 'quality' is not a valid images config key.
