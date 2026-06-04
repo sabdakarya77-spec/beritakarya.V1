@@ -2,19 +2,38 @@
 
 import { motion } from 'framer-motion';
 import { Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface BreakingNewsTickerProps {
   news?: string[];
 }
 
 export default function BreakingNewsTicker({ 
-  news = [
+  news: initialNews = [
     "Sri Mulyani Paparkan Strategi Fiskal 2026 di Hadapan DPR",
     "Rupiah Menguat ke Level Rp 15.200 per Dolar AS Pagi Ini",
     "Timnas Indonesia Siap Hadapi Laga Krusial di Kualifikasi Piala Dunia",
     "Pemerintah Resmi Luncurkan Program Insentif Kendaraan Listrik Tahap II"
   ] 
 }: BreakingNewsTickerProps) {
+  const [tickerNews, setTickerNews] = useState<string[]>(initialNews);
+
+  useEffect(() => {
+    async function fetchBreakingNews() {
+      try {
+        const res = await fetch('/api/breaking-news');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            setTickerNews(json.data);
+          }
+        }
+      } catch (err) {
+        console.error('Gagal memuat breaking news dari API:', err);
+      }
+    }
+    fetchBreakingNews();
+  }, []);
   return (
     <div className="flex h-8 max-w-full items-center overflow-hidden text-white sm:h-9 lg:h-10">
       <div className="my-0.5 ml-0.5 flex h-[calc(100%-4px)] shrink-0 items-center gap-1 rounded-r-md bg-brand-red px-1.5 shadow-[4px_0_8px_rgba(0,0,0,0.1)] sm:my-1 sm:h-[calc(100%-8px)] sm:px-2 lg:px-2.5">
@@ -35,7 +54,7 @@ export default function BreakingNewsTicker({
           }}
           className="absolute inset-y-0 left-0 flex h-full min-w-max items-center gap-5 whitespace-nowrap pl-6 pr-3 will-change-transform sm:gap-7 sm:pl-10 sm:pr-4 lg:gap-10 lg:pl-14 lg:pr-5"
         >
-          {news.map((item, i) => (
+          {tickerNews.map((item, i) => (
             <div key={i} className="flex items-center gap-5 sm:gap-7 lg:gap-10">
               <span className="cursor-pointer text-[10px] font-medium tracking-tight text-white/90 transition-colors hover:text-brand-red sm:text-[11px] lg:text-[12px]">
                 {item}
@@ -43,7 +62,7 @@ export default function BreakingNewsTicker({
               <span className="h-1 w-1 rounded-full bg-brand-red sm:h-1 sm:w-1 lg:h-1.5 lg:w-1.5" />
             </div>
           ))}
-          {news.map((item, i) => (
+          {tickerNews.map((item, i) => (
             <div key={`dup-${i}`} aria-hidden="true" className="flex items-center gap-5 sm:gap-7 lg:gap-10">
               <span className="cursor-pointer text-[10px] font-medium tracking-tight text-white/90 transition-colors hover:text-brand-red sm:text-[11px] lg:text-[12px]">
                 {item}
