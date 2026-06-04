@@ -168,7 +168,7 @@ export default async function AuthorProfilePage({ params }: Props) {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top_right,rgba(225,29,72,0.12),transparent_42%)]" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(180deg,transparent,rgba(15,23,42,0.04))] dark:bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.03))]" />
           <Container>
-            <div className="pb-14 md:pb-20">
+            <div className="pb-12 md:pb-16">
               <Link
                 href={`/${siteParam}/penulis`}
                 className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 transition-colors hover:text-brand-red"
@@ -177,111 +177,80 @@ export default async function AuthorProfilePage({ params }: Props) {
                 Kembali ke Halaman Penulis
               </Link>
 
-              <div className="mt-8 inline-flex items-center rounded-full border border-brand-red/15 bg-brand-red/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-brand-red">
+              <div className="mt-6 inline-flex items-center rounded-full border border-brand-red/15 bg-brand-red/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-brand-red">
                 Profil Editorial
               </div>
 
-              <div className="relative mt-8 grid grid-cols-1 gap-10 xl:grid-cols-[minmax(0,1.35fr)_22rem] xl:items-start xl:gap-12">
-                <div className="min-w-0">
-                  <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.75rem] border border-brand-red/10 bg-gradient-to-br from-brand-red to-red-700 text-2xl font-serif font-black text-white shadow-[0_24px_60px_rgba(225,29,72,0.18)] md:h-24 md:w-24 md:text-3xl">
-                      {initials}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-3 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
-                        <span>{roleLabel}</span>
-                        <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-white/15" />
-                        <span className="inline-flex items-center gap-2">
-                          <CalendarDays size={13} className="text-brand-red" />
-                          Bergabung sejak {joinedAt}
-                        </span>
-                      </div>
-
-                      <h1 className="mt-4 max-w-4xl text-4xl font-serif font-black tracking-[-0.045em] text-brand-black dark:text-white sm:text-5xl lg:text-6xl xl:text-[4.25rem] xl:leading-[0.97]">
-                        {profile.name}
-                      </h1>
-
-                      <p className="mt-5 max-w-3xl text-base leading-7 text-slate-600 dark:text-slate-300 md:text-[1.05rem] md:leading-8">
-                        {bio}
-                      </p>
-                    </div>
+              {/* Profile header — full width, no sidebar */}
+              <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8 md:gap-12">
+                {/* Avatar */}
+                <div className="shrink-0 text-center sm:text-left">
+                  <div className="inline-flex h-20 w-20 items-center justify-center rounded-[1.75rem] border border-brand-red/10 bg-gradient-to-br from-brand-red to-red-700 text-2xl font-serif font-black text-white shadow-[0_20px_50px_rgba(225,29,72,0.22)] md:h-24 md:w-24 md:text-3xl">
+                    {initials}
                   </div>
-
-                  <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-[1.5rem] border border-gray-100 bg-gray-50/80 px-5 py-4 dark:border-white/5 dark:bg-white/[0.03]">
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
-                        <FileText size={13} className="text-brand-red" />
-                        Artikel Terbit
-                      </div>
-                      <p className="mt-3 text-2xl font-black text-brand-black dark:text-white">
-                        {stats.publishedCount.toLocaleString('id-ID')}
-                      </p>
-                    </div>
-
-                    <div className="rounded-[1.5rem] border border-gray-100 bg-gray-50/80 px-5 py-4 dark:border-white/5 dark:bg-white/[0.03]">
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
-                        <Eye size={13} className="text-brand-red" />
-                        Total Dilihat
-                      </div>
-                      <p className="mt-3 text-2xl font-black text-brand-black dark:text-white">
-                        {formatCompactNumber(stats.totalViews)}
-                      </p>
-                    </div>
-
-                    <div className="rounded-[1.5rem] border border-gray-100 bg-gray-50/80 px-5 py-4 dark:border-white/5 dark:bg-white/[0.03]">
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
-                        <CalendarDays size={13} className="text-brand-red" />
-                        Kanal
-                      </div>
-                      <p className="mt-3 text-lg font-black text-brand-black dark:text-white">
-                        {siteConfig.name}
-                      </p>
-                    </div>
+                  <div className="mt-3">
+                    <span className="inline-block rounded-lg bg-brand-red/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-brand-red">
+                      {roleLabel}
+                    </span>
                   </div>
                 </div>
 
-                <aside className="space-y-4">
-                  <div className="rounded-[1.75rem] border border-gray-100 bg-white p-6 shadow-[0_20px_50px_rgba(15,23,42,0.05)] dark:border-white/5 dark:bg-white/[0.03] dark:shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-brand-red">
-                      Ringkasan Profil
-                    </p>
-                    <dl className="mt-5 space-y-4">
-                      <div className="border-b border-gray-100 pb-4 dark:border-white/5">
-                        <dt className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
-                          Peran
-                        </dt>
-                        <dd className="mt-2 text-sm font-bold text-brand-black dark:text-white">
-                          {roleLabel}
-                        </dd>
-                      </div>
-                      <div className="border-b border-gray-100 pb-4 dark:border-white/5">
-                        <dt className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
-                          Rekam Publikasi
-                        </dt>
-                        <dd className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                          {stats.publishedCount.toLocaleString('id-ID')} artikel dengan total {stats.totalViews.toLocaleString('id-ID')} pembacaan publik.
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
-                          Status Editorial
-                        </dt>
-                        <dd className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                          Profil ini tampil sebagai bagian dari tim penulis resmi {siteConfig.name}.
-                        </dd>
-                      </div>
-                    </dl>
+                {/* Name + Bio */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400">
+                    <span className="inline-flex items-center gap-1.5">
+                      <CalendarDays size={12} className="text-brand-red" />
+                      Bergabung sejak {joinedAt}
+                    </span>
                   </div>
 
-                  <div className="rounded-[1.75rem] border border-gray-100 bg-brand-black p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.16)] dark:border-white/5 dark:bg-slate-900">
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-brand-red">
-                      Catatan Redaksi
-                    </p>
-                    <p className="mt-4 text-sm leading-7 text-gray-300">
-                      Seluruh artikel pada halaman ini telah tayang melalui proses kurasi, verifikasi, dan standar editorial yang berlaku di jaringan BeritaKarya.
-                    </p>
+                  <h1 className="mt-3 text-3xl font-serif font-black tracking-[-0.04em] text-brand-black dark:text-white sm:text-4xl lg:text-5xl xl:text-[3.25rem] xl:leading-[1.04]">
+                    {profile.name}
+                  </h1>
+
+                  <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-300 md:text-[0.95rem] md:leading-relaxed">
+                    {bio}
+                  </p>
+                </div>
+              </div>
+
+              {/* Stats strip — horizontal, balanced */}
+              <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:max-w-lg">
+                <div className="rounded-2xl border border-gray-100 bg-gray-50/70 px-4 py-3.5 dark:border-white/5 dark:bg-white/[0.03]">
+                  <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+                    <FileText size={11} className="text-brand-red" />
+                    Artikel Terbit
                   </div>
-                </aside>
+                  <p className="mt-2 text-xl font-black text-brand-black dark:text-white">
+                    {stats.publishedCount.toLocaleString('id-ID')}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-gray-100 bg-gray-50/70 px-4 py-3.5 dark:border-white/5 dark:bg-white/[0.03]">
+                  <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+                    <Eye size={11} className="text-brand-red" />
+                    Total Dilihat
+                  </div>
+                  <p className="mt-2 text-xl font-black text-brand-black dark:text-white">
+                    {formatCompactNumber(stats.totalViews)}
+                  </p>
+                </div>
+                <div className="col-span-2 sm:col-span-1 rounded-2xl border border-gray-100 bg-gray-50/70 px-4 py-3.5 dark:border-white/5 dark:bg-white/[0.03]">
+                  <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+                    <CalendarDays size={11} className="text-brand-red" />
+                    Kanal
+                  </div>
+                  <p className="mt-2 text-base font-black text-brand-black dark:text-white">
+                    {siteConfig.name}
+                  </p>
+                </div>
+              </div>
+
+              {/* Editorial note — slim, inline strip */}
+              <div className="mt-5 flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50/50 px-4 py-3 dark:border-white/5 dark:bg-white/[0.02] sm:max-w-lg">
+                <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red" />
+                <p className="text-[11px] leading-5 text-slate-500 dark:text-slate-400">
+                  Seluruh artikel telah melalui proses kurasi, verifikasi, dan standar editorial jaringan BeritaKarya.
+                </p>
               </div>
             </div>
           </Container>
@@ -302,40 +271,31 @@ export default async function AuthorProfilePage({ params }: Props) {
             </div>
 
             {recentArticles.length > 0 ? (
-              <div className="mt-10 grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1.2fr)_22rem] xl:items-start">
-                <div className="min-w-0 rounded-[2rem] border border-gray-100 bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.05)] dark:border-white/5 dark:bg-white/[0.03] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] md:p-6">
-                  {featuredArticle && (
+              <div className="mt-8 space-y-8">
+                {/* Featured article — full width */}
+                {featuredArticle && (
+                  <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-white/5 dark:bg-white/[0.03] md:p-6">
                     <NewsCard article={featuredArticle} variant="medium" site={siteParam} priority />
-                  )}
-                </div>
-
-                <aside className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)] dark:border-white/5 dark:bg-white/[0.03] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] md:p-6">
-                  <div className="border-b border-gray-100 pb-4 dark:border-white/5">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red">
-                      Arsip Terbaru
-                    </p>
-                    <h3 className="mt-2 text-xl font-black tracking-tight text-brand-black dark:text-white">
-                      Publikasi lain
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                      Daftar tulisan lain dari penulis ini dalam format yang lebih ringkas dan mudah dipindai.
-                    </p>
                   </div>
+                )}
 
-                  <div className="mt-2">
-                    {remainingArticles.length > 0 ? (
-                      remainingArticles.map((article) => (
-                        <NewsCard key={article.id} article={article} variant="minimal" site={siteParam} />
-                      ))
-                    ) : (
-                      <div className="py-8">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
-                          Saat ini baru ada satu artikel terbit yang tampil pada profil penulis ini.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </aside>
+                {/* Remaining articles — clean 3-col grid */}
+                {remainingArticles.length > 0 && (
+                  <>
+                    <div className="flex items-center gap-4">
+                      <div className="h-px flex-1 bg-gray-100 dark:bg-white/5" />
+                      <span className="text-[9px] font-black uppercase tracking-[0.22em] text-gray-400">Publikasi Lainnya</span>
+                      <div className="h-px flex-1 bg-gray-100 dark:bg-white/5" />
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {remainingArticles.map((article) => (
+                        <div key={article.id} className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-white/5 dark:bg-white/[0.03]">
+                          <NewsCard article={article} variant="minimal" site={siteParam} />
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <div className="mt-10 rounded-[2rem] border border-dashed border-gray-200 bg-white px-6 py-14 text-center dark:border-white/10 dark:bg-white/[0.02]">

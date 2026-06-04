@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, User as UserIcon, Bell, Moon, Sun, Bookmark } from 'lucide-react';
+import { Search, User as UserIcon, Moon, Sun, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -92,37 +92,18 @@ export default function Navbar({
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-900 bg-slate-950 text-white shadow-md">
-      <div className={cn(
-        "overflow-hidden transition-all duration-300 ease-out border-b border-slate-900",
-        isCollapsed ? "max-h-0 opacity-0 pointer-events-none" : "max-h-12 opacity-100"
-      )}>
-        <Container className="flex h-9 items-center justify-between gap-4 text-[10px] font-medium text-slate-400 sm:h-10 sm:text-[11px]">
-          <div className="flex min-w-0 items-center gap-4">
-            <div className="min-w-0 truncate">
-              {isArticlePage ? (
-                <span className="truncate text-[10px] normal-case tracking-[0.03em] text-slate-400 sm:text-[11px]">
-                  {articleTopDate}
-                </span>
-              ) : (
-                <DateTimeWeather />
-              )}
-            </div>
-          </div>
-        </Container>
-      </div>
-
+    <header className="sticky top-0 z-50 border-b border-slate-900/60 bg-slate-950/98 backdrop-blur-sm text-white shadow-[0_2px_20px_rgba(0,0,0,0.35)]">
       <div className={cn(
         "transition-all duration-300 ease-out",
         isCollapsed
           ? "max-h-0 overflow-hidden opacity-0 pointer-events-none"
-          : "max-h-40 overflow-visible opacity-100"
+          : "max-h-28 overflow-visible opacity-100"
       )}>
-        <Container className="flex items-center justify-between gap-4 md:gap-8 h-16 md:h-20">
-          <div className="flex items-center gap-4 shrink-0">
+        <Container className="flex items-center justify-between gap-3 md:gap-6 h-14 md:h-[4.25rem]">
+          <div className="flex items-center shrink-0">
             <Link href={`/${activeSite}`} className="flex flex-col items-start group">
               {siteConfig?.logoUrl ? (
-                <div className="relative h-7 w-[6.5rem] sm:h-9 sm:w-[8.5rem]">
+                <div className="relative h-7 w-[6.5rem] sm:h-8 sm:w-[8rem]">
                   <SmartImage 
                     src={siteConfig.logoUrl} 
                     alt={siteConfig.name} 
@@ -133,64 +114,53 @@ export default function Navbar({
                   />
                 </div>
               ) : (
-                <h1 className="font-sans text-[1.2rem] font-extrabold leading-none tracking-[-0.045em] sm:text-[1.5rem]">
-                  <span className="text-brand-red group-hover:text-brand-red/90 transition-colors">BERITA</span>
+                <h1 className="font-sans text-[1.15rem] font-extrabold leading-none tracking-[-0.045em] sm:text-[1.4rem]">
+                  <span className="text-brand-red transition-colors">BERITA</span>
                   <span className="text-white">KARYA</span>
                 </h1>
               )}
-              <span className="hidden sm:block text-[8px] font-medium tracking-[0.05em] text-slate-400 mt-0.5">
-                Nusantara Berbicara
+              <span className="hidden sm:block text-[9px] font-normal tracking-[0.01em] text-slate-500 mt-0.5">
+                {articleTopDate}
               </span>
             </Link>
           </div>
 
-          <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm xl:max-w-md mx-auto hidden md:block">
-            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-xs xl:max-w-md mx-auto hidden md:block">
+            <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               type="text"
               placeholder="Cari berita, topik, penulis..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-full border border-slate-800 bg-slate-900/60 py-1.5 pl-9 pr-4 text-[11px] text-white placeholder:text-slate-500 outline-none transition-all focus:border-brand-red focus:bg-slate-900/80 focus:ring-1 focus:ring-brand-red"
+              className="w-full rounded-full border border-slate-800/70 bg-slate-900/40 py-2 pl-9 pr-4 text-[11px] text-white placeholder:text-slate-600 outline-none transition-all focus:border-brand-red/50 focus:bg-slate-900/60 focus:ring-1 focus:ring-brand-red/30"
             />
           </form>
 
-          <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-3.5 shrink-0">
+          <div className="flex min-w-0 items-center justify-end gap-1 sm:gap-1.5 shrink-0">
             <button 
               onClick={onSearchClick}
-              className="md:hidden rounded-full p-2 text-slate-300 hover:bg-slate-900 hover:text-white"
+              className="md:hidden rounded-full p-2 text-slate-400 hover:bg-slate-800/70 hover:text-white transition-colors"
               aria-label="Cari berita"
             >
-              <Search size={18} strokeWidth={1.5} />
+              <Search size={17} strokeWidth={1.5} />
             </button>
 
             {!isArticlePage && (
               <Link 
                 href={`/${activeSite}?cat=tersimpan`}
-                className="relative rounded-full p-1.5 text-slate-300 transition-colors hover:bg-slate-900 hover:text-white"
+                className="relative rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-800/70 hover:text-white"
               >
                 <Bookmark size={15} strokeWidth={1.5} />
                 {savedArticlesCount > 0 && (
-                  <span className="absolute -right-1 -top-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-brand-red px-1 text-[8px] font-bold text-white leading-none">
+                  <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-brand-red px-1 text-[8px] font-bold text-white leading-none">
                     {savedArticlesCount}
                   </span>
                 )}
               </Link>
             )}
 
-            {!isArticlePage && (
-              <button 
-                aria-label="Notifikasi"
-                className="hidden md:flex rounded-full p-1.5 text-slate-300 transition-colors hover:bg-slate-900 hover:text-white"
-              >
-                <Bell size={15} strokeWidth={1.5} />
-              </button>
-            )}
-              
-            <div className="hidden h-4 w-px bg-slate-800 md:block" />
-
             <button 
-              className="rounded-full p-1.5 text-slate-300 transition-colors hover:bg-slate-900 hover:text-white" 
+              className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-800/70 hover:text-white" 
               onClick={toggleTheme}
             >
               {theme === 'light' ? <Moon size={15} strokeWidth={1.5} /> : <Sun size={15} strokeWidth={1.5} />}
@@ -269,12 +239,12 @@ export default function Navbar({
         </Container>
       </div>
 
-      <div className="hidden border-t border-slate-900 bg-slate-950 md:block">
+      <div className="hidden border-t border-slate-900/50 bg-slate-950 md:block">
         <Container className={cn(
-          "relative z-40 hidden items-center justify-center text-[10px] font-bold uppercase tracking-wider text-slate-300 md:flex lg:text-[11px]",
+          "relative z-40 hidden items-center justify-center text-[10px] font-semibold uppercase tracking-widest text-slate-400 md:flex lg:text-[11px]",
           isCollapsed
-            ? "h-9 gap-4"
-            : "h-11 gap-6"
+            ? "h-8 gap-3"
+            : "h-10 gap-5"
         )}>
           {categories.map((cat, index) => {
           const isActive = selectedCategory === cat.slug || cat.subCategories?.some(sub => sub.slug === selectedCategory);
