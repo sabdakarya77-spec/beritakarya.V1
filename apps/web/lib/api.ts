@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+// Gunakan relative path di browser untuk mendukung Next.js API rewrites (mencegah isu cross-domain cookies)
+const API_URL = typeof window !== 'undefined'
+  ? ''
+  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001')
 
 export const api = axios.create({
   baseURL: `${API_URL}/api/v1`,
