@@ -38,6 +38,14 @@ export default function Navbar({
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/${activeSite}?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
   
   const { user, logout } = useAuthStore();
   const activeSite = siteConfig?.id || pathname.split('/')[1] || 'pusat';
@@ -84,22 +92,16 @@ export default function Navbar({
   };
 
   return (
-    <header className={cn(
-      "sticky top-0 z-50 border-b transition-all duration-500",
-      isArticlePage
-        ? "border-black/5 bg-[color:rgb(var(--brand-surface-rgb)/0.88)] backdrop-blur-xl shadow-[0_12px_36px_rgba(15,23,42,0.08)] dark:border-white/5 dark:bg-[rgba(2,6,23,0.84)]"
-        : "border-black/5 bg-[var(--bg-main)] shadow-sm dark:border-white/5"
-    )}>
+    <header className="sticky top-0 z-50 border-b border-slate-900 bg-slate-950 text-white shadow-md">
       <div className={cn(
-        "overflow-hidden transition-all duration-300 ease-out",
+        "overflow-hidden transition-all duration-300 ease-out border-b border-slate-900",
         isCollapsed ? "max-h-0 opacity-0 pointer-events-none" : "max-h-12 opacity-100"
       )}>
-      <div className="border-b border-black/5 dark:border-white/5">
-        <Container className="flex h-9 items-center justify-between gap-4 text-[10px] font-medium text-brand-text-muted sm:h-10 sm:text-[11px]">
+        <Container className="flex h-9 items-center justify-between gap-4 text-[10px] font-medium text-slate-400 sm:h-10 sm:text-[11px]">
           <div className="flex min-w-0 items-center gap-4">
             <div className="min-w-0 truncate">
               {isArticlePage ? (
-                <span className="truncate text-[10px] normal-case tracking-[0.03em] text-brand-text-muted sm:text-[11px]">
+                <span className="truncate text-[10px] normal-case tracking-[0.03em] text-slate-400 sm:text-[11px]">
                   {articleTopDate}
                 </span>
               ) : (
@@ -109,7 +111,6 @@ export default function Navbar({
           </div>
         </Container>
       </div>
-      </div>
 
       <div className={cn(
         "transition-all duration-300 ease-out",
@@ -117,138 +118,163 @@ export default function Navbar({
           ? "max-h-0 overflow-hidden opacity-0 pointer-events-none"
           : "max-h-40 overflow-visible opacity-100"
       )}>
-      <Container className={cn(
-        "grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:gap-3",
-        isArticlePage ? "min-h-[4.35rem] sm:min-h-[4.65rem] md:min-h-[4.95rem]" : "min-h-[4.65rem] sm:min-h-[4.95rem] md:min-h-[5.3rem]"
-      )}>
-        <div className="flex min-w-0 items-center gap-3 md:gap-4">
-          <button 
-            onClick={onSearchClick}
-            className="hidden rounded-full p-2 text-brand-black transition-colors hover:bg-black/5 dark:text-white dark:hover:bg-white/5 md:inline-flex"
-            aria-label="Cari berita"
-          >
-            <Search size={18} strokeWidth={1.5} />
-          </button>
-        </div>
+        <Container className="flex items-center justify-between gap-4 md:gap-8 h-16 md:h-20">
+          <div className="flex items-center gap-4 shrink-0">
+            <Link href={`/${activeSite}`} className="flex flex-col items-start group">
+              {siteConfig?.logoUrl ? (
+                <div className="relative h-7 w-[6.5rem] sm:h-9 sm:w-[8.5rem]">
+                  <SmartImage 
+                    src={siteConfig.logoUrl} 
+                    alt={siteConfig.name} 
+                    fill 
+                    context="logo"
+                    className="object-contain brightness-0 invert"
+                    priority
+                  />
+                </div>
+              ) : (
+                <h1 className="font-sans text-[1.2rem] font-extrabold leading-none tracking-[-0.045em] sm:text-[1.5rem]">
+                  <span className="text-brand-red group-hover:text-brand-red/90 transition-colors">BERITA</span>
+                  <span className="text-white">KARYA</span>
+                </h1>
+              )}
+              <span className="hidden sm:block text-[8px] font-medium tracking-[0.05em] text-slate-400 mt-0.5">
+                Nusantara Berbicara
+              </span>
+            </Link>
+          </div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="min-w-0 justify-self-center"
-        >
-          <Link href={`/${activeSite}`} className="flex max-w-full flex-col items-center group">
-            {siteConfig?.logoUrl ? (
-              <div className="relative mb-0.5 h-8 w-[7.5rem] sm:h-10 sm:w-[10rem] md:h-[2.85rem] md:w-[11.5rem]">
-                <SmartImage 
-                  src={siteConfig.logoUrl} 
-                  alt={siteConfig.name} 
-                  fill 
-                  context="logo"
-                  className="object-contain"
-                  priority
-                />
+          <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm xl:max-w-md mx-auto hidden md:block">
+            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Cari berita, topik, penulis..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-full border border-slate-800 bg-slate-900/60 py-1.5 pl-9 pr-4 text-[11px] text-white placeholder:text-slate-500 outline-none transition-all focus:border-brand-red focus:bg-slate-900/80 focus:ring-1 focus:ring-brand-red"
+            />
+          </form>
+
+          <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-3.5 shrink-0">
+            <button 
+              onClick={onSearchClick}
+              className="md:hidden rounded-full p-2 text-slate-300 hover:bg-slate-900 hover:text-white"
+              aria-label="Cari berita"
+            >
+              <Search size={18} strokeWidth={1.5} />
+            </button>
+
+            {!isArticlePage && (
+              <Link 
+                href={`/${activeSite}?cat=tersimpan`}
+                className="relative rounded-full p-1.5 text-slate-300 transition-colors hover:bg-slate-900 hover:text-white"
+              >
+                <Bookmark size={15} strokeWidth={1.5} />
+                {savedArticlesCount > 0 && (
+                  <span className="absolute -right-1 -top-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-brand-red px-1 text-[8px] font-bold text-white leading-none">
+                    {savedArticlesCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
+            {!isArticlePage && (
+              <button 
+                aria-label="Notifikasi"
+                className="hidden md:flex rounded-full p-1.5 text-slate-300 transition-colors hover:bg-slate-900 hover:text-white"
+              >
+                <Bell size={15} strokeWidth={1.5} />
+              </button>
+            )}
+              
+            <div className="hidden h-4 w-px bg-slate-800 md:block" />
+
+            <button 
+              className="rounded-full p-1.5 text-slate-300 transition-colors hover:bg-slate-900 hover:text-white" 
+              onClick={toggleTheme}
+            >
+              {theme === 'light' ? <Moon size={15} strokeWidth={1.5} /> : <Sun size={15} strokeWidth={1.5} />}
+            </button>
+
+            {user ? (
+              <div className="relative">
+                <button 
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center gap-1.5 rounded-full p-1 text-slate-300 transition-colors hover:bg-slate-900 hover:text-white"
+                >
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-red text-[10px] font-bold text-white shadow-sm">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="hidden max-w-[88px] truncate text-[11px] font-semibold md:inline">
+                    {user.name.split(' ')[0]}
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {isProfileOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-xl"
+                    >
+                      <div className="border-b border-slate-800 p-4">
+                        <p className="text-xs font-bold text-white truncate">{user.name}</p>
+                        <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
+                      </div>
+                      <div className="p-2">
+                        {['superadmin', 'wapimred', 'reporter', 'kontributor'].includes(user.role) && (
+                          <Link 
+                            href={`/${activeSite}/dashboard`}
+                            className="block rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-brand-red"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            Dashboard
+                          </Link>
+                        )}
+                        <button 
+                          onClick={() => {
+                            setIsProfileOpen(false);
+                            logout();
+                          }}
+                          className="w-full text-left rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-brand-red transition-colors hover:bg-red-500/10"
+                        >
+                          Keluar
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
-              <h1 className="text-center font-serif text-[1.45rem] font-black leading-none tracking-[-0.045em] sm:text-[2rem] md:text-[2.55rem]">
-                <span className="text-brand-red group-hover:text-brand-red/90 transition-colors">BERITA</span>
-                <span className="text-brand-black group-hover:opacity-90 transition-opacity">KARYA</span>
-              </h1>
-            )}
-            <span className="mt-1 max-w-[8rem] text-center text-[9px] font-medium tracking-[0.05em] text-brand-text-muted transition-all sm:max-w-[240px] sm:text-[10px] sm:tracking-[0.08em]">
-              Nusantara Berbicara 
-            </span>
-          </Link>
-        </motion.div>
-
-        <div className={cn("flex min-w-0 items-center justify-end gap-1 sm:gap-2 md:gap-3", isArticlePage && "md:gap-2.5")}>
-
-          {!isArticlePage && (
-            <button 
-              aria-label="Notifikasi"
-              className="hidden xl:flex rounded-full p-1.5 text-brand-text-muted transition-colors hover:bg-black/5 hover:text-brand-black"
-            >
-              <Bell size={16} strokeWidth={1.2} />
-            </button>
-          )}
-            
-          {user ? (
-            <div className="relative hidden sm:block">
-              <button 
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center gap-1.5 rounded-full p-1.5 text-brand-text-muted transition-colors hover:bg-black/5 hover:text-brand-black"
+              <Link 
+                href="/login"
+                className="flex items-center gap-1.5 rounded-full p-1.5 text-slate-300 transition-colors hover:bg-slate-900 hover:text-white"
               >
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-red text-[10px] font-bold text-white">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
-                <span className="hidden max-w-[88px] truncate text-[11px] font-semibold md:inline">
-                  {user.name.split(' ')[0]}
-                </span>
-              </button>
+                <UserIcon size={15} strokeWidth={1.5} />
+                <span className="hidden text-[11px] font-semibold md:inline">Masuk</span>
+              </Link>
+            )}
 
-              <AnimatePresence>
-                {isProfileOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-black/5 bg-white shadow-xl dark:border-white/5 dark:bg-slate-900"
-                  >
-                    <div className="border-b border-black/5 p-4 dark:border-white/5">
-                      <p className="text-xs font-bold text-brand-black dark:text-white truncate">{user.name}</p>
-                      <p className="text-[11px] text-gray-500 truncate">{user.email}</p>
-                    </div>
-                    <div className="p-2">
-                      {['superadmin', 'wapimred', 'reporter', 'kontributor'].includes(user.role) && (
-                        <Link 
-                          href={`/${activeSite}/dashboard`}
-                          className="block rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-600 transition-colors hover:bg-gray-50 hover:text-brand-red dark:text-gray-300 dark:hover:bg-white/5"
-                          onClick={() => setIsProfileOpen(false)}
-                        >
-                          Dashboard
-                        </Link>
-                      )}
-                      <button 
-                        onClick={() => {
-                          setIsProfileOpen(false);
-                          logout();
-                        }}
-                        className="mt-1 w-full rounded-xl px-3 py-2 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-brand-red transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
-                      >
-                        Keluar
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ) : (
-            <Link 
-              href="/login"
-              className="hidden items-center gap-1.5 rounded-full p-1.5 text-brand-text-muted transition-colors hover:bg-black/5 hover:text-brand-black sm:flex"
+            <button
+              onClick={onMenuClick}
+              className="md:hidden rounded-full p-1.5 text-slate-300 transition-colors hover:bg-slate-900 hover:text-white"
+              aria-label="Menu"
             >
-              <UserIcon size={16} strokeWidth={1.2} />
-              <span className="hidden text-[11px] font-semibold md:inline">Masuk</span>
-            </Link>
-          )}
-          
-          <div className="hidden h-5 w-px bg-black/10 dark:bg-white/10 md:block" />
-
-          <button 
-            className="rounded-full p-1 text-brand-text-muted/85 transition-colors hover:bg-black/5 hover:text-brand-black sm:p-2 sm:text-brand-text-muted" 
-            onClick={toggleTheme}
-          >
-            {theme === 'light' ? <Moon size={16} strokeWidth={1.5} /> : <Sun size={16} strokeWidth={1.5} />}
-          </button>
-        </div>
-      </Container>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+          </div>
+        </Container>
       </div>
 
-      <div className="hidden border-t border-black/5 dark:border-white/5 md:block">
+      <div className="hidden border-t border-slate-900 bg-slate-950 md:block">
         <Container className={cn(
-          "relative z-40 hidden items-center justify-center text-[10px] font-medium tracking-[0.04em] text-brand-text-muted md:flex lg:text-[11px]",
+          "relative z-40 hidden items-center justify-center text-[10px] font-bold uppercase tracking-wider text-slate-300 md:flex lg:text-[11px]",
           isCollapsed
-            ? "h-10 gap-3.5"
-            : "h-12 gap-5"
+            ? "h-9 gap-4"
+            : "h-11 gap-6"
         )}>
           {categories.map((cat, index) => {
           const isActive = selectedCategory === cat.slug || cat.subCategories?.some(sub => sub.slug === selectedCategory);
@@ -266,8 +292,8 @@ export default function Navbar({
                 transition={{ delay: index * 0.05 }}
                 onClick={() => handleCategoryClick(cat.slug)}
                 className={cn(
-                  "group relative flex items-center gap-1 transition-all hover:text-brand-red dark:hover:text-white",
-                  isActive ? "font-semibold text-brand-black dark:text-white" : "text-gray-500 dark:text-gray-500"
+                  "group relative flex items-center gap-1 transition-all hover:text-white",
+                  isActive ? "font-black text-white" : "text-slate-400"
                 )}
               >
                 {cat.slug === 'tersimpan' && (
@@ -275,7 +301,7 @@ export default function Navbar({
                     size={11} 
                     className={cn(
                       "transition-colors",
-                      isActive ? "text-brand-red fill-brand-red/20" : "text-gray-400 dark:text-gray-500 group-hover:text-brand-red"
+                      isActive ? "text-brand-red fill-brand-red/20" : "text-slate-500 group-hover:text-white"
                     )} 
                   />
                 )}
@@ -288,12 +314,12 @@ export default function Navbar({
                 {isActive && (
                   <motion.span 
                     layoutId="activeCategoryLine"
-                    className="absolute -bottom-[0.72rem] left-0 h-0.5 w-full bg-brand-red"
+                    className="absolute -bottom-[0.67rem] left-0 h-0.5 w-full bg-brand-red"
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
                 {!isActive && (
-                  <span className="absolute -bottom-[0.72rem] left-0 h-0.5 w-0 bg-brand-red transition-all duration-300 group-hover:w-full" />
+                  <span className="absolute -bottom-[0.67rem] left-0 h-0.5 w-0 bg-brand-red transition-all duration-300 group-hover:w-full" />
                 )}
               </motion.button>
 
@@ -303,8 +329,8 @@ export default function Navbar({
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.15, ease: "easeOut" }}
-                    className="absolute left-1/2 top-full z-50 mt-1 flex min-w-[220px] -translate-x-1/2 flex-col gap-0.5 rounded-2xl border border-black/5 bg-white/95 p-2 shadow-[0_12px_40px_rgba(0,0,0,0.12)] backdrop-blur-md dark:border-white/10 dark:bg-slate-900/95 dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)]"
+                    transition={{ duration: 0.12, ease: "easeOut" }}
+                    className="absolute left-1/2 top-full z-50 mt-1 flex min-w-[200px] -translate-x-1/2 flex-col gap-0.5 rounded-xl border border-slate-800 bg-slate-900 p-1.5 shadow-xl backdrop-blur-md"
                   >
                     {cat.subCategories?.map((sub) => {
                       const isSubActive = selectedCategory === sub.slug;
@@ -317,8 +343,8 @@ export default function Navbar({
                             setHoveredCategory(null);
                           }}
                           className={cn(
-                            "group/sub flex items-center justify-between rounded-xl px-4 py-2 text-left text-[10px] font-medium tracking-[0.02em] transition-colors hover:bg-gray-50 dark:hover:bg-white/5 lg:text-[11px]",
-                            isSubActive ? "text-brand-red bg-brand-red/5" : "text-gray-600 dark:text-gray-400 hover:text-brand-red dark:hover:text-white"
+                            "group/sub flex items-center justify-between rounded-lg px-3 py-1.5 text-left text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-slate-800",
+                            isSubActive ? "text-brand-red bg-brand-red/5" : "text-slate-400 hover:text-white"
                           )}
                         >
                           <span>{sub.name}</span>
@@ -338,7 +364,7 @@ export default function Navbar({
         </Container>
       </div>
 
-      <div className="border-t border-black/5 dark:border-white/5 md:hidden">
+      <div className="border-t border-slate-900 md:hidden bg-slate-950">
         <Container className="md:hidden">
           <nav className={cn(
             "flex gap-1.5 overflow-x-auto no-scrollbar transition-all duration-300",
@@ -354,14 +380,14 @@ export default function Navbar({
                 "flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition-all",
                         isCollapsed && "px-2.5 py-1 text-[10px]",
                 isActive
-                  ? "border-brand-red bg-brand-red/10 text-brand-red dark:text-white"
-                  : "border-black/10 text-brand-text-muted dark:border-white/10 dark:text-gray-400"
+                  ? "border-brand-red bg-brand-red/10 text-brand-red"
+                  : "border-slate-800 text-slate-400 bg-slate-900/40"
               )}
             >
               {cat.slug === 'tersimpan' && (
                 <Bookmark 
                   size={9} 
-                  className={isActive ? "text-brand-red fill-brand-red/20" : "text-gray-400 dark:text-gray-400"} 
+                  className={isActive ? "text-brand-red fill-brand-red/20" : "text-slate-500"} 
                 />
               )}
               <span>{cat.name}</span>
@@ -384,7 +410,7 @@ export default function Navbar({
         if (activeParent && activeParent.subCategories && activeParent.subCategories.length > 0) {
           return (
             <div className={cn(
-              "border-t border-black/5 bg-black/[0.02] transition-all duration-300 md:hidden dark:border-white/5 dark:bg-white/[0.03]",
+              "border-t border-slate-900 bg-slate-950 transition-all duration-300 md:hidden",
               isCollapsed && "border-transparent"
             )}>
               <Container className="md:hidden">
@@ -403,7 +429,7 @@ export default function Navbar({
                           isCollapsed && "px-2 py-1 text-[9px]",
                           isSubActive
                             ? "bg-brand-red text-white"
-                            : "bg-black/[0.04] text-gray-600 dark:bg-white/5 dark:text-gray-400"
+                            : "bg-slate-900 text-slate-400 border border-slate-800"
                         )}
                       >
                         {sub.name}
