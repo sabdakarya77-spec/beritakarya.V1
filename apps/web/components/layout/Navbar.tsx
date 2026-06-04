@@ -119,8 +119,10 @@ export default function Navbar({
                   <span className="text-white">KARYA</span>
                 </h1>
               )}
-              <span className="hidden sm:block text-[9px] font-normal tracking-[0.01em] text-slate-500 mt-0.5">
-                {articleTopDate}
+              <span className="hidden sm:block text-[9px] tracking-wide mt-0.5 text-slate-400">
+                <span className="font-bold text-slate-300 italic">Nusantara Berbicara</span>
+                <span className="text-brand-red mx-1.5 font-bold">•</span>
+                <span className="font-normal">{articleTopDate}</span>
               </span>
             </Link>
           </div>

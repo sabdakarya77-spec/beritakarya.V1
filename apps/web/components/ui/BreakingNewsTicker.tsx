@@ -36,10 +36,13 @@ export default function BreakingNewsTicker({
   }, []);
   return (
     <div className="flex h-8 max-w-full items-center overflow-hidden text-white sm:h-9 lg:h-10">
-      <div className="my-0.5 ml-0.5 flex h-[calc(100%-4px)] shrink-0 items-center gap-1 rounded-r-md bg-brand-red px-1.5 shadow-[4px_0_8px_rgba(0,0,0,0.1)] sm:my-1 sm:h-[calc(100%-8px)] sm:px-2 lg:px-2.5">
-        <Zap size={10} className="fill-white animate-pulse sm:size-[11px]" />
-        <span className="whitespace-nowrap text-[8px] font-black uppercase tracking-[0.08em] sm:hidden">Breaking</span>
-        <span className="hidden whitespace-nowrap text-[9px] font-black uppercase tracking-[0.1em] sm:inline lg:text-[10px]">Breaking News</span>
+      {/* Penanda Minimalis Terkini (Pulse Dot + Teks) */}
+      <div className="flex items-center gap-1.5 shrink-0 px-2 sm:px-3">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-red opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-red"></span>
+        </span>
+        <span className="text-[9px] font-black uppercase tracking-[0.15em] text-brand-red">TERKINI</span>
       </div>
       <div className="relative flex h-full min-w-0 flex-1 items-center overflow-hidden group">
         <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-6 bg-gradient-to-r from-brand-black to-transparent sm:w-10 lg:w-14 dark:from-[#020617]" />
