@@ -29,6 +29,9 @@ export interface EditorState {
   isExclusive: boolean
   isFeatured: boolean
   
+  // Content Type
+  contentType: 'article' | 'photo_journalism' | 'video_exclusive'
+  
   // UI State
   isSidebarOpen: boolean
   isFocusMode: boolean
@@ -56,6 +59,7 @@ export interface EditorState {
   // Data Sync
   loadArticle: (id: string, siteId: string) => Promise<void>
   saveArticle: () => Promise<void>
+  setContentType: (type: EditorState['contentType']) => void
   updateArticleData: (data: Partial<EditorState>) => void
   
   toggleSidebar: (isOpen?: boolean) => void
@@ -108,6 +112,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   isExclusive: false,
   isFeatured: false,
   
+  contentType: 'article',
+  
   isSidebarOpen: false,
   isFocusMode: false,
   editorMode: 'gridblok',
@@ -123,6 +129,22 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     scheduleAutoSave(get)
   },
   setSiteId: (siteId) => set({ siteId }),
+  
+  setContentType: (contentType) => {
+    // Auto-set category and flags based on content type
+    let updates: Partial<EditorState> = { contentType }
+    
+    if (contentType === 'photo_journalism') {
+      updates.categoryId = 'foto-jurnalistik'
+      updates.isExclusive = true
+    } else if (contentType === 'video_exclusive') {
+      updates.categoryId = 'video'
+      updates.isExclusive = true
+    }
+    
+    set({ ...updates, isDirty: true })
+    scheduleAutoSave(get)
+  },
 
   setBlocks: (blocks) => {
     set((s) => ({ undoStack: [...s.undoStack.slice(-20), s.blocks], blocks, isDirty: true }))
@@ -455,7 +477,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     saving: false, saveError: null, lastSaved: null, isDirty: false, isLoading: false, undoStack: [],
     metaTitle: '', metaDescription: '', categoryId: null, tags: [],
     featuredImage: '', isBreaking: false, isExclusive: false, isFeatured: false,
-    isSidebarOpen: false, activeTab: 'content'
+    isSidebarOpen: false, activeTab: 'content', contentType: 'article'
   }),
 
   getMissingRequirements: () => {

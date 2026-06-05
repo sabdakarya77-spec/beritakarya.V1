@@ -6,6 +6,8 @@ import { EditorTopbar } from './EditorTopbar'
 import { EditorTitleStage } from './EditorTitleStage'
 import { EditorContent } from './EditorContent'
 import { formatDate } from '@beritakarya/utils'
+import { PhotoGalleryUpload } from './PhotoGalleryUpload'
+import { VideoEmbedZone } from './VideoEmbedZone'
 
 interface EditorProps {
   articleId: string
@@ -44,6 +46,7 @@ export function Editor({ articleId, siteId }: EditorProps) {
     submitForReview,
     publishArticle,
     updateArticleData,
+    contentType,
   } = useEditorStore()
 
   // Load article on mount
@@ -144,11 +147,24 @@ export function Editor({ articleId, siteId }: EditorProps) {
           {/* Title Stage */}
           <EditorTitleStage isFocusMode={isFocusMode} />
           
-          {/* Tiptap Editor */}
-          <div className="editor-canvas">
-            {/* Dynamic import TiptapEditor to avoid SSR issues */}
-            <TiptapEditorWrapper />
-          </div>
+          {/* Conditional Content based on Content Type */}
+          {contentType === 'photo_journalism' ? (
+            /* Foto Jurnalistik - Gallery Upload */
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+              <PhotoGalleryUpload />
+            </div>
+          ) : contentType === 'video_exclusive' ? (
+            /* Video Eksklusif - Embed Zone */
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+              <VideoEmbedZone />
+            </div>
+          ) : (
+            /* Standard Article - Tiptap Editor */
+            <div className="editor-canvas">
+              {/* Dynamic import TiptapEditor to avoid SSR issues */}
+              <TiptapEditorWrapper />
+            </div>
+          )}
         </div>
       </EditorContent>
     </div>

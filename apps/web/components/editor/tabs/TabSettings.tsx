@@ -5,7 +5,7 @@ import { useEditorStore } from '../../../store/editorStore'
 import { CATEGORIES_CONFIG, CategoryItem } from '../../../lib/constants'
 import { MediaLibraryModal } from '../MediaLibraryModal'
 import { type MediaItem } from '../../../hooks/useMediaLibrary'
-import { Image as ImageIconIcon, Tag, Flag, Zap, Star, Sparkles, ChevronDown, Upload, ImageIcon, X, FolderOpen, AlertCircle } from 'lucide-react'
+import { Image as ImageIconIcon, Tag, Flag, Zap, Star, Sparkles, ChevronDown, Upload, ImageIcon, X, FolderOpen, AlertCircle, FileText, Camera, Video } from 'lucide-react'
 import { useImageUpload } from '../../../hooks/useImageUpload'
 import { cn } from '../../../lib/utils'
 
@@ -17,6 +17,8 @@ export function TabSettings() {
     isBreaking,
     isExclusive,
     isFeatured,
+    contentType,
+    setContentType,
     updateArticleData 
   } = useEditorStore()
 
@@ -102,6 +104,58 @@ export function TabSettings() {
 
   return (
     <div className="p-4 space-y-6 animate-fade-in">
+      {/* Content Type Selector */}
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-panel-text-secondary">
+          <FileText size={12} />
+          Tipe Konten
+        </label>
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            onClick={() => setContentType('article')}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200",
+              contentType === 'article'
+                ? "border-panel-accent bg-panel-accent/5 text-panel-accent"
+                : "border-panel-border bg-panel-surface hover:border-panel-accent/40 hover:bg-panel-elevated text-panel-text-secondary"
+            )}
+          >
+            <FileText size={18} />
+            <span className="text-[10px] font-bold">Artikel</span>
+          </button>
+          <button
+            onClick={() => setContentType('photo_journalism')}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200",
+              contentType === 'photo_journalism'
+                ? "border-panel-accent bg-panel-accent/5 text-panel-accent"
+                : "border-panel-border bg-panel-surface hover:border-panel-accent/40 hover:bg-panel-elevated text-panel-text-secondary"
+            )}
+          >
+            <Camera size={18} />
+            <span className="text-[10px] font-bold">Foto Jurnalistik</span>
+          </button>
+          <button
+            onClick={() => setContentType('video_exclusive')}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200",
+              contentType === 'video_exclusive'
+                ? "border-panel-accent bg-panel-accent/5 text-panel-accent"
+                : "border-panel-border bg-panel-surface hover:border-panel-accent/40 hover:bg-panel-elevated text-panel-text-secondary"
+            )}
+          >
+            <Video size={18} />
+            <span className="text-[10px] font-bold">Video Eksklusif</span>
+          </button>
+        </div>
+        {contentType === 'photo_journalism' && (
+          <p className="text-[9px] text-panel-text-muted">Kategori: Galeri Foto • Badge: Eksklusif</p>
+        )}
+        {contentType === 'video_exclusive' && (
+          <p className="text-[9px] text-panel-text-muted">Kategori: Video • Badge: Eksklusif</p>
+        )}
+      </div>
+
       {/* Featured Image */}
       <div className="space-y-2">
         <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-panel-text-secondary">

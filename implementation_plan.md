@@ -1,244 +1,233 @@
-# Rencana Implementasi: Restrukturisasi Layout, Section Logic & Visual Portal Berita Karya
+# Rencana Implementasi: Integrasi Video Hosting Mux & Fitur Tipe Artikel Video
 
-Rencana ini mencakup dua fokus utama: **(A) Restrukturisasi urutan section dan logika distribusi artikel**, serta **(B) Peningkatan branding visual, tipografi, dan halaman trust redaksi**.
+Rencana ini memuat rancangan arsitektur lengkap untuk mendukung video hosting mandiri menggunakan **Mux** pada portal BeritaKarya. Ini mencakup perubahan skema database (Prisma), pembuatan endpoint API backend, pengerjaan webhook Mux, serta pembuatan antarmuka drag-and-drop khusus "Tipe Artikel: Video" pada editor CMS.
 
 ---
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Layout & Sidebar Rule — Keputusan Desain Kritis:**
-> Kami merekomendasikan aturan **"Sidebar hanya aktif untuk section feed utama berita harian"** dan dikosongkan (full-width) untuk section editorial khusus seperti Fokus Redaksi, Iklan, Opini, dan Foto Jurnalistik. Lihat rincian zona layout di bawah.
+> **Biaya Layanan Mux (Pay-as-you-go):**
+> Integrasi ini membutuhkan Mux API Credentials (`MUX_TOKEN_ID` dan `MUX_TOKEN_SECRET`). Mux adalah layanan berbayar yang menghitung biaya berdasarkan durasi video masuk (encoding), penyimpanan bulanan, dan durasi tonton (streaming). Mohon siapkan akun Mux di dashboard mereka.
 
 > [!WARNING]
-> **Perubahan logika slicing array artikel:** Seluruh logika `.slice()` di `SiteHomePage.tsx` akan diganti dengan fungsi `distributeArticles()` yang lebih ketat dan terstruktur agar artikel tidak overlap antar section.
+> **Skema Migrasi Database (Prisma):**
+> Kita akan melakukan migrasi database untuk menambahkan kolom video pada tabel `Media` dan `Article`. Disarankan untuk mencadangkan database produksi sebelum migrasi dijalankan.
 
 ---
 
-## Bagian A — Restrukturisasi Section & Layout Logic
+## Open Questions
 
-### Masalah yang Ditemukan (Berdasarkan Gambar Upload)
-
-| # | Masalah | Penjelasan |
-|---|---------|------------|
-| 1 | **Ukuran gambar kartu sama semua** | Grid 2-kolom memiliki proporsi gambar yang identik dari atas ke bawah, membuat layout terasa monoton |
-| 2 | **Sidebar aktif sampai bawah halaman** | Sidebar menempel terus bahkan saat konten di bawah (Opini, Foto, Video) lebih baik ditampilkan full-width |
-| 3 | **Tidak ada jarak visual antar section** | Section Fokus Redaksi, Trending, Berita Terbaru, dan Iklan tidak memiliki pembeda visual yang jelas |
-| 4 | **Logika distribusi artikel longgar** | Berita yang muncul di Hero bisa overlap dengan yang tampil di Fokus Redaksi karena `slice()` tidak terpisah ketat |
+> [!NOTE]
+> **Penyimpanan di Galeri Media:**
+> Apakah video Mux yang diunggah penulis harus muncul di "Galeri Media" umum (`/dashboard/media`) bersama gambar-gambar biasa? 
+> *Rencana ini mengasumsikan **Ya**, video akan disimpan di tabel `Media` dengan tipe `VIDEO` agar penulis dapat menggunakan kembali video tersebut di artikel lain tanpa perlu upload ulang.*
 
 ---
 
-### Arsitektur Section Baru (Urutan Top → Bottom)
+## Proposed Changes
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  [FULL WIDTH]  HERO SECTION — artikel[0..3]                     │
-│  MagazineBentoHero + slider otomatis                           │
-└─────────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────────┐
-│  [FULL WIDTH]  FOKUS REDAKSI — artikel[4..7]                    │
-│  Grid 4 kolom (xl) / 2 kolom (md) — isFeatured/isExclusive     │
-│  Kartu LEBIH BESAR, variasi ukuran (1 besar + 3 kecil)         │
-└─────────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────────┐
-│  [FULL WIDTH]  TRENDING TOPICS — tag/topik hangat               │
-│  Horizontal pill strip — tidak membutuhkan artikel              │
-└─────────────────────────────────────────────────────────────────┘
-┌─────────────────────────────┬───────────────────────────────────┐
-│  [8/12] BERITA TERBARU      │  [4/12] SIDEBAR KANAN             │
-│  artikel[8..9] — 2 kartu    │  • Akses Redaksi (WA/TG/Email)   │
-│  "featured" horizontal besar │  • Paling Populer               │
-│  —————————————————————————  │  • Info Pasar                    │
-│  [INLINE AD — full 8col]    │  • Video/Iklan Kecil             │
-│  —————————————————————————  │                                  │
-│  artikel[10..15] — 6 kartu  │  [SIDEBAR BERHENTI DI SINI]      │
-│  grid 2-kolom, ukuran medium │                                  │
-└─────────────────────────────┴───────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────────┐
-│  [FULL WIDTH]  PILIHAN EDITOR — artikel[isFeatured filter]      │
-│  Grid 3 kolom — kartu BESAR dengan gambar portrait              │
-└─────────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────────┐
-│  [FULL WIDTH]  OPINI & ANALISIS — artikel filter opini/analisis │
-│  Layout khusus: teks dominan, foto kecil di kanan               │
-└─────────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────────┐
-│  [FULL WIDTH]  FOTO JURNALISTIK — grid 3 kolom portrait         │
-│  Gambar BESAR dan mencolok, teks overlay minimal                │
-└─────────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────────┐
-│  [FULL WIDTH]  VIDEO EKSKLUSIF — dark background               │
-│  Grid 3 kolom, aspect-ratio video 16:9                         │
-└─────────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────────┐
-│  [FULL WIDTH]  LOAD MORE / INFINITE SCROLL                      │
-└─────────────────────────────────────────────────────────────────┘
-```
+### Database (Prisma Schema)
+
+Kita perlu memperluas skema database agar dapat mencatat status video, asset ID dari Mux, `playback_id` untuk streaming HLS, serta data pendukung seperti durasi video.
+
+#### [MODIFY] [schema.prisma](file:///d:/beritakarya-v1/apps/api/prisma/schema.prisma)
+* Tambahkan enum `MediaType` atau kolom string `mediaType` pada model `Media`.
+* Tambahkan kolom berikut pada model `Media`:
+  * `mediaType` (default: `"IMAGE"`) - membedakan gambar dan video.
+  * `muxAssetId` (String?) - ID aset di Mux.
+  * `muxPlaybackId` (String?) - ID pemutaran HLS di Mux.
+  * `duration` (Float?) - Durasi video dalam detik.
+  * `status` (String) (default: `"READY"`) - status kesiapan media (`"PROCESSING"`, `"READY"`, `"FAILED"`).
+* Tambahkan kolom berikut pada model `Article`:
+  * `videoPlaybackId` (String?) - Tautan langsung ke `playback_id` Mux untuk mempercepat query halaman publik.
 
 ---
 
-### Aturan Sidebar: Aktif vs Full-Width
+### Backend API (apps/api)
 
-| Section | Layout | Alasan |
-|---------|--------|--------|
-| Hero | Full-width | Perlu ruang penuh untuk gambar utama |
-| Fokus Redaksi | Full-width | Butuh 4 kolom; sidebar mengurangi bobot visual |
-| Trending Topics | Full-width | Strip horizontal — sidebar tidak relevan |
-| **Berita Terbaru** | **8+4 col (ada sidebar)** | Butuh akses redaksi, populer, dan iklan di sisi kanan |
-| **Berita Lanjutan** | **8+4 col (ada sidebar)** | Meneruskan grid dengan sidebar yang sama |
-| Pilihan Editor | Full-width | 3-kolom memerlukan ruang penuh, terasa premium |
-| Opini & Analisis | Full-width | Format teks panjang, tidak cocok dengan sidebar |
-| Foto Jurnalistik | Full-width | Gambar perlu ruang penuh untuk dampak visual |
-| Video Eksklusif | Full-width | Background gelap + 3 kolom butuh penuh |
+Backend akan menangani pembuatan URL unggah langsung (Direct Upload) dan memproses callback webhook dari Mux ketika video selesai diproses.
 
-> **Catatan UX:** Sidebar dikosongkan setelah grid "Berita Lanjutan" selesai. Secara teknis ini berarti `aside` ada dalam elemen grid yang berbeda dari section bawahnya — section editorial di bawah menggunakan `Container` penuh tanpa pembagian `grid-cols-12`.
+#### [MODIFY] [package.json](file:///d:/beritakarya-v1/apps/api/package.json)
+* Tambahkan dependensi `@mux/mux-node` untuk interaksi SDK resmi Mux.
 
----
+#### [NEW] [mux.service.ts](file:///d:/beritakarya-v1/apps/api/src/services/mux.service.ts)
+* Inisialisasi Mux Client menggunakan environment variables: `MUX_TOKEN_ID` & `MUX_TOKEN_SECRET`.
+* Buat fungsi `createDirectUpload()`: Menghubungi Mux API untuk meminta secure upload URL.
+* Buat fungsi `getPlaybackUrl(playbackId)`: Mengembalikan URL HLS (`https://stream.mux.com/{playbackId}.m3u8`).
 
-### Logika Distribusi Artikel Baru — fungsi `distributeArticles()`
+#### [MODIFY] [media.controller.ts](file:///d:/beritakarya-v1/apps/api/src/modules/media/media.controller.ts)
+* Tambahkan endpoint **`POST /api/v1/media/mux/upload-url`** (Memerlukan Auth):
+  * Memanggil `createDirectUpload()` dari `MuxService`.
+  * Membuat record baru di tabel `Media` dengan `mediaType: "VIDEO"`, `status: "PROCESSING"`, dan mencatat `muxAssetId`.
+  * Mengembalikan `uploadUrl` (URL tujuan unggah dari browser) dan `mediaId` ke frontend.
+* Tambahkan endpoint publik **`POST /api/v1/media/mux/webhook`** (Tanpa Auth):
+  * Menerima notifikasi dari server Mux.
+  * Memvalidasi signature Mux (opsional/rekomendasi keamanan).
+  * Menangani event `video.asset.ready`: Mengambil `playback_id` & `duration` lalu memperbarui record `Media` yang cocok menjadi `status: "READY"`.
+  * Menangani event `video.asset.errored`: Mengubah status `Media` menjadi `status: "FAILED"`.
 
-Menggantikan seluruh logika `.slice()` yang tersebar di `SiteHomePage.tsx` dengan satu fungsi deterministik:
-
-```typescript
-function distributeArticles(articles: any[]) {
-  // Slot 0–3: Hero (4 artikel terbaru)
-  const hero = articles.slice(0, 4);
-
-  // Slot 4–7: Fokus Redaksi (diprioritaskan isFeatured/isExclusive)
-  // Filter terlebih dahulu artikel bertanda featured/exclusive yang
-  // belum masuk hero, lalu fallback ke artikel urutan berikutnya
-  const featuredPool = articles
-    .slice(4)
-    .filter(a => a.isFeatured || a.isExclusive)
-    .slice(0, 4);
-  const fokusRedaksi = featuredPool.length >= 4
-    ? featuredPool
-    : articles.slice(4, 8); // fallback
-
-  // Kumpulkan ID yang sudah terpakai
-  const usedIds = new Set([
-    ...hero.map(a => a.id),
-    ...fokusRedaksi.map(a => a.id),
-  ]);
-
-  // Sisa artikel yang belum terpakai (untuk feed utama ke bawah)
-  const remaining = articles.filter(a => !usedIds.has(a.id));
-
-  // Slot Feed Utama (Berita Terbaru — di samping sidebar)
-  const feedFeatured = remaining.slice(0, 2);   // 2 kartu hero-horizontal besar
-  const feedStream   = remaining.slice(2, 8);   // 6 kartu grid medium
-
-  // Slot Editorial Extras (full-width, di bawah sidebar)
-  const remainingAfterFeed = remaining.slice(8);
-  const editorChoice  = remainingAfterFeed.filter(a => a.isFeatured).slice(0, 3);
-  const opinion       = remainingAfterFeed.slice(0, 3);    // fallback posisi
-  const photoJournal  = remainingAfterFeed.slice(3, 6);
-  const videoStories  = remainingAfterFeed.slice(6, 9);
-
-  // Sidebar: Populer dari pool terluas (hindari overlap hero)
-  const popular = articles.filter(a => !hero.some(h => h.id === a.id)).slice(0, 5);
-
-  return {
-    hero, fokusRedaksi, feedFeatured, feedStream,
-    editorChoice, opinion, photoJournal, videoStories, popular
-  };
-}
-```
+#### [MODIFY] [media.repository.ts](file:///d:/beritakarya-v1/apps/api/src/modules/media/media.repository.ts)
+* Perbarui fungsi `createMedia` dan `findMediaBySite` untuk mendukung filter bertipe `VIDEO` dan penyimpanan kolom Mux.
 
 ---
 
-### Variasi Ukuran Kartu untuk Menghindari Monoton
+### Frontend Dashboard & Editor (apps/web)
 
-#### Section: Fokus Redaksi (Full-Width, 4 Artikel)
-```
-┌──────────────────────────┬───────────┬───────────┐
-│                          │  Kartu 2  │  Kartu 3  │
-│   Kartu 1 (BESAR)        │ (medium)  │ (medium)  │
-│   col-span-2, row-span-2 ├───────────┴───────────┤
-│   gambar aspect-[4/3]    │        Kartu 4        │
-│                          │  (horizontal strip)   │
-└──────────────────────────┴───────────────────────┘
-```
-Implementasi: `grid-cols-3` dengan `col-span-2` untuk artikel pertama.
+Frontend akan dimodifikasi agar memiliki tab pilihan "Tipe Artikel: Video" yang secara otomatis menampilkan area drag-and-drop file video.
 
-#### Section: Berita Terbaru (Bagian Atas — sebelum inline ad)
-- 2 kartu pertama: `variant="horizontal"` — gambar di kiri, teks panjang di kanan (lebih besar dari medium)
-- 6 kartu stream: `variant="medium"` — grid 2 kolom seperti biasa
+#### [MODIFY] [package.json](file:///d:/beritakarya-v1/apps/web/package.json)
+* Tambahkan dependensi `@mux/mux-player` atau `@mux/mux-player-react` untuk merender pemutar video premium.
 
-#### Section: Pilihan Editor (Full-Width)
-- Grid 3 kolom dengan gambar aspect-ratio **portrait** `aspect-[3/4]` — lebih tinggi dari kartu biasa
-- Memberikan kesan majalah premium
+#### [MODIFY] [TabSettings.tsx](file:///d:/beritakarya-v1/apps/web/components/editor/tabs/TabSettings.tsx)
+* Tambahkan selektor **Tipe Post** di bagian atas Settings: `Standard Article` | `Foto Jurnalistik` | `Video Eksklusif`.
+* Logika otomatis:
+  * Jika memilih `Video Eksklusif`, otomatis centang badge **Eksklusif** dan arahkan kategori default ke **Video**.
+  * Jika memilih `Foto Jurnalistik`, arahkan kategori default ke **Galeri Foto**.
 
----
+#### [NEW] [VideoUploadZone.tsx](file:///d:/beritakarya-v1/apps/web/components/editor/VideoUploadZone.tsx)
+* Tampilan area Drag-and-Drop file video (.mp4, .mov, .avi) menggunakan native file selector / drag events.
+* Alur unggah video:
+  1. Penulis drag file video ke area unggah.
+  2. Frontend memanggil API `/api/v1/media/mux/upload-url` untuk meminta URL unggah.
+  3. Frontend mengunggah berkas video mentah langsung ke server Mux menggunakan Axios `PUT` dengan progress bar interaktif.
+  4. Sambil Mux memproses encoding di server mereka, frontend secara berkala melakukan polling (atau menunggu status dari backend) hingga video berstatus `READY`.
+  5. Setelah siap, tampilkan preview pemutar video menggunakan `@mux/mux-player-react`.
 
-## Bagian B — Peningkatan Branding Visual & Trust Pages
-
-### [Component: Visual & Branding System]
-
-#### [MODIFY] [layout.tsx](file:///d:/beritakarya-v1/apps/web/app/layout.tsx)
-- Mengimpor font **Plus Jakarta Sans** dari `next/font/google` menggantikan **Outfit**.
-- Variabel CSS: `--font-plus-jakarta-sans` → `sans` di Tailwind.
-
-#### [MODIFY] [tailwind.config.ts](file:///d:/beritakarya-v1/apps/web/tailwind.config.ts)
-- Memetakan font `sans` ke `var(--font-plus-jakarta-sans)`, `var(--font-inter)`.
-
-#### [MODIFY] [globals.css](file:///d:/beritakarya-v1/apps/web/app/globals.css)
-- Memperbarui Google Fonts import ke Plus Jakarta Sans.
-- Menambahkan CSS custom class `section-divider` (separator visual antar section agar jeda section terasa jelas).
-
-#### [MODIFY] [Navbar.tsx](file:///d:/beritakarya-v1/apps/web/components/layout/Navbar.tsx)
-- Mengganti fallback teks logo dengan **SVG logo tipografi premium**.
+#### [MODIFY] [Editor.tsx](file:///d:/beritakarya-v1/apps/web/components/editor/Editor.tsx)
+* Jika tipe artikel adalah `Video`, sembunyikan kanvas Tiptap standar (atau minimalkan teks editor hanya untuk kolom "Deskripsi Video") dan tampilkan komponen `VideoUploadZone` di area canvas utama secara dominan.
 
 ---
 
-### [Component: Core — SiteHomePage.tsx]
+### Frontend Public Website (apps/web)
 
 #### [MODIFY] [SiteHomePage.tsx](file:///d:/beritakarya-v1/apps/web/components/pages/SiteHomePage.tsx)
-
-Ini adalah file utama yang paling banyak berubah:
-
-1. **Menambahkan fungsi `distributeArticles()`** — menggantikan seluruh logika `.slice()` yang tersebar.
-2. **Menyusun ulang urutan JSX section** sesuai arsitektur baru di atas.
-3. **Memisahkan zona 8+4 (sidebar) dan zona full-width** secara struktural di JSX — tidak lagi membungkus semua section dalam satu `grid-cols-12`.
-4. **Menambahkan Section Fokus Redaksi** dengan grid asimetris (1 besar + 3 kecil).
-5. **Mengubah 2 kartu teratas Berita Terbaru** menjadi `variant="horizontal"` agar proporsi lebih berkesan.
+* Pada section **Laporan Video Eksklusif** (baris 849-887), ganti elemen gambar statis/YouTube embed dengan `<MuxPlayer>` yang memuat `playback_id` dari artikel video Mux secara native dan tanpa iklan.
 
 ---
 
-### [Component: NewsCard]
+## Foto Jurnalistik
 
-#### [MODIFY] [NewsCard.tsx](file:///d:/beritakarya-v1/apps/web/components/ui/NewsCard.tsx)
-- Menghapus `<p>{excerpt}</p>` pada render `medium` default agar kartu bersih.
-- Menambahkan micro-animation hover yang lebih halus.
+Bagian ini menangani integrasi fitur **Foto Jurnalistik** yang memungkinkan penulis mengunggah galeri foto dengan caption, credit, dan alt text per gambar.
 
----
+### Frontend Dashboard & Editor - Foto Jurnalistik
 
-### [Component: Trust & Legal Pages]
+#### [NEW] [PhotoGalleryUpload.tsx](file:///d:/beritakarya-v1/apps/web/components/editor/PhotoGalleryUpload.tsx)
+* Area drag-and-drop untuk multi-image upload (batch upload).
+* Support format: `.jpg`, `.jpeg`, `.png`, `.webp`, `.gif`.
+* Fitur per-image:
+  * **Caption** - Deskripsi singkat untuk setiap foto.
+  * **Credit** - Sumber/nama fotografer.
+  * **Alt Text** - Untuk SEO dan accessibility.
+  * **Preview thumbnail** - Thumbnail sebelum upload.
+* Preview grid dengan kemampuan reorder via drag-and-drop.
+* Batasan: Maksimal 20 foto per galeri.
+* Progress bar untuk setiap image yang diunggah.
+* Tombol hapus untuk setiap image.
 
-#### [MODIFY] [page.tsx — /p/[slug]](file:///d:/beritakarya-v1/apps/web/app/[site]/p/[slug]/page.tsx)
-- Menambahkan konten fallback profesional berbahasa Indonesia jika database kosong:
-  - **Tentang Kami:** Visi, misi, dan komitmen editorial
-  - **Redaksi:** Struktur kepengurusan standar
-  - **Kode Etik:** Butir-butir KEJ Dewan Pers
-  - **Pedoman Media Siber:** Keputusan Dewan Pers No. 5/2008
+#### [NEW] [ImageGalleryBlock.tsx](file:///d:/beritakarya-v1/apps/web/components/editor/blocks/ImageGalleryBlock.tsx)
+* Component untuk menampilkan dan mengedit gallery di dalam editor.
+* Mendukung layout modes:
+  * **Grid** - Tampilan grid 2 atau 3 kolom.
+  * **Slider/Carousel** - Tampilan slide horizontal.
+  * **Masonry** - Tampilan masonry/pinterest style.
+* Edit caption, credit, alt text langsung dari editor.
+* Reorder images via drag-and-drop.
+
+#### [MODIFY] [EditorContent.tsx](file:///d:/beritakarya-v1/apps/web/components/editor/EditorContent.tsx)
+* Jika tipe artikel adalah `Foto Jurnalistik`:
+  * Tampilkan `PhotoGalleryUpload` di area utama editor.
+  * Tiptap editor tetap tersedia untuk paragraph introduksi/artikel pembuka.
+  * Otomatis set category default ke `foto-jurnalistik`.
+  * Set badge label: **Galeri Foto**.
+
+#### [MODIFY] [FloatingMenu.tsx](file:///d:/beritakarya-v1/apps/web/components/editor/menus/FloatingMenu.tsx)
+* Tambahkan opsi "Galeri Foto" di floating menu untuk inserting gallery block di tengah artikel.
+* Tambahkan opsi "Grid Foto" untuk image grid block.
+
+#### [NEW] [useImageUpload.ts](file:///d:/beritakarya-v1/apps/web/hooks/useImageUpload.ts)
+* Custom hook untuk handle multi-image upload logic.
+* Mendukung:
+  * Batch upload dengan progress tracking.
+  * Image compression sebelum upload (optional).
+  * Validation: file size (max 10MB), dimensions, format.
+  * Retry mechanism untuk failed uploads.
+
+### Backend API - Foto Jurnalistik
+
+#### [MODIFY] [media.controller.ts](file:///d:/beritakarya-v1/apps/api/src/modules/media/media.controller.ts)
+* Tambahkan endpoint **`POST /api/v1/media/batch`** (Memerlukan Auth):
+  * Upload multiple images dalam satu request.
+  * Accept array of files dengan metadata (caption, credit, altText).
+  * Return array of created media records.
+* Update endpoint **`PATCH /api/v1/media/:id`**:
+  * Support update caption, credit, altText untuk setiap image.
+
+#### [MODIFY] [media.repository.ts](file:///d:/beritakarya-v1/apps/api/src/modules/media/media.repository.ts)
+* Tambahkan fungsi `createMediaBatch()` untuk bulk insert.
+* Update `findMediaBySite` untuk support filtering `mediaType: "IMAGE"`.
+
+### Frontend Public Website - Foto Jurnalistik
+
+#### [NEW] [ArticleGalleryViewer.tsx](file:///d:/beritakarya-v1/apps/web/components/berita/ArticleGalleryViewer.tsx)
+* Component untuk menampilkan galeri foto di halaman artikel publik.
+* Fitur:
+  * **Lightbox** - Full-screen viewer saat klik gambar.
+  * **Thumbnail strip** - Navigasi cepat di bagian bawah lightbox.
+  * **Keyboard navigation** - Arrow keys, ESC to close.
+  * **Swipe support** - Untuk mobile touch devices.
+  * **Lazy loading** - Images load on-demand.
+  * **Zoom** - Pinch-to-zoom di mobile, scroll-to-zoom di desktop.
+  * Display caption dan credit di overlay lightbox.
+
+#### [MODIFY] [artikel/[slug]/page.tsx](file:///d:/beritakarya-v1/apps/web/app/[site]/artikel/[slug]/page.tsx)
+* Jika artikel bertipe `Foto Jurnalistik`:
+  * Render `ArticleGalleryViewer` dengan images dari blocks.
+  * Tampilkan intro text dari article content.
+  * Matikan layout sidebar article (full-width gallery view).
+
+#### [MODIFY] [SiteHomePage.tsx](file:///d:/beritakarya-v1/apps/web/components/pages/SiteHomePage.tsx)
+* Pada section **Galeri Foto Jurnalistik**:
+  * Tampilkan featured photos dari artikel `foto-jurnalistik` terbaru.
+  * Link ke halaman artikel galeri saat diklik.
+  * Grid layout dengan hover effect dan caption preview.
 
 ---
 
 ## Verification Plan
 
 ### Automated Tests
-```powershell
-pnpm --filter @beritakarya/web build
-```
+* Uji coba validitas kompilasi typescript dan bundling aplikasi:
+  ```powershell
+  pnpm type-check
+  pnpm build
+  ```
 
 ### Manual Verification
+1. **Direct Upload Flow:**
+   - Masuk to editor `/dashboard/articles/new`.
+   - Pilih tipe artikel **"Video Eksklusif"**.
+   - Seret video berformat `.mp4` ke dropzone.
+   - Amati progress bar berjalan s.d 100%.
+2. **Webhook & Processing:**
+   - Setelah upload 100%, sistem menunjukkan status "Menyiapkan video...".
+   - Webhook Mux terpanggil, database terupdate dengan `playback_id`.
+   - UI editor berubah menampilkan Mux Player dengan preview video yang diunggah.
+3. **Public Homepage Playback:**
+   - Terbitkan artikel video tersebut.
+   - Buka beranda publik situs, navigasikan ke section "Laporan Video Eksklusif" di bagian bawah.
+   - Klik tombol putar dan pastikan video berjalan mulus dengan Mux Player premium tanpa logo YouTube.
 
-| Pengujian | Target |
-|-----------|--------|
-| Tidak ada artikel yang muncul di dua section berbeda | `distributeArticles()` tidak overlap |
-| Section Hero → Fokus Redaksi → Trending → Feed+Sidebar terbaca urut | Visual scroll dari atas ke bawah |
-| Fokus Redaksi menampilkan 1 kartu besar + 3 kecil | Grid asimetris berfungsi |
-| 2 kartu atas Berita Terbaru memakai `variant="horizontal"` | Proporsi berbeda |
-| Section Pilihan Editor, Opini, Foto, Video = full-width (tidak ada sidebar) | Sidebar berhenti setelah Berita Lanjutan |
-| Kartu medium tidak menampilkan excerpt | Teks bersih |
-| Halaman /p/about, /p/editorial, /p/ethics menampilkan konten fallback | Trust pages tampil baik |
+### Foto Jurnalistik Verification
+4. **Photo Gallery Upload:**
+   - Masuk ke editor `/dashboard/articles/new`.
+   - Pilih tipe artikel **"Foto Jurnalistik"**.
+   - Upload 5-10 foto dengan drag-and-drop.
+   - Isi caption dan credit untuk setiap foto.
+   - Reorder foto dengan drag.
+5. **Gallery Viewer:**
+   - Terbitkan artikel foto jurnalistik.
+   - Buka artikel di halaman publik.
+   - Klik salah satu foto untuk membuka lightbox.
+   - Navigasi antar foto dengan arrow keys atau thumbnail strip.
+   - Pastikan caption dan credit tampil dengan benar.
