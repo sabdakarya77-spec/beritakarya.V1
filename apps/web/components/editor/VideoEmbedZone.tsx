@@ -20,6 +20,7 @@ export function VideoEmbedZone({ onVideoChange }: VideoEmbedZoneProps) {
   const [videoTitle, setVideoTitle] = useState(existingEmbedBlock?.title || '')
   
   // Detect video type from URL
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const embedInfo = useMemo(() => {
     if (!videoUrl.trim()) return null
     
