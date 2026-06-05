@@ -24,8 +24,8 @@ export async function recordView(data: {
       }
     })
 
-    // Track active reader in Redis (last 5 minutes)
-    if (data.ipAddress && data.siteId) {
+    // Track active reader in Redis (last 5 minutes) - skip if Redis not available
+    if (data.ipAddress && data.siteId && redis) {
       const visitorHash = crypto
         .createHash('md5')
         .update(`${data.ipAddress}-${data.userAgent || ''}`)
