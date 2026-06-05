@@ -175,9 +175,32 @@ function distributeArticles(articles: any[]) {
   // Zona 5+ — Editorial extras (full-width, di bawah zona sidebar)
   const afterFeed   = remaining.slice(8)
   const editorChoice = afterFeed.filter((a: any) => a.isFeatured).slice(0, 3)
-  const opinion      = afterFeed.slice(0, 3)
-  const photoJournal = afterFeed.slice(3, 6)
-  const videoStories = afterFeed.slice(6, 9)
+  
+  // Filter berdasarkan kategori — Opini, Foto Jurnalistik, Video
+  const opinionSlugs = ['opini', 'kolom-esai', 'analisis', 'kolom']
+  const photoSlugs   = ['galeri-foto', 'foto-jurnalistik']
+  const videoSlugs   = ['video', 'dokumenter-reportase', 'podcast-audio']
+  
+  // Opinion: ambil dari artikel dengan kategori opini/analisis
+  const opinion = afterFeed.filter((a: any) => {
+    const catSlug = a.category?.slug?.toLowerCase()
+    const parentSlug = a.category?.parentSlug?.toLowerCase()
+    return opinionSlugs.includes(catSlug) || opinionSlugs.includes(parentSlug)
+  }).slice(0, 3)
+  
+  // Photo Journal: ambil dari kategori galeri foto
+  const photoJournal = afterFeed.filter((a: any) => {
+    const catSlug = a.category?.slug?.toLowerCase()
+    const parentSlug = a.category?.parentSlug?.toLowerCase()
+    return photoSlugs.includes(catSlug) || photoSlugs.includes(parentSlug)
+  }).slice(0, 3)
+  
+  // Video Stories: ambil dari kategori video
+  const videoStories = afterFeed.filter((a: any) => {
+    const catSlug = a.category?.slug?.toLowerCase()
+    const parentSlug = a.category?.parentSlug?.toLowerCase()
+    return videoSlugs.includes(catSlug) || videoSlugs.includes(parentSlug)
+  }).slice(0, 3)
 
   // Sidebar populer: dari artikel non-hero (boleh overlap dengan section lain)
   const popular = articles.filter((a: any) => !heroIds.has(a.id)).slice(0, 5)
