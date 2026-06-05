@@ -114,47 +114,10 @@ export default function Navbar({
                   />
                 </div>
               ) : (
-                <div className="relative flex items-center">
-                  {/* Typographic SVG Logo - Modern News Brand Mark */}
-                  <svg 
-                    width="140" 
-                    height="36" 
-                    viewBox="0 0 140 36" 
-                    fill="none" 
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-7 w-auto sm:h-8"
-                    aria-label="Berita Karya"
-                  >
-                    {/* Red accent bar */}
-                    <rect x="0" y="8" width="4" height="20" rx="1" fill="#DC2626"/>
-                    
-                    {/* BK Letters - Bold Typographic Style */}
-                    <text 
-                      x="10" 
-                      y="26" 
-                      fontFamily="'Plus Jakarta Sans', 'Inter', system-ui, sans-serif" 
-                      fontSize="22" 
-                      fontWeight="800" 
-                      letterSpacing="-0.02em"
-                      fill="white"
-                    >
-                      BK
-                    </text>
-                    
-                    {/* Subtitle - News Portal indicator */}
-                    <text 
-                      x="10" 
-                      y="35" 
-                      fontFamily="'Plus Jakarta Sans', 'Inter', system-ui, sans-serif" 
-                      fontSize="7" 
-                      fontWeight="600" 
-                      letterSpacing="0.12em"
-                      fill="#94A3B8"
-                    >
-                      PORTAL BERITA
-                    </text>
-                  </svg>
-                </div>
+                <h1 className="font-sans text-[1.15rem] font-extrabold leading-none tracking-[-0.045em] sm:text-[1.4rem]">
+                  <span className="text-brand-red transition-colors">BERITA</span>
+                  <span className="text-white">KARYA</span>
+                </h1>
               )}
               <span className="hidden sm:block text-[9px] tracking-wide mt-0.5 text-slate-400">
                 <span className="font-bold text-slate-300 italic">Nusantara Berbicara</span>
