@@ -44,53 +44,84 @@ async function processImage(
     sharp = (await import('sharp')).default
   } catch (err) {
     logger.error('[Media] Failed to import sharp:', err)
-    throw new Error('Sharp library not available')
+    throw new AppError('Library pemrosesan gambar tidak tersedia. Pastikan sharp terinstall.', 500, 'SHARP_NOT_AVAILABLE')
   }
 
   let meta: any
   try {
     meta = await sharp(buffer).metadata()
-  } catch (err) {
+  } catch (err: any) {
     logger.error('[Media] Failed to read image metadata:', err)
-    throw new Error('Invalid image file or corrupted data')
+    throw new AppError('Tidak dapat membaca metadata gambar. File mungkin corrupted atau format tidak didukung.', 500, 'INVALID_IMAGE_METADATA')
+  }
+
+  if (!meta.width || !meta.height) {
+    throw new AppError('Gambar tidak memiliki dimensi yang valid', 500, 'INVALID_IMAGE_DIMENSIONS')
   }
 
   const maxW = 1920
   let processedBuffer = buffer
   if ((meta.width ?? 0) > maxW) {
-    processedBuffer = await sharp(buffer).resize(maxW).toBuffer()
+    try {
+      processedBuffer = await sharp(buffer).resize(maxW).toBuffer()
+    } catch (err: any) {
+      logger.error('[Media] Failed to resize image:', err)
+      throw new AppError('Gagal meresize gambar', 500, 'IMAGE_RESIZE_FAILED')
+    }
   }
 
   // ── Full-size image (with optional watermark) ──
   let pipeline = sharp(processedBuffer)
 
   if (!options.skipWatermark) {
-    const currentMeta = await sharp(processedBuffer).metadata()
-    const currentW = currentMeta.width || maxW
-    const currentH = currentMeta.height || maxW
-    const fontSize = Math.max(14, Math.floor(currentW * 0.02))
-    const boxWidth = Math.max(180, fontSize * 12)
-    const boxHeight = Math.max(32, fontSize * 2.2)
+    try {
+      const currentMeta = await sharp(processedBuffer).metadata()
+      const currentW = currentMeta.width || maxW
+      const currentH = currentMeta.height || maxW
+      const fontSize = Math.max(14, Math.floor(currentW * 0.02))
+      const boxWidth = Math.max(180, fontSize * 12)
+      const boxHeight = Math.max(32, fontSize * 2.2)
 
-    const watermarkSvg = `<svg width="${boxWidth}" height="${boxHeight}" xmlns="http://www.w3.org/2000/svg">
+      const watermarkSvg = `<svg width="${boxWidth}" height="${boxHeight}" xmlns="http://www.w3.org/2000/svg">
 <rect width="${boxWidth}" height="${boxHeight}" rx="4" ry="4" fill="rgba(0,0,0,0.65)" />
 <text x="${boxWidth / 2}" y="${boxHeight / 2}" dominant-baseline="middle" text-anchor="middle" fill="rgba(255,255,255,0.95)" font-size="${fontSize}px" font-weight="700" font-family="Noto Sans, DejaVu Sans, Liberation Sans, sans-serif">© BERITAKARYA 2026</text>
 </svg>`
 
-    pipeline = pipeline.composite([{ input: Buffer.from(watermarkSvg), gravity: 'southeast' }])
+      pipeline = pipeline.composite([{ input: Buffer.from(watermarkSvg), gravity: 'southeast' }])
+    } catch (err: any) {
+      logger.error('[Media] Failed to add watermark:', err)
+      throw new AppError('Gagal menambahkan watermark', 500, 'WATERMARK_FAILED')
+    }
   }
 
-  const fullBuffer: Buffer = await pipeline.webp({ quality: 82 }).toBuffer()
+  let fullBuffer: Buffer
+  try {
+    fullBuffer = await pipeline.webp({ quality: 82 }).toBuffer()
+  } catch (err: any) {
+    logger.error('[Media] Failed to convert to WebP:', err)
+    throw new AppError('Gagal mengkonversi gambar ke format WebP', 500, 'WEBP_CONVERSION_FAILED')
+  }
 
   // ── Thumbnail 400px ──
-  const thumbBuffer: Buffer = await sharp(buffer).resize(400).webp({ quality: 70 }).toBuffer()
+  let thumbBuffer: Buffer
+  try {
+    thumbBuffer = await sharp(buffer).resize(400).webp({ quality: 70 }).toBuffer()
+  } catch (err: any) {
+    logger.error('[Media] Failed to create thumbnail:', err)
+    throw new AppError('Gagal membuat thumbnail', 500, 'THUMBNAIL_FAILED')
+  }
 
   // ── BlurHash (tiny 10×10 WebP base64) ──
-  const blurBuffer: Buffer = await sharp(buffer)
-    .resize(10, 10, { fit: 'inside' })
-    .webp({ quality: 20 })
-    .toBuffer()
-  const blurHash = `data:image/webp;base64,${blurBuffer.toString('base64')}`
+  let blurHash = ''
+  try {
+    const blurBuffer: Buffer = await sharp(buffer)
+      .resize(10, 10, { fit: 'inside' })
+      .webp({ quality: 20 })
+      .toBuffer()
+    blurHash = `data:image/webp;base64,${blurBuffer.toString('base64')}`
+  } catch (err) {
+    logger.warn('[Media] Failed to create blurhash, using empty string:', err)
+  }
 
   // ── Dominant color ──
   let dominantColor = ''
@@ -103,16 +134,22 @@ async function processImage(
   } catch { /* non-critical */ }
 
   // ── Final dimensions from the processed full image ──
-  const finalMeta = await sharp(fullBuffer).metadata()
+  let finalMeta: any
+  try {
+    finalMeta = await sharp(fullBuffer).metadata()
+  } catch (err) {
+    logger.warn('[Media] Failed to get final metadata, using original:', err)
+    finalMeta = meta
+  }
 
   return {
     fullBuffer,
     thumbBuffer,
     blurHash,
     dominantColor,
-    width: finalMeta.width ?? meta.width ?? 0,
-    height: finalMeta.height ?? meta.height ?? 0,
-    originalFormat: meta.format ?? 'unknown',
+    width: finalMeta?.width ?? meta?.width ?? 0,
+    height: finalMeta?.height ?? meta?.height ?? 0,
+    originalFormat: meta?.format ?? 'unknown',
   }
 }
 
@@ -151,57 +188,35 @@ mediaRouter.post(
     if (req.file.mimetype === 'application/pdf') {
       // ── PDF: upload buffer directly ──
       const key = `${id}.pdf`
-      try {
-        await StorageService.uploadBuffer(req.file.buffer, key, 'application/pdf', mediaBucket, {
-          isPublic: true,
-        })
-        url = StorageService.getPublicUrl(mediaBucket, key)
-        thumbUrl = url
-        originalFormat = 'pdf'
-      } catch (err: any) {
-        logger.error('[Media] PDF upload failed:', err)
-        return res
-          .status(500)
-          .json({ success: false, error: { message: `Gagal mengunggah PDF: ${err.message}` } })
-      }
+      await StorageService.uploadBuffer(req.file.buffer, key, 'application/pdf', mediaBucket, {
+        isPublic: true,
+      })
+      url = StorageService.getPublicUrl(mediaBucket, key)
+      thumbUrl = url
+      originalFormat = 'pdf'
     } else {
       // ── Image: process then upload two versions ──
-      let processed: ProcessResult
-      try {
-        processed = await processImage(req.file.buffer, { skipWatermark })
-      } catch (err: any) {
-        logger.error('[Media] Image processing failed:', err)
-        return res
-          .status(500)
-          .json({ success: false, error: { message: `Gagal memproses gambar: ${err.message}` } })
-      }
+      const processed: ProcessResult = await processImage(req.file.buffer, { skipWatermark })
 
       const fullKey = `${id}.webp`
       const thumbKey = `thumbs/${id}_thumb.webp`
 
-      try {
-        await Promise.all([
-          StorageService.uploadBuffer(processed.fullBuffer, fullKey, 'image/webp', mediaBucket, {
-            isPublic: true,
-          }),
-          StorageService.uploadBuffer(processed.thumbBuffer, thumbKey, 'image/webp', mediaBucket, {
-            isPublic: true,
-          }),
-        ])
+      await Promise.all([
+        StorageService.uploadBuffer(processed.fullBuffer, fullKey, 'image/webp', mediaBucket, {
+          isPublic: true,
+        }),
+        StorageService.uploadBuffer(processed.thumbBuffer, thumbKey, 'image/webp', mediaBucket, {
+          isPublic: true,
+        }),
+      ])
 
-        url = StorageService.getPublicUrl(mediaBucket, fullKey)
-        thumbUrl = StorageService.getPublicUrl(mediaBucket, thumbKey)
-        blurHash = processed.blurHash
-        width = processed.width
-        height = processed.height
-        originalFormat = processed.originalFormat
-        dominantColor = processed.dominantColor
-      } catch (err: any) {
-        logger.error('[Media] Upload to Supabase Storage failed:', err)
-        return res
-          .status(500)
-          .json({ success: false, error: { message: `Gagal mengunggah ke storage: ${err.message}` } })
-      }
+      url = StorageService.getPublicUrl(mediaBucket, fullKey)
+      thumbUrl = StorageService.getPublicUrl(mediaBucket, thumbKey)
+      blurHash = processed.blurHash
+      width = processed.width
+      height = processed.height
+      originalFormat = processed.originalFormat
+      dominantColor = processed.dominantColor
     }
 
     const media = await repo.createMedia({

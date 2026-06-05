@@ -7,6 +7,7 @@ import {
 import { getSignedUrl as getS3SignedUrl } from '@aws-sdk/s3-request-presigner'
 import fs from 'fs/promises'
 import { logger } from '../lib/logger'
+import { AppError } from '../utils/AppError'
 
 const s3 = new S3Client({
   endpoint: process.env.S3_ENDPOINT,
@@ -61,9 +62,10 @@ export class StorageService {
       )
       logger.info(`[Storage] Uploaded to ${bucket}/${remoteKey}`)
       return remoteKey
-    } catch (error) {
+    } catch (error: any) {
       logger.error(`[Storage] uploadBuffer failed for ${bucket}/${remoteKey}:`, error)
-      throw error
+      const message = error?.message || 'Unknown storage error'
+      throw new AppError(`Gagal mengunggah ke storage: ${message}`, 500, 'STORAGE_UPLOAD_FAILED')
     }
   }
 
@@ -73,7 +75,7 @@ export class StorageService {
    */
   static getPublicUrl(bucket: string, key: string): string {
     if (!SUPABASE_STORAGE_PUBLIC_URL) {
-      throw new Error('SUPABASE_STORAGE_PUBLIC_URL is not configured')
+      throw new AppError('Konfigurasi CDN tidak ditemukan. Hubungi administrator.', 500, 'STORAGE_CONFIG_MISSING')
     }
     const base = SUPABASE_STORAGE_PUBLIC_URL.replace(/\/$/, '')
     return `${base}/${bucket}/${key}`
