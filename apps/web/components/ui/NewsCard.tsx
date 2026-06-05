@@ -220,13 +220,10 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
                 {article.category?.name || 'UMUM'}
               </span>
             </div>
-            <h3 className="line-clamp-3 font-sans text-[1.08rem] font-extrabold leading-[1.2] tracking-tight text-brand-black transition-colors group-hover:text-brand-red dark:text-white md:text-[1.18rem]">
-              {article.title}
-            </h3>
-            <p className="line-clamp-2 text-[13px] font-normal leading-relaxed text-brand-text-muted opacity-80 dark:text-gray-400">
-              {excerpt}
-            </p>
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[10px] text-brand-text-muted dark:text-gray-400">
+              <h3 className="line-clamp-3 font-sans text-[1.08rem] font-extrabold leading-[1.2] tracking-tight text-brand-black transition-colors group-hover:text-brand-red dark:text-white md:text-[1.18rem]">
+                {article.title}
+              </h3>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[10px] text-brand-text-muted dark:text-gray-400">
                <div className="flex min-w-0 items-center gap-1">
                   <div className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-gray-100 text-[9px] font-semibold dark:bg-white/10">
                     {authorName[0] || 'R'}
