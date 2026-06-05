@@ -196,7 +196,8 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
       />
       <Link href={articleHref} onMouseEnter={() => prefetchImage(imageUrl)}>
         <motion.article 
-          whileHover={{ y: -3 }}
+          whileHover={{ y: -4, scale: 1.01 }}
+          transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
           className="group relative flex cursor-pointer flex-col gap-3 md:gap-4"
         >
           <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 shadow-sm dark:bg-white/5">

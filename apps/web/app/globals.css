@@ -150,6 +150,16 @@
   }
 }
 
+/* Section Divider - Visual separator between sections */
+.section-divider {
+  @apply relative border-t border-black/5 dark:border-white/5;
+}
+
+.section-divider::before {
+  content: '';
+  @apply absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-brand-red/10 to-transparent;
+}
+
 @layer components {
   .news-container {
     @apply max-w-container mx-auto px-4;
