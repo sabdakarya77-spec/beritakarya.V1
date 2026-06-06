@@ -178,7 +178,7 @@ function distributeArticles(articles: any[]) {
   
   // Filter berdasarkan kategori — Opini, Foto Jurnalistik, Video
   const opinionSlugs = ['opini', 'kolom-esai', 'analisis', 'kolom']
-  const photoSlugs   = ['galeri-foto', 'foto-jurnalistik']
+  const photoSlugs   = ['foto-jurnalistik']
   const videoSlugs   = ['video', 'dokumenter-reportase', 'podcast-audio']
   
   // Opinion: ambil dari artikel dengan kategori opini/analisis

@@ -118,7 +118,7 @@ async function main() {
     { name: 'Rilis Pers', slug: 'rilis-pers', parentSlug: 'advertorial', order: 2, color: 'orange', description: 'Pernyataan resmi perusahaan dan lembaga.' },
     // Video
     { name: 'Dokumenter & Reportase', slug: 'dokumenter', parentSlug: 'video', order: 1, color: 'sky', description: 'Liputan audio-visual eksklusif di lapangan.' },
-    { name: 'Galeri Foto', slug: 'galeri-foto', parentSlug: 'video', order: 2, color: 'pink', description: 'Karya jurnalistik dalam lensa fotografi.' },
+    { name: 'Foto Jurnalistik', slug: 'foto-jurnalistik', parentSlug: 'video', order: 2, color: 'pink', description: 'Karya jurnalistik dalam lensa fotografi.' },
     { name: 'Podcast & Audio', slug: 'podcast', parentSlug: 'video', order: 3, color: 'indigo', description: 'Obrolan santai dan informatif seputar isu terhangat.' }
   ]
 

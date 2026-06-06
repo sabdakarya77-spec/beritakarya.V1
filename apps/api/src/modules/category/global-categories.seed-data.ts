@@ -92,7 +92,7 @@ export const GLOBAL_CATEGORIES_SEED = [
     slug: 'video',
     subCategories: [
       { name: 'Dokumenter & Reportase', slug: 'dokumenter-reportase' },
-      { name: 'Galeri Foto', slug: 'galeri-foto' },
+      { name: 'Foto Jurnalistik', slug: 'foto-jurnalistik' },
       { name: 'Podcast & Audio', slug: 'podcast-audio' }
     ]
   }

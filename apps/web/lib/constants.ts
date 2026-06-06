@@ -65,7 +65,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   'rilis-pers': 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-950/20 border border-yellow-100 dark:border-yellow-900/30',
   video: 'text-sky-600 bg-sky-50 dark:text-sky-400 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-900/30',
   'dokumenter-reportase': 'text-sky-600 bg-sky-50 dark:text-sky-400 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-900/30',
-  'galeri-foto': 'text-sky-600 bg-sky-50 dark:text-sky-400 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-900/30',
+  'foto-jurnalistik': 'text-sky-600 bg-sky-50 dark:text-sky-400 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-900/30',
   'podcast-audio': 'text-sky-600 bg-sky-50 dark:text-sky-400 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-900/30',
   tersimpan: 'text-gray-600 bg-gray-50 dark:text-gray-400 dark:bg-gray-950/20 border border-gray-100 dark:border-gray-900/30',
   terbaru: 'text-gray-600 bg-gray-50 dark:text-gray-400 dark:bg-gray-950/20 border border-gray-100 dark:border-gray-900/30',
@@ -308,7 +308,7 @@ export const CATEGORIES_CONFIG: CategoryItem[] = [
     slug: 'video',
     subCategories: [
       { name: 'Dokumenter & Reportase', slug: 'dokumenter-reportase' },
-      { name: 'Galeri Foto', slug: 'galeri-foto' },
+      { name: 'Foto Jurnalistik', slug: 'foto-jurnalistik' },
       { name: 'Podcast & Audio', slug: 'podcast-audio' }
     ]
   },
