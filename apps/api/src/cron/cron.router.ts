@@ -9,6 +9,7 @@
 import { Router, Request, Response } from 'express'
 import { runKYCCleanup } from './kyc-cleanup'
 import { runTokenCleanup } from './token-cleanup'
+import { runAdExpiry } from './ad-expiry'
 import { checkAllQuotas } from '../middleware/quotaNotifications'
 import { processDueScheduledArticles } from '../modules/article/article.service'
 import { logger } from '../lib/logger'
@@ -74,6 +75,19 @@ cronRouter.post('/scheduled-publish', requireCronSecret, async (_req: Request, r
     res.json({ success: true, job: 'scheduled-publish', result })
   } catch (err) {
     logger.error('[Cron] scheduled-publish failed:', err)
+    res.status(500).json({ success: false, error: String(err) })
+  }
+})
+
+// ── POST /api/cron/ad-expiry — setiap jam ─────────────────────────────────────
+cronRouter.post('/ad-expiry', requireCronSecret, async (_req: Request, res: Response) => {
+  logger.info('[Cron] ad-expiry triggered')
+  try {
+    const result = await runAdExpiry()
+    logger.info(`[Cron] ad-expiry: ${result.expired} expired out of ${result.total} total`)
+    res.json({ success: true, job: 'ad-expiry', result })
+  } catch (err) {
+    logger.error('[Cron] ad-expiry failed:', err)
     res.status(500).json({ success: false, error: String(err) })
   }
 })

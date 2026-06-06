@@ -89,14 +89,17 @@ export default function AdSpace({
   const handleAdClick = () => {
     if (!ad) return;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    // AUTO-TRACK: Record Click when ad is clicked by visitor
-    fetch(`${apiUrl}/api/v1/ads/track/${ad.id}?action=click`, {
-      method: 'POST'
-    }).catch(() => {});
+    const url = `${apiUrl}/api/v1/ads/track/${ad.id}?action=click`;
+    // Pakai sendBeacon agar request tetap terkirim meski browser navigate away
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url);
+    } else {
+      fetch(url, { method: 'POST', keepalive: true }).catch(() => {});
+    }
   };
 
   const styles = {
-    leaderboard: "w-full h-20 md:h-24 mb-6",
+    leaderboard: "w-full h-24 md:h-[250px] mb-6",
     rectangle: "w-full h-[250px] mb-8",
     'in-feed': "w-full h-40 mb-12"
   };

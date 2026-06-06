@@ -103,6 +103,21 @@ export const articleUpdateLimiter = rateLimit({
   legacyHeaders: false,
 })
 
+export const adTrackingLimiter = rateLimit({
+  store: getStore('ad-track'),
+  windowMs: 60 * 1000, // 1 menit
+  max: 30,             // 30 impression/click per IP per menit
+  message: {
+    success: false,
+    error: {
+      code: 'RATE_LIMITED',
+      message: 'Terlalu banyak request tracking. Coba lagi sebentar.',
+    },
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
 export const aiLimiter = rateLimit({
   store: getStore('ai'),
   windowMs: 60 * 60 * 1000,

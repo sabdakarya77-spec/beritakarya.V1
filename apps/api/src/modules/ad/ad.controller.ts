@@ -3,31 +3,47 @@ import { prisma } from '../../db/client'
 import { requireAuth, requireRole } from '../../middleware/auth.middleware'
 import { siteMiddleware, requireSiteAccess } from '../../middleware/site.middleware'
 import { asyncHandler } from '../../utils/asyncHandler'
+import { adTrackingLimiter } from '../../lib/rateLimit'
+import { isDuplicateImpression, syncTrackingToBooking, sanitizeAdCode } from './ad.service'
 
 export const adRouter = Router()
 
-// Public endpoint for tracking views/clicks
+// Public endpoint for tracking views/clicks — with rate limiting & dedup
 adRouter.post('/track/:id',
+  adTrackingLimiter,
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params
     const { action } = req.query // 'impression' | 'click'
-    
+    const ip = req.ip || req.socket.remoteAddress || 'unknown'
+
     try {
-      if (action === 'click') {
+      // Fetch ad to get siteId & slot for booking sync
+      const ad = await prisma.advertisement.findUnique({ where: { id } })
+      if (!ad) return res.json({ success: true })
+
+      if (action === 'impression') {
+        // Dedup: skip jika IP yang sama sudah track impression untuk ad ini
+        const isDup = await isDuplicateImpression(id, ip)
+        if (!isDup) {
+          await prisma.advertisement.update({
+            where: { id },
+            data: { impressions: { increment: 1 } }
+          })
+          // Sync ke AdBooking yang ACTIVE
+          await syncTrackingToBooking(ad.siteId, ad.slot, 'impression')
+        }
+      } else if (action === 'click') {
         await prisma.advertisement.update({
           where: { id },
           data: { clicks: { increment: 1 } }
         })
-      } else if (action === 'impression') {
-        await prisma.advertisement.update({
-          where: { id },
-          data: { impressions: { increment: 1 } }
-        })
+        // Sync ke AdBooking yang ACTIVE
+        await syncTrackingToBooking(ad.siteId, ad.slot, 'click')
       }
     } catch (e) {
       // Ignore if ad not found
     }
-    
+
     res.json({ success: true })
   })
 )
@@ -86,6 +102,17 @@ adRouter.post('/',
   requireSiteAccess,
   asyncHandler(async (req: Request, res: Response) => {
     const { slot, code, imageUrl, linkUrl, isActive } = req.body
+
+    // Sanitasi HTML code field untuk mencegah XSS
+    let sanitizedCode = code || null
+    if (code) {
+      const { valid, sanitized } = sanitizeAdCode(code)
+      if (!valid) {
+        return res.status(400).json({ success: false, message: 'Kode HTML mengandung pola yang tidak diizinkan' })
+      }
+      sanitizedCode = sanitized
+    }
+
     const ad = await prisma.advertisement.upsert({
       where: {
         siteId_slot: {
@@ -94,7 +121,7 @@ adRouter.post('/',
         }
       },
       update: {
-        code: code || null,
+        code: sanitizedCode,
         imageUrl: imageUrl || null,
         linkUrl: linkUrl || null,
         isActive: isActive ?? true
@@ -102,7 +129,7 @@ adRouter.post('/',
       create: {
         siteId: req.site!,
         slot,
-        code: code || null,
+        code: sanitizedCode,
         imageUrl: imageUrl || null,
         linkUrl: linkUrl || null,
         isActive: isActive ?? true
@@ -121,11 +148,22 @@ adRouter.patch('/:id',
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params
     const { slot, code, imageUrl, linkUrl, isActive } = req.body
+
+    // Sanitasi HTML code field
+    let sanitizedCode = code || null
+    if (code) {
+      const { valid, sanitized } = sanitizeAdCode(code)
+      if (!valid) {
+        return res.status(400).json({ success: false, message: 'Kode HTML mengandung pola yang tidak diizinkan' })
+      }
+      sanitizedCode = sanitized
+    }
+
     const ad = await prisma.advertisement.update({
       where: { id },
       data: {
         slot,
-        code: code || null,
+        code: sanitizedCode,
         imageUrl: imageUrl || null,
         linkUrl: linkUrl || null,
         isActive
@@ -170,7 +208,32 @@ adRouter.post('/bookings',
   requireAuth,
   requireRole(['advertiser']),
   asyncHandler(async (req: any, res: Response) => {
-    const { packageId, siteId, imageUrl, linkUrl, startDate, endDate } = req.body
+    const { packageId, siteId, imageUrl, linkUrl, startDate } = req.body
+
+    // Validasi: package exists dan aktif
+    const pkg = await prisma.adPackage.findUnique({ where: { id: packageId } })
+    if (!pkg || !pkg.isActive) {
+      return res.status(400).json({ success: false, message: 'Paket iklan tidak ditemukan atau tidak aktif' })
+    }
+
+    // Validasi: site exists
+    const site = await prisma.site.findUnique({ where: { id: siteId } })
+    if (!site) {
+      return res.status(400).json({ success: false, message: 'Site tidak ditemukan' })
+    }
+
+    // Validasi: startDate tidak di masa lalu
+    const start = new Date(startDate)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    if (start < today) {
+      return res.status(400).json({ success: false, message: 'Tanggal mulai tidak boleh di masa lalu' })
+    }
+
+    // Auto-set endDate dari package durationDays
+    const computedEndDate = new Date(start)
+    computedEndDate.setDate(computedEndDate.getDate() + pkg.durationDays)
+
     const booking = await prisma.adBooking.create({
       data: {
         userId: req.user.userId,
@@ -178,8 +241,8 @@ adRouter.post('/bookings',
         packageId,
         imageUrl: imageUrl || null,
         linkUrl: linkUrl || null,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
+        startDate: start,
+        endDate: computedEndDate,
         paymentStatus: 'PENDING',
         status: 'PENDING_REVIEW'
       }
@@ -209,6 +272,22 @@ adRouter.post('/bookings/:id/pay',
   asyncHandler(async (req: any, res: Response) => {
     const { id } = req.params
     const { paymentProof } = req.body
+
+    // Ownership check: hanya pemilik booking yang bisa upload bukti bayar
+    const existing = await prisma.adBooking.findUnique({ where: { id } })
+    if (!existing || existing.userId !== req.user.userId) {
+      return res.status(403).json({ success: false, message: 'Akses ditolak' })
+    }
+
+    // Validasi: hanya booking dengan paymentStatus PENDING yang bisa di-update
+    if (existing.paymentStatus !== 'PENDING') {
+      return res.status(400).json({ success: false, message: 'Bukti bayar sudah diupload atau booking sudah diproses' })
+    }
+
+    if (!paymentProof) {
+      return res.status(400).json({ success: false, message: 'URL bukti bayar wajib diisi' })
+    }
+
     const booking = await prisma.adBooking.update({
       where: { id },
       data: {
@@ -295,7 +374,7 @@ adRouter.post('/bookings/:id/approve',
   requireRole(['superadmin']),
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params
-    
+
     const booking = await prisma.adBooking.findUnique({
       where: { id },
       include: { package: true }
@@ -303,7 +382,15 @@ adRouter.post('/bookings/:id/approve',
     if (!booking) {
       return res.status(404).json({ success: false, message: 'Pemesanan tidak ditemukan' })
     }
-    
+
+    // Validasi: hanya booking yang menunggu verifikasi yang bisa di-approve
+    if (booking.paymentStatus !== 'VERIFYING') {
+      return res.status(400).json({
+        success: false,
+        message: 'Booking belum menunggu verifikasi pembayaran'
+      })
+    }
+
     // Update booking status
     const updatedBooking = await prisma.adBooking.update({
       where: { id },
@@ -312,8 +399,9 @@ adRouter.post('/bookings/:id/approve',
         status: 'ACTIVE'
       }
     })
-    
+
     // AUTO-INTEGRATION: Sync/Upsert to active Advertisement table for that site & slot!
+    // Reset counters karena ini kampanye baru yang menggantikan slot
     await prisma.advertisement.upsert({
       where: {
         siteId_slot: {
@@ -340,7 +428,7 @@ adRouter.post('/bookings/:id/approve',
         clicks: 0
       }
     })
-    
+
     res.json({ success: true, data: updatedBooking })
   })
 )
