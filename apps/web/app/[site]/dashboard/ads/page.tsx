@@ -24,7 +24,8 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { AD_SLOT_DEFINITIONS } from '../../../../lib/constants';
+import { AD_SLOT_DEFINITIONS, type AdSlotId } from '../../../../lib/constants';
+import AdImageCropper from '../../../../components/ui/AdImageCropper';
 
 // ==========================================
 // TYPES & INTERFACES
@@ -109,6 +110,61 @@ export default function AdsDashboard() {
   const [advPaymentProof, setAdvPaymentProof] = useState('');
   const [bookingStep, setBookingStep] = useState(1);
   const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
+
+  // Cropper state
+  const [cropperFile, setCropperFile] = useState<File | null>(null);
+  const [cropperAspect, setCropperAspect] = useState(970 / 250);
+  const cropperCallbackRef = useRef<((blob: Blob) => void) | null>(null);
+
+  // Aspect ratio per slot type
+  const SLOT_ASPECT_RATIOS: Record<AdSlotId, number> = {
+    leaderboard: 970 / 250,
+    rectangle: 300 / 250,
+    rectangle_secondary: 300 / 250,
+    in_feed: 300 / 250,
+  };
+
+  // Upload file with optional crop
+  const uploadAdFile = async (file: File, slotId?: AdSlotId): Promise<string> => {
+    // If slot has an aspect ratio, show cropper first
+    if (slotId && SLOT_ASPECT_RATIOS[slotId]) {
+      const croppedBlob = await new Promise<Blob>((resolve, reject) => {
+        setCropperAspect(SLOT_ASPECT_RATIOS[slotId]);
+        setCropperFile(file);
+        cropperCallbackRef.current = resolve;
+        // onCancel will reject
+        cropperCancelRef.current = reject;
+      });
+      // Upload the cropped blob
+      const croppedFile = new File([croppedBlob], file.name.replace(/\.[^.]+$/, '.webp'), { type: 'image/webp' });
+      return doUpload(croppedFile);
+    }
+    return doUpload(file);
+  };
+
+  const doUpload = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('siteId', site || 'pusat');
+    const res = await api.post('/media/upload?purpose=ad', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data?.data?.url || res.data?.url || res.data?.filePath || '';
+  };
+
+  const cropperCancelRef = useRef<(() => void) | null>(null);
+
+  const handleCropperComplete = (blob: Blob) => {
+    setCropperFile(null);
+    cropperCallbackRef.current?.(blob);
+    cropperCallbackRef.current = null;
+  };
+
+  const handleCropperCancel = () => {
+    setCropperFile(null);
+    cropperCancelRef.current?.();
+    cropperCancelRef.current = null;
+  };
 
   // Initial Data Loaders
   const fetchData = async () => {
@@ -204,17 +260,6 @@ export default function AdsDashboard() {
     } catch (error: any) {
       alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal menghapus iklan');
     }
-  };
-
-  // Handler: Upload file to media API
-  const uploadAdFile = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('siteId', site || 'pusat');
-    const res = await api.post('/media/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-    return res.data?.url || res.data?.filePath || res.data || '';
   };
 
   // Handler: Reorder leaderboard banners
@@ -1204,6 +1249,16 @@ export default function AdsDashboard() {
         </div>
       )}
 
+      {/* Image Cropper Modal */}
+      {cropperFile && (
+        <AdImageCropper
+          file={cropperFile}
+          aspectRatio={cropperAspect}
+          onComplete={handleCropperComplete}
+          onCancel={handleCropperCancel}
+        />
+      )}
+
     </div>
   );
 }
@@ -1211,7 +1266,7 @@ export default function AdsDashboard() {
 // ========================================================
 // SUB-COMPONENT: STATIC AD SLOT CARD
 // ========================================================
-function AdSlotCard({ slot, data, onSave, onUpload, isSaving }: { slot: any, data: Ad | undefined, onSave: (p: Partial<Ad>) => void, onUpload: (file: File) => Promise<string>, isSaving: boolean }) {
+function AdSlotCard({ slot, data, onSave, onUpload, isSaving }: { slot: any, data: Ad | undefined, onSave: (p: Partial<Ad>) => void, onUpload: (file: File, slotId?: string) => Promise<string>, isSaving: boolean }) {
   const [mode, setMode] = useState<'image' | 'script'>(data?.imageUrl ? 'image' : 'script');
   const [imageUrl, setImageUrl] = useState(data?.imageUrl || '');
   const [linkUrl, setLinkUrl] = useState(data?.linkUrl || '');
@@ -1234,10 +1289,10 @@ function AdSlotCard({ slot, data, onSave, onUpload, isSaving }: { slot: any, dat
     if (!file) return;
     setUploading(true);
     try {
-      const url = await onUpload(file);
+      const url = await onUpload(file, slot.id);
       if (url) setImageUrl(url);
     } catch {
-      alert('Gagal mengupload file');
+      // User cancelled crop or upload failed
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -1464,7 +1519,7 @@ function LeaderboardManager({
   onUpdate: (id: string, payload: Partial<Ad>) => void;
   onDelete: (id: string) => void;
   onReorder: (slotId: string, direction: 'up' | 'down', index: number) => void;
-  onUpload: (file: File) => Promise<string>;
+  onUpload: (file: File, slotId?: string) => Promise<string>;
   savingId: string | null;
 }) {
   return (
@@ -1535,7 +1590,7 @@ function LeaderboardBannerRow({
   onUpdate: (id: string, payload: Partial<Ad>) => void;
   onDelete: (id: string) => void;
   onReorder: (slotId: string, direction: 'up' | 'down', index: number) => void;
-  onUpload: (file: File) => Promise<string>;
+  onUpload: (file: File, slotId?: string) => Promise<string>;
   isSaving: boolean;
 }) {
   const [editing, setEditing] = useState(false);
@@ -1551,10 +1606,10 @@ function LeaderboardBannerRow({
     if (!file) return;
     setUploading(true);
     try {
-      const url = await onUpload(file);
+      const url = await onUpload(file, ad.slot);
       if (url) setImageUrl(url);
     } catch {
-      alert('Gagal mengupload file');
+      // User cancelled crop or upload failed
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';

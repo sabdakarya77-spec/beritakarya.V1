@@ -23,6 +23,39 @@ const upload = multer({
   },
 })
 
+// ─── Ad-specific image processing (compress to max size) ───────────────────
+
+const AD_MAX_WIDTH = 1200
+const AD_MAX_SIZE_BYTES = 200 * 1024 // 200 KB
+
+async function processAdImage(buffer: Buffer): Promise<{ buffer: Buffer; width: number; height: number }> {
+  let sharp: any
+  try {
+    sharp = (await import('sharp')).default
+  } catch {
+    throw new AppError('Library pemrosesan gambar tidak tersedia.', 500, 'SHARP_NOT_AVAILABLE')
+  }
+
+  // Resize to max width, keep aspect ratio
+  let processed = await sharp(buffer)
+    .resize(AD_MAX_WIDTH, undefined, { fit: 'inside', withoutEnlargement: true })
+    .webp({ quality: 80 })
+    .toBuffer()
+
+  // Compress until under max size (reduce quality iteratively)
+  let quality = 80
+  while (processed.length > AD_MAX_SIZE_BYTES && quality > 30) {
+    quality -= 10
+    processed = await sharp(buffer)
+      .resize(AD_MAX_WIDTH, undefined, { fit: 'inside', withoutEnlargement: true })
+      .webp({ quality })
+      .toBuffer()
+  }
+
+  const meta = await sharp(processed).metadata()
+  return { buffer: processed, width: meta.width || 0, height: meta.height || 0 }
+}
+
 // ─── Image Processing (Sharp) ─────────────────────────────────────────────────
 
 interface ProcessResult {
@@ -185,6 +218,8 @@ mediaRouter.post(
     let originalFormat = ''
     let dominantColor = ''
 
+    const isAd = req.query.purpose === 'ad'
+
     if (req.file.mimetype === 'application/pdf') {
       // ── PDF: upload buffer directly ──
       const key = `${id}.pdf`
@@ -194,6 +229,18 @@ mediaRouter.post(
       url = StorageService.getPublicUrl(mediaBucket, key)
       thumbUrl = url
       originalFormat = 'pdf'
+    } else if (isAd) {
+      // ── Ad image: resize + compress to max 200KB ──
+      const adResult = await processAdImage(req.file.buffer)
+      const adKey = `ads/${id}.webp`
+      await StorageService.uploadBuffer(adResult.buffer, adKey, 'image/webp', mediaBucket, {
+        isPublic: true,
+      })
+      url = StorageService.getPublicUrl(mediaBucket, adKey)
+      thumbUrl = url
+      width = adResult.width
+      height = adResult.height
+      originalFormat = 'ad-webp'
     } else {
       // ── Image: process then upload two versions ──
       const processed: ProcessResult = await processImage(req.file.buffer, { skipWatermark })
