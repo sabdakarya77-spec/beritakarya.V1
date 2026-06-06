@@ -115,13 +115,13 @@ export default function Navbar({
                 </div>
               ) : (
                 <h1 className="font-sans text-[1.15rem] font-extrabold leading-none tracking-[-0.045em] sm:text-[1.4rem]">
-                  <span className="text-brand-red transition-colors">BERITA</span>
+                  <span className="text-red-500 transition-colors">BERITA</span>
                   <span className="text-white">KARYA</span>
                 </h1>
               )}
               <span className="hidden sm:block text-[9px] tracking-wide mt-0.5 text-slate-400">
                 <span className="font-bold text-slate-300 italic">Nusantara Berbicara</span>
-                <span className="text-brand-red mx-1.5 font-bold">•</span>
+                <span className="text-red-500 mx-1.5 font-bold">•</span>
                 <span className="font-normal">{articleTopDate}</span>
               </span>
             </Link>
@@ -134,7 +134,7 @@ export default function Navbar({
               placeholder="Cari berita, topik, penulis..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-full border border-slate-800/70 bg-slate-900/40 py-2 pl-9 pr-4 text-[11px] text-white placeholder:text-slate-600 outline-none transition-all focus:border-brand-red/50 focus:bg-slate-900/60 focus:ring-1 focus:ring-brand-red/30"
+              className="w-full rounded-full border border-slate-800/70 bg-slate-900/40 py-2 pl-9 pr-4 text-[11px] text-white placeholder:text-slate-600 outline-none transition-all focus:border-red-500/50 focus:bg-slate-900/60 focus:ring-1 focus:ring-brand-red/30"
             />
           </form>
 
@@ -154,7 +154,7 @@ export default function Navbar({
               >
                 <Bookmark size={15} strokeWidth={1.5} />
                 {savedArticlesCount > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-brand-red px-1 text-[8px] font-bold text-white leading-none">
+                  <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-red-500 px-1 text-[8px] font-bold text-white leading-none">
                     {savedArticlesCount}
                   </span>
                 )}
@@ -174,7 +174,7 @@ export default function Navbar({
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="flex items-center gap-1.5 rounded-full p-1 text-slate-300 transition-colors hover:bg-slate-900 hover:text-white"
                 >
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-red text-[10px] font-bold text-white shadow-sm">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                   <span className="hidden max-w-[88px] truncate text-[11px] font-semibold md:inline">
@@ -198,7 +198,7 @@ export default function Navbar({
                         {['superadmin', 'wapimred', 'reporter', 'kontributor'].includes(user.role) && (
                           <Link 
                             href={`/${activeSite}/dashboard`}
-                            className="block rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-brand-red"
+                            className="block rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-red-500"
                             onClick={() => setIsProfileOpen(false)}
                           >
                             Dashboard
@@ -209,7 +209,7 @@ export default function Navbar({
                             setIsProfileOpen(false);
                             logout();
                           }}
-                          className="w-full text-left rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-brand-red transition-colors hover:bg-red-500/10"
+                          className="w-full text-left rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-red-500 transition-colors hover:bg-red-500/10"
                         >
                           Keluar
                         </button>
@@ -273,25 +273,25 @@ export default function Navbar({
                     size={11} 
                     className={cn(
                       "transition-colors",
-                      isActive ? "text-brand-red fill-brand-red/20" : "text-slate-500 group-hover:text-white"
+                      isActive ? "text-red-500 fill-red-500/20" : "text-slate-500 group-hover:text-white"
                     )} 
                   />
                 )}
                 <span>{cat.name}</span>
                 {cat.slug === 'tersimpan' && savedArticlesCount > 0 && (
-                  <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-brand-red px-1.5 py-0.5 text-[9px] font-black tracking-normal text-white">
+                  <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[9px] font-black tracking-normal text-white">
                     {savedArticlesCount}
                   </span>
                 )}
                 {isActive && (
                   <motion.span 
                     layoutId="activeCategoryLine"
-                    className="absolute -bottom-[0.67rem] left-0 h-0.5 w-full bg-brand-red"
+                    className="absolute -bottom-[0.67rem] left-0 h-0.5 w-full bg-red-500"
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
                 {!isActive && (
-                  <span className="absolute -bottom-[0.67rem] left-0 h-0.5 w-0 bg-brand-red transition-all duration-300 group-hover:w-full" />
+                  <span className="absolute -bottom-[0.67rem] left-0 h-0.5 w-0 bg-red-500 transition-all duration-300 group-hover:w-full" />
                 )}
               </motion.button>
 
@@ -316,12 +316,12 @@ export default function Navbar({
                           }}
                           className={cn(
                             "group/sub flex items-center justify-between rounded-lg px-3 py-1.5 text-left text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-slate-800",
-                            isSubActive ? "text-brand-red bg-brand-red/5" : "text-slate-400 hover:text-white"
+                            isSubActive ? "text-red-500 bg-red-500/5" : "text-slate-400 hover:text-white"
                           )}
                         >
                           <span>{sub.name}</span>
                           <span className={cn(
-                            "w-1 h-1 rounded-full bg-brand-red scale-0 transition-transform group-hover/sub:scale-100",
+                            "w-1 h-1 rounded-full bg-red-500 scale-0 transition-transform group-hover/sub:scale-100",
                             isSubActive ? "scale-100" : ""
                           )} />
                         </button>
@@ -352,19 +352,19 @@ export default function Navbar({
                 "flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition-all",
                         isCollapsed && "px-2.5 py-1 text-[10px]",
                 isActive
-                  ? "border-brand-red bg-brand-red/10 text-brand-red"
+                  ? "border-red-500 bg-red-500/10 text-red-500"
                   : "border-slate-800 text-slate-400 bg-slate-900/40"
               )}
             >
               {cat.slug === 'tersimpan' && (
                 <Bookmark 
                   size={9} 
-                  className={isActive ? "text-brand-red fill-brand-red/20" : "text-slate-500"} 
+                  className={isActive ? "text-red-500 fill-red-500/20" : "text-slate-500"} 
                 />
               )}
               <span>{cat.name}</span>
               {cat.slug === 'tersimpan' && savedArticlesCount > 0 && (
-                <span className="inline-flex min-w-4 items-center justify-center rounded-full bg-brand-red px-1 py-0.5 text-[9px] font-black tracking-normal text-white">
+                <span className="inline-flex min-w-4 items-center justify-center rounded-full bg-red-500 px-1 py-0.5 text-[9px] font-black tracking-normal text-white">
                   {savedArticlesCount}
                 </span>
               )}
@@ -400,7 +400,7 @@ export default function Navbar({
                           "shrink-0 whitespace-nowrap rounded-xl px-2.5 py-1 text-[10px] font-medium transition-all",
                           isCollapsed && "px-2 py-1 text-[9px]",
                           isSubActive
-                            ? "bg-brand-red text-white"
+                            ? "bg-red-500 text-white"
                             : "bg-slate-900 text-slate-400 border border-slate-800"
                         )}
                       >
