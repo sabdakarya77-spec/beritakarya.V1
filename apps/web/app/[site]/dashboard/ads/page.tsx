@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../../../../lib/api';
 import { useAuthStore } from '../../../../store/authStore';
 import { useParams } from 'next/navigation';
@@ -207,6 +207,17 @@ export default function AdsDashboard() {
     } catch (error: any) {
       alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal menghapus iklan');
     }
+  };
+
+  // Handler: Upload file to media API
+  const uploadAdFile = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('siteId', site || 'pusat');
+    const res = await api.post('/media/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data?.url || res.data?.filePath || res.data || '';
   };
 
   // Handler: Reorder leaderboard banners
@@ -854,6 +865,7 @@ export default function AdsDashboard() {
                     onUpdate={handleUpdateAd}
                     onDelete={handleDeleteAd}
                     onReorder={handleReorderAds}
+                    onUpload={uploadAdFile}
                     savingId={savingAdId}
                   />
 
@@ -864,6 +876,7 @@ export default function AdsDashboard() {
                       slot={slot}
                       data={ads.find(a => a.slot === slot.id)}
                       onSave={(p) => handleSaveActiveAd(slot.id, p)}
+                      onUpload={uploadAdFile}
                       isSaving={savingAdId === slot.id}
                     />
                   ))}
@@ -1201,12 +1214,14 @@ export default function AdsDashboard() {
 // ========================================================
 // SUB-COMPONENT: STATIC AD SLOT CARD
 // ========================================================
-function AdSlotCard({ slot, data, onSave, isSaving }: { slot: any, data: Ad | undefined, onSave: (p: Partial<Ad>) => void, isSaving: boolean }) {
+function AdSlotCard({ slot, data, onSave, onUpload, isSaving }: { slot: any, data: Ad | undefined, onSave: (p: Partial<Ad>) => void, onUpload: (file: File) => Promise<string>, isSaving: boolean }) {
   const [mode, setMode] = useState<'image' | 'script'>(data?.imageUrl ? 'image' : 'script');
   const [imageUrl, setImageUrl] = useState(data?.imageUrl || '');
   const [linkUrl, setLinkUrl] = useState(data?.linkUrl || '');
   const [code, setCode] = useState(data?.code || '');
   const [isActive, setIsActive] = useState(data ? data.isActive : true);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync local state when data prop changes (e.g. after refetch)
   useEffect(() => {
@@ -1216,6 +1231,21 @@ function AdSlotCard({ slot, data, onSave, isSaving }: { slot: any, data: Ad | un
     setCode(data?.code || '');
     setIsActive(data ? data.isActive : true);
   }, [data?.id, data?.imageUrl, data?.linkUrl, data?.code, data?.isActive]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await onUpload(file);
+      if (url) setImageUrl(url);
+    } catch {
+      alert('Gagal mengupload file');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const hasChanges = 
     imageUrl !== (data?.imageUrl || '') || 
@@ -1321,15 +1351,20 @@ function AdSlotCard({ slot, data, onSave, isSaving }: { slot: any, data: Ad | un
                 <div>
                   <label className="dash-label mb-2 block">Upload Banner / URL Gambar</label>
                   <div className="flex gap-2">
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={imageUrl}
                       onChange={(e) => setImageUrl(e.target.value)}
                       placeholder="https://... (PNG/JPG/WebP)"
                       className="flex-1 px-4 py-3 bg-white dark:bg-slate-950 border border-gray-200 dark:border-white/10 rounded-xl text-xs outline-none focus:border-brand-red transition-all"
                     />
-                    <button className="p-3 bg-gray-100 dark:bg-white/5 rounded-xl text-gray-500 hover:text-brand-red transition-all">
-                      <Upload size={18} />
+                    <input ref={fileInputRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleFileUpload} />
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="p-3 bg-gray-100 dark:bg-white/5 rounded-xl text-gray-500 hover:text-brand-red transition-all disabled:opacity-50"
+                    >
+                      {uploading ? <RefreshCw size={18} className="animate-spin" /> : <Upload size={18} />}
                     </button>
                   </div>
                 </div>
@@ -1423,6 +1458,7 @@ function LeaderboardManager({
   onUpdate,
   onDelete,
   onReorder,
+  onUpload,
   savingId
 }: {
   ads: Ad[];
@@ -1431,6 +1467,7 @@ function LeaderboardManager({
   onUpdate: (id: string, payload: Partial<Ad>) => void;
   onDelete: (id: string) => void;
   onReorder: (slotId: string, direction: 'up' | 'down', index: number) => void;
+  onUpload: (file: File) => Promise<string>;
   savingId: string | null;
 }) {
   return (
@@ -1472,6 +1509,7 @@ function LeaderboardManager({
               onUpdate={onUpdate}
               onDelete={onDelete}
               onReorder={onReorder}
+              onUpload={onUpload}
               isSaving={savingId === ad.id}
             />
           ))}
@@ -1491,6 +1529,7 @@ function LeaderboardBannerRow({
   onUpdate,
   onDelete,
   onReorder,
+  onUpload,
   isSaving
 }: {
   ad: Ad;
@@ -1499,6 +1538,7 @@ function LeaderboardBannerRow({
   onUpdate: (id: string, payload: Partial<Ad>) => void;
   onDelete: (id: string) => void;
   onReorder: (slotId: string, direction: 'up' | 'down', index: number) => void;
+  onUpload: (file: File) => Promise<string>;
   isSaving: boolean;
 }) {
   const [editing, setEditing] = useState(false);
@@ -1507,6 +1547,23 @@ function LeaderboardBannerRow({
   const [code, setCode] = useState(ad.code || '');
   const [mode, setMode] = useState<'image' | 'script'>(ad.imageUrl ? 'image' : 'script');
   const [isActive, setIsActive] = useState(ad.isActive);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await onUpload(file);
+      if (url) setImageUrl(url);
+    } catch {
+      alert('Gagal mengupload file');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const handleSave = () => {
     if (mode === 'image') {
@@ -1622,14 +1679,24 @@ function LeaderboardBannerRow({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div>
-                  <label className="dash-label mb-1 block">URL Banner</label>
-                  <input
-                    type="text"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://... (WebP/JPG/PNG)"
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-950 border border-gray-200 dark:border-white/10 rounded-xl text-xs outline-none focus:border-brand-red transition-all"
-                  />
+                  <label className="dash-label mb-1 block">Upload Banner / URL Gambar</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      placeholder="https://... (WebP/JPG/PNG)"
+                      className="flex-1 px-4 py-3 bg-white dark:bg-slate-950 border border-gray-200 dark:border-white/10 rounded-xl text-xs outline-none focus:border-brand-red transition-all"
+                    />
+                    <input ref={fileInputRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleFileUpload} />
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="p-3 bg-gray-100 dark:bg-white/5 rounded-xl text-gray-500 hover:text-brand-red transition-all disabled:opacity-50"
+                    >
+                      {uploading ? <RefreshCw size={16} className="animate-spin" /> : <Upload size={16} />}
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <label className="dash-label mb-1 block">Link Tujuan</label>
