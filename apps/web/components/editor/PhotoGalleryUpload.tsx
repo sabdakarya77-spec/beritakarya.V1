@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Upload, X, GripVertical, ImageIcon, Loader2 } from 'lucide-react'
 import { api } from '../../lib/api'
 import { cn } from '../../lib/utils'
@@ -40,6 +40,32 @@ export function PhotoGalleryUpload({ onImagesChange }: PhotoGalleryUploadProps) 
   const [images, setImages] = useState<GalleryImage[]>(initialImages)
   const [uploading, setUploading] = useState(false)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+
+  // Auto-sync images to editor store whenever they change
+  useEffect(() => {
+    // Only sync if we have images that are fully uploaded (not still uploading)
+    const uploadedImages = images.filter(img => !img.uploading && img.url && !img.url.startsWith('blob:'))
+    if (uploadedImages.length === 0) return
+
+    const currentBlocks = useEditorStore.getState().blocks
+    const galleryBlock = currentBlocks.find(b => b.type === 'gallery')
+    const imageItems: ImageItem[] = uploadedImages.map(({ url, alt, caption, credit }) => ({
+      url, alt: alt || '', caption, credit
+    }))
+
+    if (galleryBlock) {
+      updateBlock(galleryBlock.id, { images: imageItems })
+    } else {
+      addBlock('gallery')
+      setTimeout(() => {
+        const freshBlocks = useEditorStore.getState().blocks
+        const newBlock = freshBlocks.find(b => b.type === 'gallery')
+        if (newBlock) {
+          updateBlock(newBlock.id, { images: imageItems })
+        }
+      }, 0)
+    }
+  }, [images, updateBlock, addBlock])
   
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -157,28 +183,30 @@ export function PhotoGalleryUpload({ onImagesChange }: PhotoGalleryUploadProps) 
   }
   
   // Sync to editor store when images change
-  const handleSaveToGallery = () => {
-    const galleryBlock = blocks.find(b => b.type === 'gallery')
+  const handleSaveToGallery = useCallback(() => {
+    const currentBlocks = useEditorStore.getState().blocks
+    const galleryBlock = currentBlocks.find(b => b.type === 'gallery')
     const imageItems: ImageItem[] = images.map(({ url, alt, caption, credit }) => ({
       url, alt: alt || '', caption, credit
     }))
-    
+
     if (galleryBlock) {
       updateBlock(galleryBlock.id, { images: imageItems })
     } else {
       // Add new gallery block
       addBlock('gallery')
-      // Get the newly added block and update it
+      // Get the newly added block from fresh state
       setTimeout(() => {
-        const newBlock = blocks.find(b => b.type === 'gallery' && b.id !== galleryBlock?.id)
+        const freshBlocks = useEditorStore.getState().blocks
+        const newBlock = freshBlocks.find(b => b.type === 'gallery')
         if (newBlock) {
           updateBlock(newBlock.id, { images: imageItems })
         }
       }, 0)
     }
-    
+
     onImagesChange?.(imageItems)
-  }
+  }, [images, updateBlock, addBlock, onImagesChange])
   
   return (
     <div className="space-y-4">
