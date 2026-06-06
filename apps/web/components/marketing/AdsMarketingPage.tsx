@@ -8,9 +8,11 @@ import {
   TrendingUp,
   Eye,
   Clock,
+  type LucideIcon,
 } from 'lucide-react'
 import type { PublicSiteConfig } from '../../lib/siteSettings'
 import { ADS_PUBLIC_PAGE } from '../../lib/marketingPages'
+import { AD_SLOT_MAP, type AdSlotId } from '../../lib/constants'
 import { PublicInfoShell } from '../layout/PublicInfoShell'
 import { LegalPageHeader } from '../legal/LegalPageHeader'
 import { LegalDocumentBody } from '../legal/LegalDocumentBody'
@@ -26,31 +28,13 @@ export interface AdPackage {
   isActive: boolean
 }
 
-const SLOT_CONFIG: Record<string, { name: string; size: string; desc: string; icon: typeof TrendingUp }> = {
-  leaderboard: {
-    name: 'Leaderboard Atas',
-    size: '970 x 90 px / Mobile: 320 x 50 px',
-    desc: 'Slot billboard utama di bagian atas homepage. Visibilitas tertinggi untuk kampanye branding.',
-    icon: TrendingUp,
-  },
-  rectangle: {
-    name: 'Sidebar Rectangle Utama',
-    size: '300 x 250 px',
-    desc: 'Slot promosi utama di sidebar homepage dan artikel. Selalu terlihat di area pendamping konten.',
-    icon: Eye,
-  },
-  rectangle_secondary: {
-    name: 'Sidebar Rectangle Sekunder',
-    size: '300 x 250 px',
-    desc: 'Slot tambahan di sidebar artikel. Ideal untuk retargeting atau promosi kedua.',
-    icon: ChevronRight,
-  },
-  in_feed: {
-    name: 'In-Feed Homepage',
-    size: '300 x 250 px',
-    desc: 'Slot sponsor di area feed homepage. Tampil native-style di sela alur konten.',
-    icon: ImageIcon,
-  },
+// Icon mapping per slot — visual only, not slot metadata.
+// Slot name/size/desc come from AD_SLOT_DEFINITIONS (single source of truth).
+const SLOT_ICONS: Record<AdSlotId, LucideIcon> = {
+  leaderboard: TrendingUp,
+  rectangle: Eye,
+  rectangle_secondary: ChevronRight,
+  in_feed: ImageIcon,
 }
 
 const VALUE_PROPS = [
@@ -148,13 +132,10 @@ export function AdsMarketingPage({
           {Object.keys(groupedPackages).length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               {Object.entries(groupedPackages).map(([slot, packages]) => {
-                const slotInfo = SLOT_CONFIG[slot] || {
-                  name: slot,
-                  size: '-',
-                  desc: '-',
-                  icon: ChevronRight,
-                }
-                const IconComponent = slotInfo.icon
+                const slotDef = AD_SLOT_MAP[slot as AdSlotId]
+                const IconComponent = SLOT_ICONS[slot as AdSlotId] || ChevronRight
+                const slotSize = slotDef?.publicSize || '-'
+                const slotDesc = slotDef?.desc || '-'
                 return packages.map((pkg) => (
                   <div
                     key={pkg.id}
@@ -173,12 +154,12 @@ export function AdsMarketingPage({
                         {pkg.name}
                       </h3>
                       <p className="text-sm text-brand-text-muted leading-relaxed mb-5">
-                        {pkg.description || slotInfo.desc}
+                        {pkg.description || slotDesc}
                       </p>
                       <ul className="space-y-2 mb-6 text-[11px] font-semibold text-brand-text-muted uppercase tracking-wide">
                         <li className="flex items-center gap-2">
                           <ChevronRight size={12} className="text-brand-red shrink-0" /> Ukuran:{' '}
-                          {slotInfo.size}
+                          {slotSize}
                         </li>
                         <li className="flex items-center gap-2">
                           <ChevronRight size={12} className="text-brand-red shrink-0" /> Format:{' '}
@@ -193,7 +174,7 @@ export function AdsMarketingPage({
                     <div className="space-y-4">
                       <div className="h-[100px] w-full bg-brand-surface dark:bg-white/[0.03] border border-dashed border-black/5 dark:border-white/10 rounded-xl flex items-center justify-center">
                         <p className="text-[10px] text-brand-text-muted font-semibold uppercase tracking-widest">
-                          Mockup: {slotInfo.size}
+                          Mockup: {slotSize}
                         </p>
                       </div>
                       <div className="flex items-center justify-between pt-4 border-t border-black/5 dark:border-white/5">

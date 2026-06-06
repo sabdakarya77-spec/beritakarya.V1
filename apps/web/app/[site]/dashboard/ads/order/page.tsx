@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '../../../../../lib/utils';
+import { getAdSlotDefinition } from '../../../../../lib/constants';
 
 interface AdPackage {
   id: string;
@@ -224,23 +225,11 @@ export default function OrderAdPage() {
   };
 
   const getSlotLabel = (slot: string) => {
-    switch (slot) {
-      case 'leaderboard': return 'Leaderboard Atas';
-      case 'rectangle': return 'Sidebar Rectangle Utama';
-      case 'rectangle_secondary': return 'Sidebar Rectangle Sekunder';
-      case 'in_feed': return 'In-Feed Homepage';
-      default: return slot.toUpperCase();
-    }
+    return getAdSlotDefinition(slot)?.name || slot.toUpperCase();
   };
 
   const getSlotDimensions = (slot: string) => {
-    switch (slot) {
-      case 'leaderboard': return '970 x 90 px';
-      case 'rectangle': return '300 x 250 px';
-      case 'rectangle_secondary': return '300 x 250 px';
-      case 'in_feed': return '300 x 250 px';
-      default: return '100% Responsive';
-    }
+    return getAdSlotDefinition(slot)?.publicSize || '100% Responsive';
   };
 
   const formatRupiah = (val: string | number) => {

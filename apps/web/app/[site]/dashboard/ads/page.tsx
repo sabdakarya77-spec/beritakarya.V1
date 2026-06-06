@@ -39,6 +39,7 @@ interface Ad {
   imageUrl: string | null;
   linkUrl: string | null;
   isActive: boolean;
+  order?: number;
   impressions?: number;
   clicks?: number;
 }
@@ -144,16 +145,85 @@ export default function AdsDashboard() {
     fetchData();
   }, [site, user]);
 
-  // Handler: Save active static ad (Wapimred/Superadmin direct edit)
+  // Auto-fill endDate when startDate or selected package changes
+  useEffect(() => {
+    if (advStartDate && selectedPkgId) {
+      const pkg = packages.find(p => p.id === selectedPkgId);
+      if (pkg) {
+        const end = new Date(advStartDate);
+        end.setDate(end.getDate() + pkg.durationDays);
+        setAdvEndDate(end.toISOString().split('T')[0]);
+      }
+    }
+  }, [advStartDate, selectedPkgId, packages]);
+
+  // Handler: Save active static ad for single-banner slots (rectangle, etc.)
   const handleSaveActiveAd = async (slotId: string, payload: Partial<Ad>) => {
     setSavingAdId(slotId);
     try {
-      await api.post('/ads', { slot: slotId, ...payload });
+      const existing = ads.find(a => a.slot === slotId);
+      if (existing) {
+        await api.patch(`/ads/${existing.id}`, { slot: slotId, ...payload });
+      } else {
+        await api.post('/ads', { slot: slotId, ...payload });
+      }
       await fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error?.message || 'Gagal menyimpan konfigurasi iklan');
+      alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal menyimpan konfigurasi iklan');
     } finally {
       setSavingAdId(null);
+    }
+  };
+
+  // Handler: Add new leaderboard banner
+  const handleAddLeaderboardBanner = async () => {
+    try {
+      await api.post('/ads', { slot: 'leaderboard', isActive: true });
+      await fetchData();
+    } catch (error: any) {
+      alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal menambah banner');
+    }
+  };
+
+  // Handler: Update any ad by ID
+  const handleUpdateAd = async (adId: string, payload: Partial<Ad>) => {
+    setSavingAdId(adId);
+    try {
+      await api.patch(`/ads/${adId}`, payload);
+      await fetchData();
+    } catch (error: any) {
+      alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal menyimpan iklan');
+    } finally {
+      setSavingAdId(null);
+    }
+  };
+
+  // Handler: Delete ad by ID
+  const handleDeleteAd = async (adId: string) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus banner iklan ini?')) return;
+    try {
+      await api.delete(`/ads/${adId}`);
+      await fetchData();
+    } catch (error: any) {
+      alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal menghapus iklan');
+    }
+  };
+
+  // Handler: Reorder leaderboard banners
+  const handleReorderAds = async (slotId: string, direction: 'up' | 'down', adIndex: number) => {
+    const slotAds = ads.filter(a => a.slot === slotId).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const targetIndex = direction === 'up' ? adIndex - 1 : adIndex + 1;
+    if (targetIndex < 0 || targetIndex >= slotAds.length) return;
+
+    const items = [...slotAds];
+    [items[adIndex], items[targetIndex]] = [items[targetIndex], items[adIndex]];
+    const reorderPayload = items.map((item, idx) => ({ id: item.id, order: idx }));
+
+    try {
+      await api.patch('/ads/reorder', { items: reorderPayload });
+      await fetchData();
+    } catch (error: any) {
+      alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal mengurutkan iklan');
     }
   };
 
@@ -184,7 +254,7 @@ export default function AdsDashboard() {
       setShowPkgForm(false);
       await fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error?.message || 'Gagal menyimpan paket');
+      alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal menyimpan paket');
     }
   };
 
@@ -194,13 +264,13 @@ export default function AdsDashboard() {
       await api.delete(`/ads/packages/${id}`);
       await fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error?.message || 'Gagal menghapus paket');
+      alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal menghapus paket');
     }
   };
 
   // Handler: Advertiser Booking
   const handleCreateBooking = async () => {
-    if (!selectedPkgId || !advImageUrl || !advLinkUrl || !advStartDate || !advEndDate) {
+    if (!selectedPkgId || !advImageUrl || !advLinkUrl || !advStartDate) {
       alert('Harap isi semua form kampanye iklan Anda!');
       return;
     }
@@ -236,7 +306,7 @@ export default function AdsDashboard() {
       await fetchData();
       alert('Pengajuan pemesanan iklan regional Anda berhasil dikirim! Menunggu validasi Superadmin.');
     } catch (error: any) {
-      alert(error.response?.data?.error?.message || 'Gagal melakukan pemesanan iklan');
+      alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal melakukan pemesanan iklan');
     } finally {
       setIsSubmittingBooking(false);
     }
@@ -250,7 +320,7 @@ export default function AdsDashboard() {
       await fetchData();
       alert('Sukses menyetujui iklan! Iklan kini telah disinkronkan dan aktif di website cabang.');
     } catch (error: any) {
-      alert(error.response?.data?.error?.message || 'Gagal menyetujui iklan');
+      alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal menyetujui iklan');
     }
   };
 
@@ -265,7 +335,7 @@ export default function AdsDashboard() {
       await fetchData();
       alert('Sukses menolak pengajuan iklan.');
     } catch (error: any) {
-      alert(error.response?.data?.error?.message || 'Gagal menolak pengajuan iklan');
+      alert(error.response?.data?.error?.message || error.response?.data?.message || 'Gagal menolak pengajuan iklan');
     }
   };
 
@@ -483,12 +553,12 @@ export default function AdsDashboard() {
                                 />
                               </div>
                               <div>
-                                <label className="dash-label mb-2 block">Tanggal Selesai</label>
-                                <input 
-                                  type="date" 
+                                <label className="dash-label mb-2 block">Tanggal Selesai (Otomatis)</label>
+                                <input
+                                  type="date"
                                   value={advEndDate}
-                                  onChange={(e) => setAdvEndDate(e.target.value)}
-                                  className="w-full px-4 py-3 bg-white dark:bg-slate-950 border border-gray-200 dark:border-white/10 rounded-xl text-xs outline-none focus:border-brand-red transition-all"
+                                  readOnly
+                                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-xl text-xs outline-none text-gray-500 cursor-not-allowed"
                                 />
                               </div>
                             </div>
@@ -516,12 +586,12 @@ export default function AdsDashboard() {
 
                         <div className="flex justify-between pt-4">
                           <button onClick={() => setBookingStep(1)} className="px-6 py-3 bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 rounded-xl text-[10px] font-black uppercase tracking-widest">Kembali</button>
-                          <button 
-                            disabled={!advImageUrl || !advLinkUrl || !advStartDate || !advEndDate}
+                          <button
+                            disabled={!advImageUrl || !advLinkUrl || !advStartDate}
                             onClick={() => setBookingStep(3)}
                             className={cn(
                               "px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all",
-                              (advImageUrl && advLinkUrl && advStartDate && advEndDate) ? "bg-brand-red text-white hover:opacity-90 shadow-lg" : "bg-gray-100 dark:bg-white/5 text-gray-400 cursor-not-allowed"
+                              (advImageUrl && advLinkUrl && advStartDate) ? "bg-brand-red text-white hover:opacity-90 shadow-lg" : "bg-gray-100 dark:bg-white/5 text-gray-400 cursor-not-allowed"
                             )}
                           >
                             Lanjutkan
@@ -776,11 +846,23 @@ export default function AdsDashboard() {
               {/* Tab Content A: Active static slots (existing code functionality) */}
               {activeTab === 'active_ads' && (
                 <div className="grid grid-cols-1 gap-8">
-                  {AD_SLOT_DEFINITIONS.map(slot => (
-                    <AdSlotCard 
-                      key={slot.id} 
-                      slot={slot} 
-                      data={ads.find(a => a.slot === slot.id)} 
+                  {/* Leaderboard: Multi-banner carousel manager */}
+                  <LeaderboardManager
+                    ads={ads.filter(a => a.slot === 'leaderboard').sort((a, b) => (a.order ?? 0) - (b.order ?? 0))}
+                    slotDef={AD_SLOT_DEFINITIONS.find(s => s.id === 'leaderboard')!}
+                    onAdd={handleAddLeaderboardBanner}
+                    onUpdate={handleUpdateAd}
+                    onDelete={handleDeleteAd}
+                    onReorder={handleReorderAds}
+                    savingId={savingAdId}
+                  />
+
+                  {/* Other slots: Single AdSlotCard */}
+                  {AD_SLOT_DEFINITIONS.filter(s => s.id !== 'leaderboard').map(slot => (
+                    <AdSlotCard
+                      key={slot.id}
+                      slot={slot}
+                      data={ads.find(a => a.slot === slot.id)}
                       onSave={(p) => handleSaveActiveAd(slot.id, p)}
                       isSaving={savingAdId === slot.id}
                     />
@@ -1126,6 +1208,15 @@ function AdSlotCard({ slot, data, onSave, isSaving }: { slot: any, data: Ad | un
   const [code, setCode] = useState(data?.code || '');
   const [isActive, setIsActive] = useState(data ? data.isActive : true);
 
+  // Sync local state when data prop changes (e.g. after refetch)
+  useEffect(() => {
+    setMode(data?.imageUrl ? 'image' : 'script');
+    setImageUrl(data?.imageUrl || '');
+    setLinkUrl(data?.linkUrl || '');
+    setCode(data?.code || '');
+    setIsActive(data ? data.isActive : true);
+  }, [data?.id, data?.imageUrl, data?.linkUrl, data?.code, data?.isActive]);
+
   const hasChanges = 
     imageUrl !== (data?.imageUrl || '') || 
     linkUrl !== (data?.linkUrl || '') || 
@@ -1318,6 +1409,270 @@ function AdSlotCard({ slot, data, onSave, isSaving }: { slot: any, data: Ad | un
           {isSaving ? 'Menyimpan...' : 'Simpan Pengaturan'}
         </button>
       </div>
+    </div>
+  );
+}
+
+// ========================================================
+// SUB-COMPONENT: LEADERBOARD CAROUSEL MANAGER
+// ========================================================
+function LeaderboardManager({
+  ads,
+  slotDef,
+  onAdd,
+  onUpdate,
+  onDelete,
+  onReorder,
+  savingId
+}: {
+  ads: Ad[];
+  slotDef: any;
+  onAdd: () => void;
+  onUpdate: (id: string, payload: Partial<Ad>) => void;
+  onDelete: (id: string) => void;
+  onReorder: (slotId: string, direction: 'up' | 'down', index: number) => void;
+  savingId: string | null;
+}) {
+  return (
+    <div className="dash-card overflow-hidden">
+      {/* Header */}
+      <div className="p-6 border-b border-gray-50 dark:border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h3 className="text-sm font-black text-brand-black dark:text-white uppercase tracking-tight">{slotDef.name} — Carousel</h3>
+            <span className="text-[9px] font-black px-2 py-0.5 bg-gray-100 dark:bg-white/10 text-gray-400 rounded-full font-mono">{slotDef.size}</span>
+            <span className="text-[9px] font-black px-2 py-0.5 bg-brand-red/10 text-brand-red rounded-full">{ads.length} Banner</span>
+          </div>
+          <p className="text-[10px] text-gray-400">{slotDef.desc}</p>
+          <p className="text-[9px] text-brand-text-muted mt-1 italic">Banner berputar otomatis setiap 7 detik. Jeda saat hover.</p>
+        </div>
+        <button
+          onClick={onAdd}
+          className="px-4 py-2.5 bg-brand-red text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-brand-red/10 hover:opacity-90 transition-all"
+        >
+          <Plus size={14} /> Tambah Banner
+        </button>
+      </div>
+
+      {/* Banner List */}
+      {ads.length === 0 ? (
+        <div className="p-12 text-center">
+          <AlertCircle size={32} className="mx-auto text-gray-300 mb-3" />
+          <p className="text-xs text-gray-400">Belum ada banner di slot ini.</p>
+          <p className="text-[10px] text-gray-400 mt-1">Klik &quot;Tambah Banner&quot; untuk menambahkan.</p>
+        </div>
+      ) : (
+        <div className="divide-y divide-gray-50 dark:divide-white/5">
+          {ads.map((ad, index) => (
+            <LeaderboardBannerRow
+              key={ad.id}
+              ad={ad}
+              index={index}
+              total={ads.length}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+              onReorder={onReorder}
+              isSaving={savingId === ad.id}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ========================================================
+// SUB-COMPONENT: SINGLE LEADERBOARD BANNER ROW
+// ========================================================
+function LeaderboardBannerRow({
+  ad,
+  index,
+  total,
+  onUpdate,
+  onDelete,
+  onReorder,
+  isSaving
+}: {
+  ad: Ad;
+  index: number;
+  total: number;
+  onUpdate: (id: string, payload: Partial<Ad>) => void;
+  onDelete: (id: string) => void;
+  onReorder: (slotId: string, direction: 'up' | 'down', index: number) => void;
+  isSaving: boolean;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [imageUrl, setImageUrl] = useState(ad.imageUrl || '');
+  const [linkUrl, setLinkUrl] = useState(ad.linkUrl || '');
+  const [code, setCode] = useState(ad.code || '');
+  const [mode, setMode] = useState<'image' | 'script'>(ad.imageUrl ? 'image' : 'script');
+  const [isActive, setIsActive] = useState(ad.isActive);
+
+  const handleSave = () => {
+    if (mode === 'image') {
+      onUpdate(ad.id, { imageUrl, linkUrl, code: null, isActive });
+    } else {
+      onUpdate(ad.id, { code, imageUrl: null, linkUrl: null, isActive });
+    }
+    setEditing(false);
+  };
+
+  return (
+    <div className="p-4 md:p-6">
+      <div className="flex items-center gap-4">
+        {/* Order controls */}
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() => onReorder('leaderboard', 'up', index)}
+            disabled={index === 0}
+            className={cn("p-1 rounded text-gray-400 hover:text-brand-red transition-colors", index === 0 && "opacity-30 cursor-not-allowed")}
+          >
+            <ArrowRight size={12} className="-rotate-90" />
+          </button>
+          <span className="text-[9px] font-mono text-gray-400 text-center">{index + 1}</span>
+          <button
+            onClick={() => onReorder('leaderboard', 'down', index)}
+            disabled={index === total - 1}
+            className={cn("p-1 rounded text-gray-400 hover:text-brand-red transition-colors", index === total - 1 && "opacity-30 cursor-not-allowed")}
+          >
+            <ArrowRight size={12} className="rotate-90" />
+          </button>
+        </div>
+
+        {/* Thumbnail preview */}
+        <div className="w-32 h-16 md:w-48 md:h-20 rounded-lg overflow-hidden bg-gray-50 dark:bg-black/20 border border-gray-100 dark:border-white/5 flex-shrink-0">
+          {ad.imageUrl ? (
+            ad.imageUrl.toLowerCase().match(/\.(mp4|webm|ogg|mov)$/i) ? (
+              <video src={ad.imageUrl} muted className="w-full h-full object-cover" />
+            ) : (
+              <img src={ad.imageUrl} alt="Banner" className="w-full h-full object-cover" />
+            )
+          ) : ad.code ? (
+            <div className="w-full h-full flex items-center justify-center text-[8px] text-gray-400 font-mono">SCRIPT</div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-[8px] text-gray-400">KOSONG</div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className={cn("text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider", isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-gray-200 text-gray-400")}>
+              {isActive ? 'AKTIF' : 'NONAKTIF'}
+            </span>
+            <span className="text-[9px] font-mono text-gray-400">#{index + 1}</span>
+          </div>
+          <p className="text-[10px] text-gray-400 mt-1 truncate">
+            {ad.imageUrl ? ad.imageUrl : ad.code ? 'Script HTML' : 'Belum diatur'}
+          </p>
+          {ad.impressions !== undefined && (
+            <div className="flex gap-4 mt-1 text-[9px] font-mono text-gray-400">
+              <span>Imp: {(ad.impressions || 0).toLocaleString()}</span>
+              <span>Click: {(ad.clicks || 0).toLocaleString()}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          {/* Toggle active */}
+          <button
+            onClick={() => onUpdate(ad.id, { isActive: !isActive })}
+            className={cn("w-10 h-5 rounded-full transition-all relative", isActive ? "bg-emerald-500" : "bg-gray-200 dark:bg-white/10")}
+          >
+            <div className={cn("w-3 h-3 bg-white rounded-full absolute top-1 transition-all shadow-sm", isActive ? "left-6" : "left-1")} />
+          </button>
+
+          <button
+            onClick={() => setEditing(!editing)}
+            className="p-2 bg-gray-50 dark:bg-white/5 text-gray-500 hover:text-brand-red rounded-lg transition-colors"
+          >
+            {editing ? <XCircle size={14} /> : <ImageIcon size={14} />}
+          </button>
+
+          <button
+            onClick={() => onDelete(ad.id)}
+            className="p-2 bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+      </div>
+
+      {/* Edit form (expandable) */}
+      {editing && (
+        <div className="mt-4 pt-4 border-t border-gray-50 dark:border-white/5 space-y-4 animate-fade-in">
+          {/* Mode switcher */}
+          <div className="flex bg-gray-50/50 dark:bg-black/10 p-1 rounded-xl border border-gray-100 dark:border-white/5">
+            <button
+              onClick={() => setMode('image')}
+              className={cn("flex-1 py-2 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", mode === 'image' ? "bg-white dark:bg-slate-800 text-brand-red shadow-sm" : "text-gray-400")}
+            >
+              <ImageIcon size={14} /> Banner Gambar
+            </button>
+            <button
+              onClick={() => setMode('script')}
+              className={cn("flex-1 py-2 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", mode === 'script' ? "bg-white dark:bg-slate-800 text-brand-red shadow-sm" : "text-gray-400")}
+            >
+              <CodeIcon size={14} /> Script Iklan
+            </button>
+          </div>
+
+          {mode === 'image' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <div>
+                  <label className="dash-label mb-1 block">URL Banner</label>
+                  <input
+                    type="text"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="https://... (WebP/JPG/PNG)"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-950 border border-gray-200 dark:border-white/10 rounded-xl text-xs outline-none focus:border-brand-red transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="dash-label mb-1 block">Link Tujuan</label>
+                  <input
+                    type="text"
+                    value={linkUrl}
+                    onChange={(e) => setLinkUrl(e.target.value)}
+                    placeholder="https://website-klien.com"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-950 border border-gray-200 dark:border-white/10 rounded-xl text-xs outline-none focus:border-brand-red transition-all"
+                  />
+                </div>
+              </div>
+              <div className="aspect-[4/1] bg-gray-50 dark:bg-black/20 rounded-xl border border-dashed border-gray-100 dark:border-white/5 flex items-center justify-center overflow-hidden">
+                {imageUrl ? (
+                  <img src={imageUrl} alt="Preview" className="w-full h-full object-contain" />
+                ) : (
+                  <span className="text-[9px] text-gray-400">Preview</span>
+                )}
+              </div>
+            </div>
+          ) : (
+            <textarea
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              rows={4}
+              placeholder="<!-- Tempel kode script iklan -->"
+              className="w-full p-4 bg-slate-950 text-emerald-400 font-mono text-xs rounded-xl outline-none border border-slate-900 focus:border-brand-red transition-all"
+            />
+          )}
+
+          <div className="flex justify-end gap-3">
+            <button onClick={() => setEditing(false)} className="px-4 py-2 bg-gray-100 dark:bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500">Batal</button>
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="px-6 py-2 bg-brand-black dark:bg-white text-white dark:text-brand-black rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:opacity-90 transition-all flex items-center gap-2"
+            >
+              {isSaving ? <RefreshCw size={12} className="animate-spin" /> : <Save size={12} />}
+              Simpan
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

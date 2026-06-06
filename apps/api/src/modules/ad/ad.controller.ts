@@ -56,7 +56,8 @@ adRouter.get('/public',
       return res.status(400).json({ success: false, message: 'site query parameter is required' })
     }
     const ads = await prisma.advertisement.findMany({
-      where: { siteId, isActive: true }
+      where: { siteId, isActive: true },
+      orderBy: { order: 'asc' }
     })
     res.json({ success: true, data: ads })
   })
@@ -77,7 +78,7 @@ adRouter.get('/',
         where: { siteId: req.site! },
         skip,
         take: limit,
-        orderBy: { slot: 'asc' }
+        orderBy: [{ slot: 'asc' }, { order: 'asc' }]
       }),
       prisma.advertisement.count({ where: { siteId: req.site! } })
     ])
@@ -113,28 +114,24 @@ adRouter.post('/',
       sanitizedCode = sanitized
     }
 
-    const ad = await prisma.advertisement.upsert({
-      where: {
-        siteId_slot: {
-          siteId: req.site!,
-          slot
-        }
-      },
-      update: {
-        code: sanitizedCode,
-        imageUrl: imageUrl || null,
-        linkUrl: linkUrl || null,
-        isActive: isActive ?? true
-      },
-      create: {
+    // Determine next order value for this slot
+    const maxOrder = await prisma.advertisement.aggregate({
+      where: { siteId: req.site!, slot },
+      _max: { order: true }
+    })
+    const nextOrder = (maxOrder._max.order ?? -1) + 1
+
+    const ad = await prisma.advertisement.create({
+      data: {
         siteId: req.site!,
         slot,
         code: sanitizedCode,
         imageUrl: imageUrl || null,
         linkUrl: linkUrl || null,
-        isActive: isActive ?? true
+        isActive: isActive ?? true,
+        order: nextOrder
       },
-      select: { id: true, slot: true, code: true, imageUrl: true, linkUrl: true, isActive: true, impressions: true, clicks: true, createdAt: true }
+      select: { id: true, slot: true, code: true, imageUrl: true, linkUrl: true, isActive: true, order: true, impressions: true, clicks: true, createdAt: true }
     })
     res.status(201).json({ success: true, data: ad })
   })
@@ -147,7 +144,7 @@ adRouter.patch('/:id',
   requireSiteAccess,
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params
-    const { slot, code, imageUrl, linkUrl, isActive } = req.body
+    const { slot, code, imageUrl, linkUrl, isActive, order } = req.body
 
     // Sanitasi HTML code field
     let sanitizedCode = code || null
@@ -166,9 +163,10 @@ adRouter.patch('/:id',
         code: sanitizedCode,
         imageUrl: imageUrl || null,
         linkUrl: linkUrl || null,
-        isActive
+        isActive,
+        order
       },
-      select: { id: true, slot: true, code: true, imageUrl: true, linkUrl: true, isActive: true, impressions: true, clicks: true, createdAt: true }
+      select: { id: true, slot: true, code: true, imageUrl: true, linkUrl: true, isActive: true, order: true, impressions: true, clicks: true, createdAt: true }
     })
     res.json({ success: true, data: ad })
   })
@@ -185,6 +183,32 @@ adRouter.delete('/:id',
       where: { id }
     })
     res.json({ success: true, message: 'Advertisement deleted' })
+  })
+)
+
+// PATCH /reorder — Update rotation order of ads within a slot
+adRouter.patch('/reorder',
+  requireAuth,
+  siteMiddleware,
+  requireRole(['superadmin', 'wapimred']),
+  requireSiteAccess,
+  asyncHandler(async (req: Request, res: Response) => {
+    const { items } = req.body // Array of { id, order }
+
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ success: false, message: 'items harus berupa array' })
+    }
+
+    await prisma.$transaction(
+      items.map((item: { id: string; order: number }) =>
+        prisma.advertisement.update({
+          where: { id: item.id },
+          data: { order: item.order }
+        })
+      )
+    )
+
+    res.json({ success: true, message: 'Urutan iklan berhasil diperbarui' })
   })
 )
 
@@ -400,34 +424,50 @@ adRouter.post('/bookings/:id/approve',
       }
     })
 
-    // AUTO-INTEGRATION: Sync/Upsert to active Advertisement table for that site & slot!
-    // Reset counters karena ini kampanye baru yang menggantikan slot
-    await prisma.advertisement.upsert({
-      where: {
-        siteId_slot: {
+    // AUTO-INTEGRATION: Sync to active Advertisement table
+    const adData = {
+      imageUrl: booking.imageUrl,
+      linkUrl: booking.linkUrl,
+      code: null,
+      isActive: true,
+      impressions: 0,
+      clicks: 0
+    }
+
+    if (booking.package.slot === 'leaderboard') {
+      // Leaderboard: ADD to carousel (create new row, don't replace)
+      const maxOrder = await prisma.advertisement.aggregate({
+        where: { siteId: booking.siteId, slot: 'leaderboard' },
+        _max: { order: true }
+      })
+      await prisma.advertisement.create({
+        data: {
           siteId: booking.siteId,
-          slot: booking.package.slot
+          slot: 'leaderboard',
+          ...adData,
+          order: (maxOrder._max.order ?? -1) + 1
         }
-      },
-      update: {
-        imageUrl: booking.imageUrl,
-        linkUrl: booking.linkUrl,
-        code: null, // Clear HTML script since this is a visual client direct banner
-        isActive: true,
-        impressions: 0,
-        clicks: 0
-      },
-      create: {
-        siteId: booking.siteId,
-        slot: booking.package.slot,
-        imageUrl: booking.imageUrl,
-        linkUrl: booking.linkUrl,
-        code: null,
-        isActive: true,
-        impressions: 0,
-        clicks: 0
+      })
+    } else {
+      // Other slots: REPLACE existing (find-first-then-update-or-create)
+      const existing = await prisma.advertisement.findFirst({
+        where: { siteId: booking.siteId, slot: booking.package.slot }
+      })
+      if (existing) {
+        await prisma.advertisement.update({
+          where: { id: existing.id },
+          data: adData
+        })
+      } else {
+        await prisma.advertisement.create({
+          data: {
+            siteId: booking.siteId,
+            slot: booking.package.slot,
+            ...adData
+          }
+        })
       }
-    })
+    }
 
     res.json({ success: true, data: updatedBooking })
   })

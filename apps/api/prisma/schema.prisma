@@ -190,13 +190,15 @@ model Advertisement {
   imageUrl    String? // If they just want to upload an image banner
   linkUrl     String? // Where the banner clicks to
   isActive    Boolean  @default(true)
+  order       Int      @default(0) // Rotation order for carousel (leaderboard)
   impressions Int      @default(0) // Tracker for views
   clicks      Int      @default(0) // Tracker for clicks
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   site Site @relation(fields: [siteId], references: [id])
 
-  @@unique([siteId, slot])
+  @@index([siteId, slot])
 }
 
 model Article {
