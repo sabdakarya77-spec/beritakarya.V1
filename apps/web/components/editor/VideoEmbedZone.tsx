@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Video, Link, X, Play, AlertCircle } from 'lucide-react'
 import { useEditorStore } from '../../store/editorStore'
 import { cn } from '../../lib/utils'
@@ -11,13 +11,17 @@ interface VideoEmbedZoneProps {
 
 export function VideoEmbedZone({ onVideoChange }: VideoEmbedZoneProps) {
   const { blocks, updateBlock, addBlock } = useEditorStore()
-  
+
   // Find existing embed block
   const existingEmbedBlock = blocks.find(b => b.type === 'embed') as any
   const initialUrl = existingEmbedBlock?.url || ''
-  
+
   const [videoUrl, setVideoUrl] = useState(initialUrl)
   const [videoTitle, setVideoTitle] = useState(existingEmbedBlock?.title || '')
+
+  // Narrative text for video exclusive
+  const existingParagraph = blocks.find(b => b.type === 'paragraph')
+  const [narrativeText, setNarrativeText] = useState((existingParagraph as any)?.content || '')
   
   // Detect video type from URL
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
@@ -61,43 +65,92 @@ export function VideoEmbedZone({ onVideoChange }: VideoEmbedZoneProps) {
       thumbnail: null
     }
   }, [videoUrl])
-  
-  const handleSave = () => {
+
+  // Auto-sync video embed to store
+  useEffect(() => {
     if (!embedInfo || !videoUrl.trim()) return
-    
-    // Find existing embed block or create new one
-    const existingBlock = blocks.find(b => b.type === 'embed')
-    
+
+    const currentBlocks = useEditorStore.getState().blocks
+    const existingBlock = currentBlocks.find(b => b.type === 'embed')
+
     const embedData = {
       url: videoUrl.trim(),
       embedType: embedInfo.type,
       title: videoTitle.trim() || undefined
     }
-    
+
     if (existingBlock) {
       updateBlock(existingBlock.id, embedData)
     } else {
       addBlock('embed')
-      // Update the new block
       setTimeout(() => {
-        const newBlock = blocks.find(b => b.type === 'embed' && b.id !== existingBlock?.id)
+        const freshBlocks = useEditorStore.getState().blocks
+        const newBlock = freshBlocks.find(b => b.type === 'embed')
         if (newBlock) {
           updateBlock(newBlock.id, embedData)
         }
       }, 0)
     }
-    
+  }, [videoUrl, videoTitle, embedInfo, updateBlock, addBlock])
+
+  // Auto-sync narrative text to paragraph block
+  useEffect(() => {
+    const currentBlocks = useEditorStore.getState().blocks
+    const paragraphBlock = currentBlocks.find(b => b.type === 'paragraph')
+
+    if (narrativeText.trim()) {
+      if (paragraphBlock) {
+        updateBlock(paragraphBlock.id, { content: narrativeText })
+      } else {
+        addBlock('paragraph')
+        setTimeout(() => {
+          const freshBlocks = useEditorStore.getState().blocks
+          const newParagraph = freshBlocks.find(b => b.type === 'paragraph')
+          if (newParagraph) {
+            updateBlock(newParagraph.id, { content: narrativeText })
+          }
+        }, 0)
+      }
+    }
+  }, [narrativeText, updateBlock, addBlock])
+
+  const handleSave = useCallback(() => {
+    if (!embedInfo || !videoUrl.trim()) return
+
+    const currentBlocks = useEditorStore.getState().blocks
+    const existingBlock = currentBlocks.find(b => b.type === 'embed')
+
+    const embedData = {
+      url: videoUrl.trim(),
+      embedType: embedInfo.type,
+      title: videoTitle.trim() || undefined
+    }
+
+    if (existingBlock) {
+      updateBlock(existingBlock.id, embedData)
+    } else {
+      addBlock('embed')
+      setTimeout(() => {
+        const freshBlocks = useEditorStore.getState().blocks
+        const newBlock = freshBlocks.find(b => b.type === 'embed')
+        if (newBlock) {
+          updateBlock(newBlock.id, embedData)
+        }
+      }, 0)
+    }
+
     onVideoChange?.(embedInfo.embedUrl, embedInfo.type)
-  }
-  
-  const handleRemove = () => {
-    const existingBlock = blocks.find(b => b.type === 'embed')
+  }, [videoUrl, videoTitle, embedInfo, updateBlock, addBlock, onVideoChange])
+
+  const handleRemove = useCallback(() => {
+    const currentBlocks = useEditorStore.getState().blocks
+    const existingBlock = currentBlocks.find(b => b.type === 'embed')
     if (existingBlock) {
       updateBlock(existingBlock.id, { url: '', embedType: 'youtube', title: '' })
     }
     setVideoUrl('')
     setVideoTitle('')
-  }
+  }, [updateBlock])
   
   return (
     <div className="space-y-4">
@@ -224,7 +277,7 @@ export function VideoEmbedZone({ onVideoChange }: VideoEmbedZoneProps) {
         >
           Simpan Video
         </button>
-        
+
         {videoUrl && (
           <button
             onClick={handleRemove}
@@ -233,6 +286,29 @@ export function VideoEmbedZone({ onVideoChange }: VideoEmbedZoneProps) {
             Hapus
           </button>
         )}
+      </div>
+
+      {/* Narrative Text */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-bold text-panel-text-primary">
+            Narasi Video
+          </label>
+          <span className="text-[10px] text-panel-text-muted">
+            {(() => {
+              const content = narrativeText.replace(/<[^>]*>/g, '')
+              const count = content.split(/\s+/).filter(Boolean).length
+              return `${count} kata`
+            })()}
+          </span>
+        </div>
+        <textarea
+          value={narrativeText}
+          onChange={(e) => setNarrativeText(e.target.value)}
+          placeholder="Tulis narasi video eksklusif di sini... (minimal 15 kata)"
+          rows={6}
+          className="w-full px-4 py-3 bg-panel-surface border border-panel-border rounded-xl text-sm text-panel-text-primary placeholder-panel-text-muted resize-y focus:outline-none focus:ring-2 focus:ring-panel-accent/30 focus:border-panel-accent"
+        />
       </div>
     </div>
   )

@@ -491,19 +491,30 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!s.categoryId) missing.push('Kategori belum dipilih')
     if (!s.featuredImage) missing.push('Gambar utama belum diunggah')
 
+    // Helper: hitung kata dari paragraph/heading blocks
+    const countWords = () => {
+      const textBlocks = s.blocks.filter(b => b.type === 'paragraph' || b.type === 'heading')
+      return textBlocks.reduce((acc, b) => {
+        const content = (b as any).content || ''
+        return acc + content.replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length
+      }, 0)
+    }
+
     if (s.contentType === 'photo_journalism') {
       // Foto Jurnalistik: wajib minimal 3 foto di galeri
       const gallery = s.blocks.find((b: any) => b.type === 'gallery')
       const imageCount = (gallery as any)?.images?.length || 0
       if (imageCount < 3) missing.push(`Galeri foto wajib minimal 3 foto (saat ini: ${imageCount})`)
-
       // Foto Jurnalistik: wajib minimal 15 kata narasi
-      const textBlocks = s.blocks.filter(b => b.type === 'paragraph' || b.type === 'heading')
-      const wordCount = textBlocks.reduce((acc, b) => {
-        const content = (b as any).content || ''
-        return acc + content.replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length
-      }, 0)
-      if (wordCount < 15) missing.push(`Narasi foto wajib minimal 15 kata (saat ini: ${wordCount})`)
+      const wc = countWords()
+      if (wc < 15) missing.push(`Narasi foto wajib minimal 15 kata (saat ini: ${wc})`)
+    } else if (s.contentType === 'video_exclusive') {
+      // Video Eksklusif: wajib minimal 1 video embed
+      const embedCount = s.blocks.filter(b => b.type === 'embed').length
+      if (embedCount < 1) missing.push('Video Eksklusif wajib memiliki minimal 1 video')
+      // Video Eksklusif: wajib minimal 15 kata narasi
+      const wc = countWords()
+      if (wc < 15) missing.push(`Narasi video wajib minimal 15 kata (saat ini: ${wc})`)
     } else {
       // Artikel biasa: wajib minimal 1 paragraf
       const paragraphCount = s.blocks.filter(b => b.type === 'paragraph' && (b as any).content?.trim()).length
@@ -522,16 +533,24 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (s.categoryId) score += 20
     if (s.featuredImage) score += 20
 
+    // Helper: hitung kata dari paragraph/heading blocks
+    const countWords = () => {
+      const textBlocks = s.blocks.filter(b => b.type === 'paragraph' || b.type === 'heading')
+      return textBlocks.reduce((acc, b) => {
+        const content = (b as any).content || ''
+        return acc + content.replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length
+      }, 0)
+    }
+
     if (s.contentType === 'photo_journalism') {
       // Foto Jurnalistik: cek galeri dan narasi
       const gallery = s.blocks.find((b: any) => b.type === 'gallery')
       const imageCount = (gallery as any)?.images?.length || 0
-      const textBlocks = s.blocks.filter(b => b.type === 'paragraph' || b.type === 'heading')
-      const wordCount = textBlocks.reduce((acc, b) => {
-        const content = (b as any).content || ''
-        return acc + content.replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length
-      }, 0)
-      if (imageCount >= 3 && wordCount >= 15) score += 20
+      if (imageCount >= 3 && countWords() >= 15) score += 20
+    } else if (s.contentType === 'video_exclusive') {
+      // Video Eksklusif: cek embed dan narasi
+      const embedCount = s.blocks.filter(b => b.type === 'embed').length
+      if (embedCount >= 1 && countWords() >= 15) score += 20
     } else {
       // Artikel biasa: cek paragraf
       if (s.blocks.some(b => b.type === 'paragraph' && (b as any).content?.trim())) score += 20

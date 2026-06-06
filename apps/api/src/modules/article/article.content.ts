@@ -6,6 +6,9 @@ const MAX_WORDS = 100_000
 const PHOTO_JOURNALISM_MIN_IMAGES = 3
 const PHOTO_JOURNALISM_MIN_WORDS = 15
 
+// Video exclusive specific requirements
+const VIDEO_EXCLUSIVE_MIN_WORDS = 15
+
 export function extractTextFromBlocks(blocks: any[] | undefined): string {
   if (!Array.isArray(blocks)) return ''
   return blocks
@@ -68,6 +71,40 @@ export function validatePhotoJournalismRequirements(blocks: any[] | undefined): 
   }
 }
 
+/**
+ * Menghitung jumlah embed block (video).
+ * Digunakan untuk validasi video eksklusif.
+ */
+export function countEmbedBlocks(blocks: any[] | undefined): number {
+  if (!Array.isArray(blocks)) return 0
+  return blocks.filter((b) => b?.type === 'embed').length
+}
+
+/**
+ * Validasi khusus untuk tipe konten video eksklusif.
+ * - Minimal 1 video embed
+ * - Minimal 15 kata narasi
+ */
+export function validateVideoExclusiveRequirements(blocks: any[] | undefined): void {
+  if (!blocks) return
+
+  const embedCount = countEmbedBlocks(blocks)
+  if (embedCount < 1) {
+    throw Object.assign(
+      new Error('Video Eksklusif wajib memiliki minimal 1 video embed'),
+      { statusCode: 400 }
+    )
+  }
+
+  const words = countWords(extractTextFromBlocks(blocks))
+  if (words < VIDEO_EXCLUSIVE_MIN_WORDS) {
+    throw Object.assign(
+      new Error(`Video Eksklusif wajib memiliki minimal ${VIDEO_EXCLUSIVE_MIN_WORDS} kata narasi video (saat ini: ${words})`),
+      { statusCode: 400 }
+    )
+  }
+}
+
 export type ArticleContentLimitOptions = {
   /** Wajib untuk submit/publish; draft boleh disimpan di bawah batas ini. */
   requireMinWords?: boolean
@@ -90,8 +127,18 @@ export function validateArticleContentLimits(
   // Validasi khusus foto jurnalistik (berlaku untuk semua status, termasuk draft)
   if (options.contentType === 'photo_journalism') {
     validatePhotoJournalismRequirements(blocks)
+    // Foto jurnalistik punya aturan sendiri, skip validasi 50 kata standar
+    return
   }
 
+  // Validasi khusus video eksklusif (berlaku untuk semua status, termasuk draft)
+  if (options.contentType === 'video_exclusive') {
+    validateVideoExclusiveRequirements(blocks)
+    // Video eksklusif punya aturan sendiri, skip validasi 50 kata standar
+    return
+  }
+
+  // Validasi standar untuk artikel biasa
   const words = countWords(extractTextFromBlocks(blocks))
   if (options.requireMinWords && words < MIN_WORDS) {
     throw Object.assign(
