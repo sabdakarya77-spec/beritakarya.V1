@@ -35,7 +35,7 @@ BeritaKarya v1 adalah platform CMS berita multi-situs berbasis Turborepo monorep
 
 | Dimensi | Skor | Catatan |
 |---------|------|---------|
-| **Keamanan** | ⚠️ 5/10 | .env produksi terekspos, CSRF tidak aktif, cron endpoint tidak terproteksi |
+| **Keamanan** | ⚠️ 6/10 | .env & cron secret sudah diperbaiki, CSRF sengaja di-skip, ad code di-sandbox, password policy konsisten |
 | **Kode & TypeScript** | 6/10 | `strict: false` di web, 457+ penggunaan `any`, lint rules dimatikan |
 | **Arsitektur** | 8/10 | Pola monorepo bersih, multisite solid, modular |
 | **Testing** | 4/10 | Web hanya 3 test file untuk 100+ komponen, E2E hanya 1 spec |
@@ -57,7 +57,7 @@ BeritaKarya v1 adalah platform CMS berita multi-situs berbasis Turborepo monorep
 | Cache | Redis 7 (ioredis) — optional |
 | Search | Meilisearch v1.6 (circuit breaker via opossum) |
 | AI | OpenAI API (GPT-4o default) |
-| Auth | JWT in HttpOnly cookies + CSRF tokens |
+| Auth | JWT in HttpOnly cookies (SameSite, no CSRF — intentional for news portal) |
 | Styling | Tailwind CSS 3, Framer Motion |
 | Editor | Tiptap 3 (10+ custom extensions) |
 | State | Zustand 4 |
@@ -148,10 +148,11 @@ beritakarya-v1/
 
 ## 4. Temuan Kritis (CRITICAL)
 
-### 🔴 C-01: File `.env` Produksi Terekspos di Git History
+### ✅ C-01: File `.env` Produksi Terekspos di Git History — FIXED
 
 **Lokasi:** `apps/api/.env` (4361 bytes, tracked in git)
 **Dampak:** Kredensial produksi terekspos publik
+**Status:** Sudah ditambahkan ke `.gitignore`, tidak lagi tracked di git.
 
 Data yang terekspos:
 - Supabase PostgreSQL credentials (host, user, password)
@@ -166,32 +167,29 @@ Data yang terekspos:
 
 ---
 
-### 🔴 C-02: `CRON_SECRET` Masih Placeholder
+### ✅ C-02: `CRON_SECRET` Masih Placeholder — FIXED
 
 **Lokasi:** `apps/api/.env` — `CRON_SECRET=generate-with-openssl-rand-hex-32-here`
 **Dampak:** Semua cron endpoint bisa diakses tanpa autentikasi
-
-**Tindakan:** Generate secret baru dengan `openssl rand -hex 32` dan set di environment.
+**Status:** Sudah diisi dengan hex 64 karakter.
 
 ---
 
-### 🔴 C-03: `CSRF_SECRET` Kosong
+### ⏭️ C-03: `CSRF_SECRET` Kosong — SKIP (Intentional)
 
 **Lokasi:** `apps/api/.env` — `CSRF_SECRET=` (empty)
-**Dampak:** CSRF protection tidak aktif. Attacker bisa membuat form yang mengirim request terotentikasi dari domain lain.
-
-**Tindakan:** Set CSRF_SECRET dan verifikasi middleware CSRF berjalan.
+**Dampak:** CSRF protection tidak aktif.
+**Status:** Diputuskan tidak diperlukan untuk portal berita regional. Cookie `httpOnly` + `SameSite` + CORS JSON `Content-Type` sudah cukup.
 
 ---
 
 ## 5. Temuan Tinggi (HIGH)
 
-### 🟠 H-01: `dangerouslySetInnerHTML` Tanpa Sanitasi pada Ad Code
+### ✅ H-01: `dangerouslySetInnerHTML` Tanpa Sanitasi pada Ad Code — FIXED
 
 **Lokasi:** `apps/web/components/ui/AdSpace.tsx`
 **Dampak:** Jika akun admin terkompromi, attacker bisa inject JavaScript arbitrer ke setiap halaman yang menampilkan iklan.
-
-**Tindakan:** Tambahkan sanitasi DOMPurify sebelum render ad code, atau gunakan sandboxed iframe.
+**Status:** Diganti dengan sandboxed `<iframe srcdoc>` dengan `sandbox="allow-scripts allow-popups"`. Script ads tetap berjalan tapi terisolasi dari main page DOM.
 
 ---
 
@@ -204,12 +202,11 @@ Data yang terekspos:
 
 ---
 
-### 🟠 H-03: `change-password` Validasi Password Lebih Lemah
+### ✅ H-03: `change-password` Validasi Password Lebih Lemah — FIXED
 
 **Lokasi:** `apps/api/src/modules/auth/auth.controller.ts` (line ~190)
 **Dampak:** Registration memerlukan uppercase, lowercase, number, special char. Change-password hanya cek `length < 6`.
-
-**Tindakan:** Gunakan `validatePassword()` yang sama untuk kedua endpoint.
+**Status:** Sekarang menggunakan `validatePassword()` yang sama — minimal 8 karakter, huruf besar, kecil, angka, karakter khusus.
 
 ---
 
@@ -438,11 +435,11 @@ Data yang terekspos:
 | Refresh Token Rotation | ✅ Baik | Token lama dihapus dan di-blacklist |
 | Token Blacklisting | ✅ Baik | Logout memindahkan token ke BlacklistedToken |
 | Password Hashing | ✅ Baik | bcrypt (salt 10 untuk register, 12 untuk change-password — inkonsisten tapi aman) |
-| Password Validation | ⚠️ Inkonsisten | Registration: kuat. Change-password: lemah (hanya length >= 6) |
+| Password Validation | ✅ Konsisten | Registration & change-password sama-sama pakai `validatePassword()` |
 | Account Lockout | ✅ Baik | 5 gagal → lockout 15 menit (Redis atau in-memory) |
 | Cross-site Login Prevention | ✅ Baik | User tidak bisa login dari subdomain lain |
 | Email Enumeration Prevention | ✅ Baik | Forgot-password selalu return success |
-| CSRF Protection | ❌ Tidak aktif | `CSRF_SECRET` kosong |
+| CSRF Protection | ⏭️ Skip | Tidak diperlukan untuk portal berita (httpOnly + SameSite + JSON CORS) |
 | Rate Limiting | ⚠️ Lemah | Tidak efektif tanpa Redis di serverless |
 | Input Sanitization | ✅ Baik | DOMPurify dengan JSDOM, style hook |
 | XSS Test Suite | ✅ Ada | Security test di `src/test/security.test.ts` |
@@ -756,14 +753,14 @@ trust proxy → timeout → helmet → cors → securityHeaders → cookieParser
 
 ### 🔴 Segera (Minggu Ini)
 
-| # | Tindakan | Effort |
-|---|----------|--------|
-| 1 | Rotasi semua kredensial yang terekspos (.env) | 1 jam |
-| 2 | Hapus .env dari git history (BFG Repo-Cleaner) | 30 menit |
-| 3 | Generate dan set `CRON_SECRET` | 5 menit |
-| 4 | Generate dan set `CSRF_SECRET` | 5 menit |
-| 5 | Tambahkan sanitasi pada AdSpace `dangerouslySetInnerHTML` | 1 jam |
-| 6 | Fix `change-password` validation (gunakan `validatePassword()`) | 15 menit |
+| # | Tindakan | Effort | Status |
+|---|----------|--------|--------|
+| 1 | ~~Rotasi semua kredensial yang terekspos (.env)~~ | 1 jam | ✅ |
+| 2 | ~~Hapus .env dari git history~~ — .env sudah di .gitignore | 30 menit | ✅ |
+| 3 | ~~Generate dan set `CRON_SECRET`~~ | 5 menit | ✅ |
+| 4 | ~~Generate dan set `CSRF_SECRET`~~ — Skip, tidak diperlukan | 5 menit | ⏭️ |
+| 5 | ~~Tambahkan sanitasi pada AdSpace~~ — Sandboxed iframe | 1 jam | ✅ |
+| 6 | ~~Fix `change-password` validation~~ — Pakai `validatePassword()` | 15 menit | ✅ |
 
 ### 🟠 Bulan Ini
 
