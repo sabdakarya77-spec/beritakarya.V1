@@ -139,7 +139,7 @@ export function AdsMarketingPage({
               <h2 className="text-2xl md:text-3xl font-serif font-black text-brand-black dark:text-white uppercase tracking-tight">
                 Pilihan Paket Iklan
               </h2>
-              <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-widest mt-2">
+              <p className="text-[11px] text-brand-text-muted font-semibold uppercase tracking-widest mt-2">
                 Format standar Dewan Pers & IAB Indonesia
               </p>
             </div>
@@ -175,7 +175,7 @@ export function AdsMarketingPage({
                       <p className="text-sm text-brand-text-muted leading-relaxed mb-5">
                         {pkg.description || slotInfo.desc}
                       </p>
-                      <ul className="space-y-2 mb-6 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
+                      <ul className="space-y-2 mb-6 text-[11px] font-semibold text-brand-text-muted uppercase tracking-wide">
                         <li className="flex items-center gap-2">
                           <ChevronRight size={12} className="text-brand-red shrink-0" /> Ukuran:{' '}
                           {slotInfo.size}
@@ -192,13 +192,13 @@ export function AdsMarketingPage({
                     </div>
                     <div className="space-y-4">
                       <div className="h-[100px] w-full bg-brand-surface dark:bg-white/[0.03] border border-dashed border-black/5 dark:border-white/10 rounded-xl flex items-center justify-center">
-                        <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">
+                        <p className="text-[10px] text-brand-text-muted font-semibold uppercase tracking-widest">
                           Mockup: {slotInfo.size}
                         </p>
                       </div>
                       <div className="flex items-center justify-between pt-4 border-t border-black/5 dark:border-white/5">
                         <div>
-                          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-brand-text-muted">
                             Tarif Iklan
                           </span>
                           <p className="text-lg font-black text-brand-red">
@@ -233,7 +233,7 @@ export function AdsMarketingPage({
           <h3 className="text-2xl md:text-3xl font-serif font-black text-white uppercase tracking-tight mb-4">
             Siap Meluncurkan Kampanye Iklan Anda?
           </h3>
-          <p className="text-sm text-gray-400 max-w-xl mx-auto leading-relaxed mb-8">
+          <p className="text-sm text-brand-text-muted max-w-xl mx-auto leading-relaxed mb-8">
             Bergabunglah bersama ribuan mitra pengiklan regional BeritaKarya. Proses pendaftaran
             instan dan pantau hasil secara transparan.
           </p>

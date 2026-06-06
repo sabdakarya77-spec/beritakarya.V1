@@ -15,7 +15,7 @@ const STATUS_MAP: Record<string, { label: string; bg: string; text: string; dot:
   approved:  { label: 'Disetujui',   bg: 'bg-emerald-50 dark:bg-emerald-900/20',text: 'text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-500' },
   scheduled: { label: 'Terjadwal',   bg: 'bg-cyan-50 dark:bg-cyan-900/20',      text: 'text-cyan-700 dark:text-cyan-400',     dot: 'bg-cyan-500' },
   published: { label: 'Terbit',      bg: 'bg-green-50 dark:bg-green-900/20',    text: 'text-green-700 dark:text-green-400',   dot: 'bg-green-500' },
-  archived:  { label: 'Arsip',       bg: 'bg-gray-50 dark:bg-gray-900/20',      text: 'text-gray-600 dark:text-gray-400',     dot: 'bg-gray-500' },
+  archived:  { label: 'Arsip',       bg: 'bg-gray-50 dark:bg-gray-900/20',      text: 'text-gray-600 dark:text-brand-text-muted',     dot: 'bg-gray-500' },
 };
 
 export default function StatusBadge({ status, className }: StatusBadgeProps) {

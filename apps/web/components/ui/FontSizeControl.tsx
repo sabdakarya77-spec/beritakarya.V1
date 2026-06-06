@@ -57,7 +57,7 @@ export default function FontSizeControl() {
 
   return (
     <div className="flex items-center gap-3 rounded-full border border-gray-200/80 bg-white/90 px-2 py-1.5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-      <div className="pl-2 text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">
+      <div className="pl-2 text-[9px] font-black uppercase tracking-[0.2em] text-brand-text-muted">
         Teks
       </div>
       <div className="flex items-center gap-1 rounded-full bg-gray-100/80 p-1 dark:bg-white/[0.04]">
@@ -69,7 +69,7 @@ export default function FontSizeControl() {
               "px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] rounded-full transition-all",
               fontSize === s.value 
                 ? "bg-white text-brand-red shadow-sm dark:bg-slate-900 dark:text-white" 
-                : "text-gray-400 hover:text-brand-black dark:hover:text-white"
+                : "text-brand-text-muted hover:text-brand-black dark:hover:text-white"
             )}
           >
             {s.label}

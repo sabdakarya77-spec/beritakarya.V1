@@ -114,7 +114,7 @@ function getRoleBadgeClass(role: string) {
     case 'kontributor':
       return 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400'
     default:
-      return 'bg-gray-50 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400'
+      return 'bg-gray-50 text-gray-600 dark:bg-gray-500/10 dark:text-brand-text-muted'
   }
 }
 
@@ -205,7 +205,7 @@ export default async function AuthorProfilePage({ params }: Props) {
   const remainingArticles = recentArticles.slice(1)
 
   const sidebarCardClass = 'rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/5 dark:bg-white/[0.02] md:p-5'
-  const sidebarLabelClass = 'flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400'
+  const sidebarLabelClass = 'flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text-muted'
 
   return (
     <PublicSiteLayout siteConfig={siteConfig}>
@@ -219,7 +219,7 @@ export default async function AuthorProfilePage({ params }: Props) {
               {/* Back link */}
               <Link
                 href={`/${siteParam}/penulis`}
-                className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 transition-colors hover:text-brand-red"
+                className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-brand-text-muted transition-colors hover:text-brand-red"
               >
                 <ArrowLeft size={14} />
                 Kembali ke Halaman Penulis
@@ -248,7 +248,7 @@ export default async function AuthorProfilePage({ params }: Props) {
 
                 {/* Name + Bio + Social + Expertise */}
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400">
+                  <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-text-muted">
                     <span className="inline-flex items-center gap-1.5">
                       <CalendarDays size={12} className="text-brand-red" />
                       Bergabung sejak {joinedAt}
@@ -267,14 +267,14 @@ export default async function AuthorProfilePage({ params }: Props) {
                   <div className="mt-5 flex flex-wrap items-center gap-2">
                     <a
                       href={`mailto:${siteConfig.contactEmail}`}
-                      className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-gray-500 transition-all hover:border-brand-red/30 hover:bg-brand-red hover:text-white dark:border-white/10 dark:bg-white/[0.03] dark:text-gray-400 dark:hover:border-brand-red/30 dark:hover:bg-brand-red dark:hover:text-white"
+                      className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-brand-text-muted transition-all hover:border-brand-red/30 hover:bg-brand-red hover:text-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-brand-red/30 dark:hover:bg-brand-red dark:hover:text-white"
                     >
                       <Mail size={12} />
                       Hubungi
                     </a>
                     <Link
                       href={`/${siteParam}`}
-                      className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-gray-500 transition-all hover:border-brand-red/30 hover:bg-brand-red hover:text-white dark:border-white/10 dark:bg-white/[0.03] dark:text-gray-400 dark:hover:border-brand-red/30 dark:hover:bg-brand-red dark:hover:text-white"
+                      className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-brand-text-muted transition-all hover:border-brand-red/30 hover:bg-brand-red hover:text-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-brand-red/30 dark:hover:bg-brand-red dark:hover:text-white"
                     >
                       <Globe size={12} />
                       {siteConfig.name}
@@ -284,7 +284,7 @@ export default async function AuthorProfilePage({ params }: Props) {
                   {/* Expertise tags [Point 10] */}
                   {expertise.length > 0 && (
                     <div className="mt-5 flex flex-wrap items-center gap-2">
-                      <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400">Keahlian:</span>
+                      <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text-muted">Keahlian:</span>
                       {expertise.map(({ name, count }) => (
                         <Link
                           key={name}
@@ -306,7 +306,7 @@ export default async function AuthorProfilePage({ params }: Props) {
               {/* Stats strip */}
               <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:max-w-lg">
                 <div className="rounded-2xl border border-gray-100 bg-gray-50/70 px-4 py-3.5 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+                  <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-brand-text-muted">
                     <FileText size={11} className="text-brand-red" />
                     Artikel Terbit
                   </div>
@@ -315,7 +315,7 @@ export default async function AuthorProfilePage({ params }: Props) {
                   </p>
                 </div>
                 <div className="rounded-2xl border border-gray-100 bg-gray-50/70 px-4 py-3.5 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+                  <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-brand-text-muted">
                     <Eye size={11} className="text-brand-red" />
                     Total Dilihat
                   </div>
@@ -324,7 +324,7 @@ export default async function AuthorProfilePage({ params }: Props) {
                   </p>
                 </div>
                 <div className="col-span-2 sm:col-span-1 rounded-2xl border border-gray-100 bg-gray-50/70 px-4 py-3.5 dark:border-white/5 dark:bg-white/[0.03]">
-                  <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+                  <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-brand-text-muted">
                     <CalendarDays size={11} className="text-brand-red" />
                     Kanal
                   </div>
@@ -377,7 +377,7 @@ export default async function AuthorProfilePage({ params }: Props) {
                       <>
                         <div className="flex items-center gap-4">
                           <div className="h-px flex-1 bg-gray-100 dark:bg-white/5" />
-                          <span className="text-[9px] font-black uppercase tracking-[0.22em] text-gray-400">Publikasi Lainnya</span>
+                          <span className="text-[9px] font-black uppercase tracking-[0.22em] text-brand-text-muted">Publikasi Lainnya</span>
                           <div className="h-px flex-1 bg-gray-100 dark:bg-white/5" />
                         </div>
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -396,7 +396,7 @@ export default async function AuthorProfilePage({ params }: Props) {
                 ) : (
                   <div className="rounded-[2rem] border border-dashed border-gray-200 bg-white px-6 py-14 text-center dark:border-white/10 dark:bg-white/[0.02]">
                     <User2 size={34} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-muted">
                       Belum ada artikel terbit dari penulis ini.
                     </p>
                   </div>
@@ -420,14 +420,14 @@ export default async function AuthorProfilePage({ params }: Props) {
                             href={`/${siteParam}/artikel/${article.slug}`}
                             className="group flex items-start gap-3"
                           >
-                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-[11px] font-black text-gray-400 transition-colors group-hover:bg-brand-red group-hover:text-white dark:bg-white/5 dark:text-gray-500">
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-[11px] font-black text-brand-text-muted transition-colors group-hover:bg-brand-red group-hover:text-white dark:bg-white/5">
                               {String(idx + 1).padStart(2, '0')}
                             </span>
                             <div className="min-w-0">
                               <p className="line-clamp-2 text-[11px] font-bold leading-snug text-brand-black dark:text-white transition-colors group-hover:text-brand-red">
                                 {article.title}
                               </p>
-                              <p className="mt-1 text-[9px] font-semibold text-gray-400">
+                              <p className="mt-1 text-[9px] font-semibold text-brand-text-muted">
                                 {article.readingTimeMin || 3} min baca
                               </p>
                             </div>
@@ -486,7 +486,7 @@ export default async function AuthorProfilePage({ params }: Props) {
                               <p className="truncate text-[11px] font-bold text-brand-black dark:text-white transition-colors group-hover:text-brand-red">
                                 {author.name}
                               </p>
-                              <p className="text-[9px] font-semibold text-gray-400">
+                              <p className="text-[9px] font-semibold text-brand-text-muted">
                                 {ROLE_LABELS[author.role] || author.role} · {author.publishedCount || 0} artikel
                               </p>
                             </div>
@@ -505,7 +505,7 @@ export default async function AuthorProfilePage({ params }: Props) {
 
                   {/* Ad slot */}
                   <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 px-4 py-8 text-center dark:border-white/10 dark:bg-white/[0.02]">
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-brand-text-muted">
                       Ruang Iklan
                     </p>
                   </div>

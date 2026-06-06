@@ -118,7 +118,7 @@ export default function AdSpace({
         styles[type],
         className
       )}>
-        <span className="text-[8px] font-black tracking-widest text-gray-400 uppercase">MEMUAT IKLAN...</span>
+        <span className="text-[8px] font-black tracking-widest text-brand-text-muted uppercase">MEMUAT IKLAN...</span>
       </div>
     );
   }
@@ -192,14 +192,14 @@ export default function AdSpace({
       </span>
 
       <div className="flex flex-col items-center justify-center gap-2 pt-7 sm:gap-3 sm:pt-6">
-        <p className="text-[9px] font-black uppercase tracking-[0.14em] text-gray-400 sm:text-[10px] sm:tracking-[0.24em]">
+        <p className="text-[9px] font-black uppercase tracking-[0.14em] text-brand-text-muted sm:text-[10px] sm:tracking-[0.24em]">
           Slot Iklan Mandiri
         </p>
         <div className="space-y-1">
           <h4 className="text-[13px] font-black text-brand-black dark:text-white tracking-tight sm:text-sm md:text-lg">
             Ruang promosi tersedia
           </h4>
-          <p className="mx-auto max-w-[17rem] text-[10px] leading-5 text-gray-500 dark:text-gray-400 sm:max-w-sm md:text-xs">
+          <p className="mx-auto max-w-[17rem] text-[10px] leading-5 text-brand-text-muted sm:max-w-sm md:text-xs">
             Slot ini disiapkan untuk banner atau script iklan mandiri dari dashboard ads.
           </p>
         </div>

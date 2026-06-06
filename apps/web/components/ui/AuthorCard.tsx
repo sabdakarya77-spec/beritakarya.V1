@@ -37,7 +37,7 @@ export default function AuthorCard({ author, site, variant = 'card', className }
         </div>
         <div className="flex flex-col min-w-0">
           <span className="text-xs font-bold text-brand-black dark:text-white truncate">{author.name}</span>
-          <span className="text-[10px] text-gray-400 font-medium">
+          <span className="text-[10px] text-brand-text-muted font-medium">
             {ROLE_LABELS[author.role || 'reporter'] || author.role}
           </span>
         </div>
@@ -57,12 +57,12 @@ export default function AuthorCard({ author, site, variant = 'card', className }
             {ROLE_LABELS[author.role || 'reporter'] || author.role}
           </p>
           {author.email && (
-            <p className="text-[11px] text-gray-400 mt-2 flex items-center gap-1">
+            <p className="text-[11px] text-brand-text-muted mt-2 flex items-center gap-1">
               <Mail size={10} /> {author.email}
             </p>
           )}
           {typeof author.articleCount === 'number' && (
-            <p className="text-[11px] text-gray-400 mt-1 flex items-center gap-1">
+            <p className="text-[11px] text-brand-text-muted mt-1 flex items-center gap-1">
               <FileText size={10} /> {author.articleCount} post ditulis
             </p>
           )}

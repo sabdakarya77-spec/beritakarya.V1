@@ -74,7 +74,7 @@ export default function MobileMenu({
                 onClick={onClose}
                 className="rounded-full p-1.5 transition-colors hover:bg-gray-100 dark:hover:bg-white/5"
               >
-                <X size={18} className="text-gray-500" />
+                <X size={18} className="text-brand-text-muted" />
               </button>
             </div>
 
@@ -82,7 +82,7 @@ export default function MobileMenu({
             <div className="no-scrollbar flex-1 space-y-5 overflow-y-auto p-5">
               {/* Profile / Auth Section */}
               <section>
-                <h3 className="mb-2.5 text-[9px] font-medium tracking-[0.06em] text-gray-400">Akun Saya</h3>
+                <h3 className="mb-2.5 text-[9px] font-medium tracking-[0.06em] text-brand-text-muted">Akun Saya</h3>
                 {user ? (
                   <div className="rounded-2xl bg-gray-50 p-3.5 dark:bg-white/5">
                     <div className="mb-3.5 flex items-center gap-3">
@@ -91,7 +91,7 @@ export default function MobileMenu({
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="truncate text-[13px] font-semibold text-brand-black dark:text-white">{user.name}</p>
-                        <p className="truncate text-[11px] text-gray-500">{user.email}</p>
+                        <p className="truncate text-[11px] text-brand-text-muted">{user.email}</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
@@ -129,7 +129,7 @@ export default function MobileMenu({
 
               {/* Categories Section */}
               <section>
-                <h3 className="mb-2.5 text-[9px] font-medium tracking-[0.06em] text-gray-400">Kategori Berita</h3>
+                <h3 className="mb-2.5 text-[9px] font-medium tracking-[0.06em] text-brand-text-muted">Kategori Berita</h3>
                 <div className="grid grid-cols-1 gap-1">
                   {categories.map((cat) => {
                     const isActive = selectedCategory === cat.slug;
@@ -141,7 +141,7 @@ export default function MobileMenu({
                           "group flex items-center justify-between rounded-xl px-3 py-2 transition-all",
                           isActive 
                             ? "bg-brand-red/10 text-brand-red" 
-                            : "hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-400"
+                            : "hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-brand-text-muted"
                         )}
                       >
                         <div className="flex items-center gap-3">
@@ -164,7 +164,7 @@ export default function MobileMenu({
 
             {/* Footer */}
             <div className="border-t border-gray-100 bg-gray-50/50 px-5 py-3.5 dark:border-white/5 dark:bg-white/[0.02]">
-              <p className="text-[8px] font-medium tracking-[0.05em] text-gray-400">
+              <p className="text-[8px] font-medium tracking-[0.05em] text-brand-text-muted">
                 © {new Date().getFullYear()} BERITA KARYA.<br />
                 Jernih Melihat Nusantara.
               </p>

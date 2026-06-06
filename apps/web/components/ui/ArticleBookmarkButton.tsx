@@ -26,7 +26,7 @@ export default function ArticleBookmarkButton({
   site,
   className,
   activeClassName = 'text-brand-red',
-  idleClassName = 'text-gray-400 hover:text-brand-red',
+  idleClassName = 'text-brand-text-muted hover:text-brand-red',
   iconSize = 18,
   onToggle,
   children,

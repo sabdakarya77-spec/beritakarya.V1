@@ -107,11 +107,11 @@ export default function MobileBottomNav({ site = 'pusat', onSearchClick, onMenuC
               )}
               <Icon
                 size={18}
-                className={isActive ? 'text-brand-red stroke-[2.5]' : 'text-gray-400 dark:text-gray-500 hover:text-brand-red transition-colors'}
+                className={isActive ? 'text-brand-red stroke-[2.5]' : 'text-brand-text-muted hover:text-brand-red transition-colors'}
               />
               <span
                 className={`text-[10px] font-medium ${
-                  isActive ? 'text-brand-red' : 'text-gray-400 dark:text-gray-500'
+                  isActive ? 'text-brand-red' : 'text-brand-text-muted'
                 }`}
               >
                 {item.label}

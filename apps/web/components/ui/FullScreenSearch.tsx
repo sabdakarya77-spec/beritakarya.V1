@@ -90,7 +90,7 @@ export default function FullScreenSearch({
           <div className="flex-1 flex flex-col justify-start w-full max-w-5xl mx-auto">
             {/* Main Search Input */}
             <div className="relative border-b-2 border-white/20 focus-within:border-brand-red transition-colors pb-4 mb-12">
-              <Search className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400" size={32} />
+              <Search className="absolute left-0 top-1/2 -translate-y-1/2 text-brand-text-muted" size={32} />
               <input
                 ref={inputRef}
                 type="text"
@@ -114,7 +114,7 @@ export default function FullScreenSearch({
               <div className="md:col-span-7 space-y-6">
                 {query.trim() ? (
                   <>
-                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 border-b border-white/10 pb-2">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-brand-text-muted border-b border-white/10 pb-2">
                       Hasil Pencarian ({results.length})
                     </h4>
                     {results.length > 0 ? (
@@ -141,18 +141,18 @@ export default function FullScreenSearch({
                                 {art.title}
                               </h5>
                             </div>
-                            <ArrowRight size={16} className="text-gray-500 group-hover:text-white transition-colors self-center flex-shrink-0" />
+                            <ArrowRight size={16} className="text-brand-text-muted group-hover:text-white transition-colors self-center flex-shrink-0" />
                           </Link>
                         ))}
                       </div>
                     ) : (
                       !loading && (
-                        <p className="text-gray-500 text-sm italic">Tidak ada artikel yang cocok dengan pencarian Anda.</p>
+                        <p className="text-brand-text-muted text-sm italic">Tidak ada artikel yang cocok dengan pencarian Anda.</p>
                       )
                     )}
                   </>
                 ) : (
-                  <div className="flex flex-col justify-center items-center py-16 text-center text-gray-500 border border-dashed border-white/10 rounded-2xl bg-white/[0.01]">
+                  <div className="flex flex-col justify-center items-center py-16 text-center text-brand-text-muted border border-dashed border-white/10 rounded-2xl bg-white/[0.01]">
                     <Search size={48} className="text-white/10 mb-4" />
                     <p className="text-sm font-light">Mulai mengetik untuk menampilkan hasil pencarian real-time secara instan.</p>
                   </div>
@@ -161,7 +161,7 @@ export default function FullScreenSearch({
 
               {/* Right Column: Trending Topics */}
               <div className="md:col-span-5 space-y-6">
-                <h4 className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 border-b border-white/10 pb-2 flex items-center gap-2">
+                <h4 className="text-[11px] font-semibold uppercase tracking-wide text-brand-text-muted border-b border-white/10 pb-2 flex items-center gap-2">
                   <TrendingUp size={14} className="text-brand-red" /> Topik Populer Hari Ini
                 </h4>
                 <div className="flex flex-wrap gap-3">

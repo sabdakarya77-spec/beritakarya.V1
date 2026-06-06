@@ -135,7 +135,7 @@ export default function SiteFooter({ siteConfig, categories }: SiteFooterProps) 
                 <Link
                   key={cat.slug}
                   href={`/${siteConfig.id}?cat=${encodeURIComponent(cat.slug)}`}
-                  className="text-[13px] font-medium text-brand-text-muted transition-all hover:text-brand-red dark:text-gray-400"
+                  className="text-[13px] font-medium text-brand-text-muted transition-all hover:text-brand-red"
                 >
                   {cat.name}
                 </Link>

@@ -37,7 +37,7 @@ export default function SavedArticlesFeed({ site }: SavedArticlesFeedProps) {
     return (
       <div className="mb-16 rounded-2xl border border-dashed border-gray-200 dark:border-white/10 bg-gray-50/70 dark:bg-white/[0.02] p-10 text-center">
         <p className="text-lg font-serif font-black text-brand-black dark:text-white">Belum ada artikel tersimpan.</p>
-        <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-3 text-sm text-brand-text-muted">
           Gunakan tombol bookmark pada hero atau halaman artikel untuk menyimpan bacaan Anda.
         </p>
         <div className="mt-6">
@@ -54,7 +54,7 @@ export default function SavedArticlesFeed({ site }: SavedArticlesFeedProps) {
 
   return (
     <div className="mb-16">
-      <div className="mb-6 text-[10px] font-black uppercase tracking-[0.16em] text-gray-400">
+      <div className="mb-6 text-[10px] font-black uppercase tracking-[0.16em] text-brand-text-muted">
         {articles.length} artikel tersimpan
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
@@ -62,7 +62,7 @@ export default function SavedArticlesFeed({ site }: SavedArticlesFeedProps) {
           <div key={`${article.site}-${article.slug}`} className="space-y-4">
             <NewsCard article={article} site={site} />
             <div className="flex items-center justify-between border-t border-gray-100 dark:border-white/5 pt-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.14em] text-gray-400">
+              <span className="text-[10px] font-black uppercase tracking-[0.14em] text-brand-text-muted">
                 Disimpan untuk dibaca lagi
               </span>
               <ArticleBookmarkButton

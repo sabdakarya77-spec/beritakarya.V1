@@ -91,7 +91,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           </div>
           <div>
             <h3 className="text-xl font-black uppercase tracking-tight text-brand-black dark:text-white">Komentar</h3>
-            <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+            <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-brand-text-muted">
               {isLoading ? 'Memuat...' : `${comments.length} komentar pembaca terdaftar`}
             </p>
           </div>
@@ -102,7 +102,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
         {user ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-gray-400 shadow-sm dark:bg-white/5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-brand-text-muted shadow-sm dark:bg-white/5">
                 <span className="font-black text-sm text-brand-red">{user.name[0]}</span>
               </div>
               <div className="flex-1 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-all focus-within:border-brand-red/30 dark:border-white/10 dark:bg-slate-900">
@@ -114,10 +114,10 @@ export default function CommentSection({ articleId }: { articleId: string }) {
                     if (message?.type === 'error') setMessage(null);
                   }}
                   placeholder="Bagikan pendapat Anda tentang berita ini..."
-                  className="min-h-[44px] w-full resize-none overflow-y-auto bg-transparent text-sm leading-relaxed outline-none placeholder:text-gray-400"
+                  className="min-h-[44px] w-full resize-none overflow-y-auto bg-transparent text-sm leading-relaxed outline-none placeholder:text-brand-text-muted"
                 />
                 <div className="mt-3 flex items-center justify-between gap-3 border-t border-gray-100 pt-3 dark:border-white/5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-brand-text-muted">
                     Komentar ditinjau redaksi sebelum tayang
                   </p>
                   <button
@@ -133,11 +133,11 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           </form>
         ) : (
           <div className="flex gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-gray-400 shadow-sm dark:bg-white/5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-brand-text-muted shadow-sm dark:bg-white/5">
               <User size={18} />
             </div>
             <div className="flex-1 rounded-2xl border border-dashed border-gray-200/90 bg-white px-4 py-3.5 shadow-sm dark:border-white/10 dark:bg-slate-900">
-              <p className="text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+              <p className="text-sm leading-relaxed text-brand-text-muted">
                 Untuk ikut berdiskusi, silakan masuk atau daftar terlebih dahulu.
               </p>
               <div className="mt-2.5 flex flex-wrap items-center gap-2.5 border-t border-gray-100 pt-2.5 dark:border-white/5">
@@ -153,7 +153,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
                 >
                   Daftar
                 </Link>
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-gray-400">
+                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text-muted">
                   Hanya akun terdaftar yang dapat mengirim komentar
                 </span>
               </div>
@@ -180,13 +180,13 @@ export default function CommentSection({ articleId }: { articleId: string }) {
         {isLoading ? (
           <div className="py-16 text-center">
             <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-brand-red/20 border-t-brand-red" />
-            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Memuat komentar...</p>
+            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-brand-text-muted">Memuat komentar...</p>
           </div>
         ) : comments.length === 0 ? (
           <div className="rounded-[1.75rem] border border-dashed border-gray-200 bg-white/[0.02] px-6 py-10 text-center dark:border-white/10 dark:bg-white/[0.015] md:py-11">
             <MessageSquare size={30} className="mx-auto mb-3 text-gray-300 dark:text-gray-600" />
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Belum ada komentar.</p>
-            <p className="mt-2 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+            <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-muted">Belum ada komentar.</p>
+            <p className="mt-2 text-sm leading-relaxed text-brand-text-muted">
               Jadilah yang pertama berdiskusi setelah masuk ke akun Anda.
             </p>
           </div>
@@ -202,7 +202,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
                     <h4 className="text-[11px] font-black uppercase tracking-widest text-brand-black dark:text-white">
                       {c.user?.name || c.authorName || 'Pembaca'}
                     </h4>
-                    <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-gray-400">
+                    <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-brand-text-muted">
                       <Clock size={10} />
                       {new Date(c.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>

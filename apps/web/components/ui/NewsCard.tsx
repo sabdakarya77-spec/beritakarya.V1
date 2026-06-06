@@ -34,7 +34,7 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
     "rounded-sm px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.14em]",
     getCategoryColor(article.category?.name)
   );
-  const calmMetaClass = "flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] font-medium text-brand-text-muted dark:text-gray-400";
+  const calmMetaClass = "flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] font-medium text-brand-text-muted";
   const defaultImageClass = 'object-cover object-[center_30%] transition-transform duration-500 ease-out group-hover:scale-[1.03]';
   const horizontalImageClass = 'object-cover object-[center_30%] transition-transform duration-500 ease-out group-hover:scale-[1.04]';
   const heroImageClass = 'object-cover object-[center_26%] opacity-75 transition-all duration-700 ease-out group-hover:scale-[1.03]';
@@ -170,10 +170,10 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
               <h3 className="line-clamp-3 font-sans text-[0.98rem] font-bold leading-[1.2] tracking-tight text-brand-black transition-colors group-hover:text-brand-red dark:text-white md:text-[1.1rem]">
                 {article.title}
               </h3>
-              <p className="hidden line-clamp-2 text-xs leading-relaxed text-brand-text-muted/90 dark:text-gray-400 md:block">
+              <p className="hidden line-clamp-2 text-xs leading-relaxed text-brand-text-muted/90 dark:text-brand-text-muted md:block">
                 {excerpt}
               </p>
-              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[10px] text-brand-text-muted dark:text-gray-400">
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[10px] text-brand-text-muted">
                  <span className="flex min-w-0 items-center gap-1"><User size={10}/> <span className="truncate">{authorName}</span></span>
                  <span>{date}</span>
               </div>
@@ -224,7 +224,7 @@ export default function NewsCard({ article, variant = 'medium', site = 'pusat', 
               <h3 className="line-clamp-3 font-sans text-[1.08rem] font-extrabold leading-[1.2] tracking-tight text-brand-black transition-colors group-hover:text-brand-red dark:text-white md:text-[1.18rem]">
                 {article.title}
               </h3>
-              <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[10px] text-brand-text-muted dark:text-gray-400">
+              <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[10px] text-brand-text-muted">
                <div className="flex min-w-0 items-center gap-1">
                   <div className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-gray-100 text-[9px] font-semibold dark:bg-white/10">
                     {authorName[0] || 'R'}

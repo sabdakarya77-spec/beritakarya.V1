@@ -118,7 +118,7 @@ export default function MobileArticleTools({
 
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-text-muted">
                 Bagikan Artikel
               </p>
               <button
@@ -165,7 +165,7 @@ export default function MobileArticleTools({
                 'flex flex-1 flex-col items-center gap-1 rounded-2xl px-3 py-2.5 transition-all',
                 isShareSheetOpen
                   ? 'bg-brand-red/10 text-brand-red'
-                  : 'text-gray-400 hover:bg-white/[0.05] hover:text-white active:scale-95'
+                  : 'text-brand-text-muted hover:bg-white/[0.05] hover:text-white active:scale-95'
               )}
             >
               <Share2 size={20} />
@@ -187,7 +187,7 @@ export default function MobileArticleTools({
                 'flex flex-1 flex-col items-center gap-1 rounded-2xl px-3 py-2.5 transition-all',
                 isSaved
                   ? 'bg-brand-red/10 text-brand-red'
-                  : 'text-gray-400 hover:bg-white/[0.05] hover:text-white active:scale-95'
+                  : 'text-brand-text-muted hover:bg-white/[0.05] hover:text-white active:scale-95'
               )}
             >
               <Bookmark size={20} className={isSaved ? 'fill-current' : undefined} />

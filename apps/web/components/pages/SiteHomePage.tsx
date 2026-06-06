@@ -50,8 +50,8 @@ function buildWhatsAppUrl(phone?: string | null, siteName?: string) {
 // Utility class constants
 // ─────────────────────────────────────────────
 const sectionEyebrowClass = 'text-[10px] font-black uppercase tracking-[0.16em]'
-const sectionEyebrowMutedClass = `${sectionEyebrowClass} text-gray-500 dark:text-gray-400`
-const sectionMetaClass = 'text-[9px] font-semibold text-gray-500 dark:text-gray-400'
+const sectionEyebrowMutedClass = `${sectionEyebrowClass} text-brand-text-muted`
+const sectionMetaClass = 'text-[9px] font-semibold text-brand-text-muted'
 const sectionTitleClass = 'text-lg md:text-xl font-sans font-extrabold tracking-tight text-brand-black dark:text-white'
 
 function formatSidebarDate(dateValue?: string | Date) {
@@ -388,7 +388,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
                   <Link
                     key={tag}
                     href={`/${siteParam}?q=${encodeURIComponent(tag)}`}
-                    className="inline-flex items-center rounded-full border border-black/5 bg-white px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-gray-500 transition-colors hover:border-brand-red/40 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-400"
+                    className="inline-flex items-center rounded-full border border-black/5 bg-white px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-brand-text-muted transition-colors hover:border-brand-red/40 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03]"
                   >
                     #{tag}
                   </Link>
@@ -427,7 +427,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
                       ? `Berita ${resolveCategoryName(categoryFilter, categoriesTree)}`
                       : 'Berita Terbaru'}
                 </h3>
-                <div className="hidden items-center gap-3 text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400 md:flex">
+                <div className="hidden items-center gap-3 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-text-muted md:flex">
                   <span className="inline-flex items-center gap-2 text-brand-red">
                     <span className="h-1.5 w-1.5 rounded-full bg-brand-red" />
                     Update Langsung
@@ -461,7 +461,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
                     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-white/5 dark:bg-white/[0.02]">
                       <div className="mb-4 flex items-center justify-between">
                         <span className={sectionEyebrowMutedClass}>Sponsorship</span>
-                        <span className="text-[9px] font-medium uppercase tracking-[0.1em] text-gray-400">
+                        <span className="text-[9px] font-medium uppercase tracking-[0.1em] text-brand-text-muted">
                           Advertisement
                         </span>
                       </div>
@@ -503,7 +503,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
                   <p className="text-base font-sans font-bold text-brand-black dark:text-white">
                     Belum ada berita untuk konteks ini.
                   </p>
-                  <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                  <p className="mt-3 text-sm text-brand-text-muted">
                     Coba kembali ke topik terbaru atau gunakan kata kunci yang lebih umum.
                   </p>
                   <div className="mt-6">
@@ -635,7 +635,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
                           <h5 className="line-clamp-2 font-sans text-sm font-semibold leading-snug tracking-tight text-brand-black transition-colors group-hover:text-brand-red dark:text-white">
                             {article.title}
                           </h5>
-                          <div className="mt-2 flex items-center justify-between gap-3 text-[10px] text-brand-text-muted dark:text-gray-400">
+                          <div className="mt-2 flex items-center justify-between gap-3 text-[10px] text-brand-text-muted">
                             <span className="truncate">{article.author?.name || 'Redaksi'}</span>
                             <span className="font-bold uppercase tracking-[0.1em] text-brand-black transition-colors group-hover:text-brand-red dark:text-white">
                               Baca
@@ -664,7 +664,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
                       className={`flex items-center justify-between ${i < arr.length - 1 ? 'border-b border-black/5 pb-2.5 dark:border-white/5' : ''}`}
                     >
                       <div>
-                        <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-gray-400">{label}</div>
+                        <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-brand-text-muted">{label}</div>
                         <div className="text-sm font-extrabold text-brand-black dark:text-white">{value}</div>
                       </div>
                       <div className="text-right">
@@ -672,7 +672,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
                           <span>{up ? '↑' : '↓'}</span>
                           <span>{change}</span>
                         </div>
-                        <div className="text-[9px] text-gray-400">{diff}</div>
+                        <div className="text-[9px] text-brand-text-muted">{diff}</div>
                       </div>
                     </div>
                   ))}
@@ -788,7 +788,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
                               &ldquo;{article.title}&rdquo;
                             </h4>
                           </Link>
-                          <p className="line-clamp-3 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                          <p className="line-clamp-3 text-xs leading-relaxed text-brand-text-muted">
                             {article.excerpt || article.blocks?.find((b: any) => b.type === 'paragraph')?.content || ''}
                           </p>
                         </div>

@@ -146,8 +146,8 @@ export default function ArticleShareActions({
 
     const labelClass =
       tone === 'floating'
-        ? 'text-[9px] font-black uppercase tracking-[0.18em] text-gray-400'
-        : 'text-[9px] font-black uppercase tracking-[0.18em] text-gray-400';
+        ? 'text-[9px] font-black uppercase tracking-[0.18em] text-brand-text-muted'
+        : 'text-[9px] font-black uppercase tracking-[0.18em] text-brand-text-muted';
 
     const iconShellClass =
       tone === 'floating'
@@ -280,7 +280,7 @@ export default function ArticleShareActions({
               className="absolute right-0 top-full z-30 mt-2.5 w-[13rem] origin-top-right rounded-2xl border border-black/[0.07] bg-white/98 p-2 shadow-[0_16px_48px_rgba(15,23,42,0.12),0_4px_12px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/[0.09] dark:bg-[color:rgb(2,6,23/0.97)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.4),0_4px_12px_rgba(0,0,0,0.2)]"
             >
               <div className="px-2 pb-1.5 pt-0.5">
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-text-muted">
                   Bagikan Artikel
                 </p>
               </div>
@@ -314,7 +314,7 @@ export default function ArticleShareActions({
 
               <div className="mt-1.5 border-t border-black/[0.05] pt-1.5 dark:border-white/[0.07]">
                 <div className="px-2 pb-1.5 pt-0.5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-text-muted">
                     Untuk Sosial Lain
                   </p>
                 </div>

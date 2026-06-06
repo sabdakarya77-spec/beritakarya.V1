@@ -51,7 +51,7 @@ export default function NewsletterForm() {
     <div className="bg-slate-900 dark:bg-black/40 border border-transparent dark:border-white/5 p-8 rounded-sm overflow-hidden relative">
       <div className="absolute top-0 right-0 w-24 h-24 bg-brand-red/10 rounded-full -mr-12 -mt-12 blur-3xl" />
       <h4 className="text-white font-serif text-2xl font-bold mb-4 relative z-10">Dapatkan Berita Pilihan</h4>
-      <p className="text-gray-400 text-xs mb-6 font-light leading-relaxed relative z-10">
+      <p className="text-brand-text-muted text-xs mb-6 font-light leading-relaxed relative z-10">
         Laporan investigasi dan analisis tajam langsung di email Anda setiap pagi.
       </p>
       

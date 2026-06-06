@@ -162,7 +162,7 @@ export default function AuthorsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {/* Search */}
             <div className="relative flex-1 max-w-md">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-text-muted" />
               <input
                 type="text"
                 placeholder="Cari penulis..."
@@ -171,7 +171,7 @@ export default function AuthorsPage() {
                   setSearch(e.target.value)
                   setPage(1)
                 }}
-                className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-4 text-xs text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-brand-red/30 dark:border-white/10 dark:bg-slate-900 dark:text-white dark:placeholder:text-gray-500"
+                className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-4 text-xs text-gray-900 outline-none transition-all placeholder:text-brand-text-muted focus:border-brand-red/30 dark:border-white/10 dark:bg-slate-900 dark:text-white"
               />
             </div>
 
@@ -202,7 +202,7 @@ export default function AuthorsPage() {
           ) : paginatedAuthors.length === 0 ? (
             <div className="py-20 text-center">
               <Users size={40} className="mx-auto mb-3 text-gray-300 dark:text-gray-650" />
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400">
+              <p className="text-xs font-bold uppercase tracking-wider text-brand-text-muted">
                 {search ? 'Penulis tidak ditemukan' : 'Belum ada penulis'}
               </p>
             </div>

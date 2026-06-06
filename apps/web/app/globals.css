@@ -208,7 +208,7 @@
   }
 
   .dash-label {
-    @apply text-[10px] font-black uppercase tracking-[0.2em] text-gray-400;
+    @apply text-[10px] font-black uppercase tracking-[0.2em] text-brand-text-muted;
   }
 
   .dash-value {
@@ -228,7 +228,7 @@
   .status-approved    { @apply bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400; }
   .status-scheduled   { @apply bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20 dark:text-cyan-400; }
   .status-published   { @apply bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400; }
-  .status-archived    { @apply bg-gray-50 text-gray-500 dark:bg-gray-800 dark:text-gray-400; }
+  .status-archived    { @apply bg-gray-50 text-brand-text-muted dark:bg-gray-800; }
 
   /* ==================== TIPTAP EDITOR STYLES ==================== */
   .tiptap-editor-wrapper {
@@ -282,7 +282,7 @@
   }
 
   .tiptap-editor-content blockquote {
-    @apply border-l-4 border-brand-red pl-4 my-4 italic text-gray-600 dark:text-gray-400;
+    @apply border-l-4 border-brand-red pl-4 my-4 italic text-gray-600 dark:text-brand-text-muted;
   }
 
   .tiptap-editor-content code {
@@ -311,7 +311,7 @@
 
   /* Placeholder styling */
   .tiptap-editor-content p.is-editor-empty:first-child::before {
-    @apply text-gray-400 dark:text-gray-500;
+    @apply text-brand-text-muted;
     content: attr(data-placeholder);
     float: left;
     height: 0;
@@ -327,7 +327,7 @@
   .tiptap-editor-content h1.is-empty::before,
   .tiptap-editor-content h2.is-empty::before,
   .tiptap-editor-content h3.is-empty::before {
-    @apply text-gray-400 dark:text-gray-500;
+    @apply text-brand-text-muted;
     content: attr(data-placeholder);
     float: left;
     height: 0;

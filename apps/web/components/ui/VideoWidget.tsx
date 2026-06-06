@@ -67,7 +67,7 @@ export default function VideoWidget({
       
       <div className="mt-3 flex items-center gap-2">
         <div className="w-6 h-0.5 bg-brand-red" />
-        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-brand-text-muted dark:text-gray-400">Tonton Sekarang</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-brand-text-muted">Tonton Sekarang</span>
       </div>
     </div>
   );

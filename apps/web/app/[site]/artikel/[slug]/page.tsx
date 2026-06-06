@@ -204,7 +204,7 @@ export default async function ArticlePage({ params }: Props) {
   const readingTime = article.readingTimeMin || Math.max(1, Math.ceil((article.wordCount || 0) / 200)) || 3;
   const articleRailClassName = 'xl:grid xl:grid-cols-[minmax(0,1.75fr)_20rem] 2xl:grid-cols-[minmax(0,1.75fr)_22.5rem] xl:justify-between xl:gap-12 2xl:gap-16'
   const sidebarCardClass = 'rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/5 dark:bg-white/[0.02]'
-  const sidebarLabelClass = 'flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400'
+  const sidebarLabelClass = 'flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text-muted'
 
   return (
     <PublicSiteLayout siteConfig={siteConfig}>
@@ -294,10 +294,10 @@ export default async function ArticlePage({ params }: Props) {
             <div className="border-b border-gray-100 dark:border-white/5">
               <Container>
                 <div className="py-3 flex items-center justify-between gap-4 max-w-5xl">
-                  <p className="text-[11px] text-brand-text-muted dark:text-gray-400 italic leading-relaxed">
+                  <p className="text-[11px] text-brand-text-muted italic leading-relaxed">
                     {coverImageCaption}
                   </p>
-                  <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 shrink-0">
+                  <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-brand-text-muted shrink-0">
                     Foto / Dokumentasi Redaksi
                   </span>
                 </div>
@@ -377,7 +377,7 @@ export default async function ArticlePage({ params }: Props) {
                                       <h4 className="line-clamp-2 font-sans text-sm font-extrabold leading-snug tracking-tight text-brand-black dark:text-white group-hover:text-brand-red transition-colors">
                                         {rel.title}
                                       </h4>
-                                      <span className="mt-1.5 text-[9px] font-semibold text-gray-500 dark:text-gray-400">
+                                      <span className="mt-1.5 text-[9px] font-semibold text-brand-text-muted">
                                         {rel.author?.name || 'Redaksi'} · {rel.readingTimeMin || 3} min baca
                                       </span>
                                     </div>
@@ -396,11 +396,11 @@ export default async function ArticlePage({ params }: Props) {
                   {/* Share & Save Section (Inline at the end of article) */}
                   <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-y border-gray-100 py-4 dark:border-white/5">
                     <div className="flex flex-wrap items-center gap-3">
-                      <span className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Bagikan:</span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.18em] text-brand-text-muted">Bagikan:</span>
                       <ArticleShareActions title={article.title} url={articleUrl} variant="inline" />
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Simpan:</span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.18em] text-brand-text-muted">Simpan:</span>
                       <ArticleBookmarkButton
                         article={article}
                         site={siteParam}
@@ -418,7 +418,7 @@ export default async function ArticlePage({ params }: Props) {
                       <Link 
                         key={tag} 
                         href={`/${siteParam}?q=${encodeURIComponent(tag)}`}
-                        className="inline-flex items-center rounded-full border border-black/5 bg-white px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-gray-500 transition-colors hover:border-brand-red/40 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-400"
+                        className="inline-flex items-center rounded-full border border-black/5 bg-white px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-brand-text-muted transition-colors hover:border-brand-red/40 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03] dark:text-brand-text-muted"
                       >
                         #{tag}
                       </Link>
@@ -439,7 +439,7 @@ export default async function ArticlePage({ params }: Props) {
                         <h3 className="text-lg md:text-xl font-sans font-extrabold tracking-tight text-brand-black dark:text-white">
                           Rekomendasi Artikel
                         </h3>
-                        <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-gray-400">
+                        <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-brand-text-muted">
                           Lanjutkan bacaan terkait topik ini
                         </p>
                       </div>
@@ -472,7 +472,7 @@ export default async function ArticlePage({ params }: Props) {
                       </div>
                     ) : (
                       <div className="col-span-full rounded-2xl border border-dashed border-gray-200 px-4 py-8 text-center dark:border-white/10">
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-brand-text-muted">
                           Belum ada rekomendasi artikel terkait.
                         </p>
                       </div>
@@ -486,7 +486,7 @@ export default async function ArticlePage({ params }: Props) {
               <aside className="hidden xl:block">
                 <div className="sticky top-32 space-y-4">
                   <div className={cn(sidebarCardClass, 'space-y-3.5')}>
-                    <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text-muted">
                       Bagikan & Simpan
                     </p>
                     <div className="flex flex-wrap items-center gap-2.5">
@@ -513,7 +513,7 @@ export default async function ArticlePage({ params }: Props) {
                           {article.author?.name?.[0] || 'R'}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[8px] font-bold uppercase tracking-[0.16em] text-gray-400">
+                          <p className="text-[8px] font-bold uppercase tracking-[0.16em] text-brand-text-muted">
                             Penulis
                           </p>
                           <p className="mt-1 text-xs font-bold leading-snug text-brand-black dark:text-white">
@@ -532,7 +532,7 @@ export default async function ArticlePage({ params }: Props) {
                     </div>
                     <div className="grid grid-cols-2 gap-2.5">
                       <div className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-white/5 dark:bg-white/[0.03]">
-                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-brand-text-muted">
                           <BookOpen size={10} className="text-brand-red" />
                           Baca
                         </div>
@@ -541,7 +541,7 @@ export default async function ArticlePage({ params }: Props) {
                         </p>
                       </div>
                       <div className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-white/5 dark:bg-white/[0.03]">
-                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-brand-text-muted">
                           <Printer size={10} className="text-brand-red" />
                           Kata
                         </div>
@@ -550,7 +550,7 @@ export default async function ArticlePage({ params }: Props) {
                         </p>
                       </div>
                       <div className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-white/5 dark:bg-white/[0.03]">
-                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-brand-text-muted">
                           <CalendarDays size={10} className="text-brand-red" />
                           Terbit
                         </div>
@@ -563,7 +563,7 @@ export default async function ArticlePage({ params }: Props) {
                         </p>
                       </div>
                       <div className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-white/5 dark:bg-white/[0.03]">
-                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                        <div className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-brand-text-muted">
                           <User2 size={10} className="text-brand-red" />
                           Kanal
                         </div>
@@ -575,7 +575,7 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
 
                   <div className={cn(sidebarCardClass, 'space-y-4')}>
-                    <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text-muted">
                       Kategori Terkait
                     </p>
                     <div className="space-y-4">
@@ -588,10 +588,10 @@ export default async function ArticlePage({ params }: Props) {
                           <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-brand-red/8 text-brand-red dark:bg-brand-red/12">
                             <BookOpen size={14} />
                           </div>
-                          <p className="mt-3 text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                          <p className="mt-3 text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text-muted">
                             Belum Ada Artikel Lain
                           </p>
-                          <p className="mt-1 text-xs leading-relaxed text-brand-text-muted dark:text-gray-400">
+                          <p className="mt-1 text-xs leading-relaxed text-brand-text-muted">
                             Jelajahi berita terbaru untuk menemukan artikel lain dari kategori ini.
                           </p>
                           <Link
@@ -618,14 +618,14 @@ export default async function ArticlePage({ params }: Props) {
                             href={`/${siteParam}/artikel/${pop.slug}`}
                             className="group flex items-start gap-3"
                           >
-                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-[11px] font-black text-gray-400 group-hover:bg-brand-red group-hover:text-white transition-colors dark:bg-white/5 dark:text-gray-500 dark:group-hover:bg-brand-red">
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-[11px] font-black text-brand-text-muted group-hover:bg-brand-red group-hover:text-white transition-colors dark:bg-white/5 dark:text-brand-text-muted dark:group-hover:bg-brand-red">
                               {String(idx + 1).padStart(2, '0')}
                             </span>
                             <div className="min-w-0">
                               <p className="line-clamp-2 text-[11px] font-bold leading-snug text-brand-black dark:text-white group-hover:text-brand-red transition-colors">
                                 {pop.title}
                               </p>
-                              <p className="mt-1 text-[9px] font-semibold text-gray-400">
+                              <p className="mt-1 text-[9px] font-semibold text-brand-text-muted">
                                 {pop.author?.name || 'Redaksi'} · {pop.readingTimeMin || 3} min
                               </p>
                             </div>
@@ -646,7 +646,7 @@ export default async function ArticlePage({ params }: Props) {
                           <Link
                             key={tag}
                             href={`/${siteParam}?q=${encodeURIComponent(tag)}`}
-                            className="inline-flex items-center rounded-full border border-black/5 bg-white px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-gray-500 transition-colors hover:border-brand-red/40 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-400"
+                            className="inline-flex items-center rounded-full border border-black/5 bg-white px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-brand-text-muted transition-colors hover:border-brand-red/40 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03] dark:text-brand-text-muted"
                           >
                             #{tag}
                           </Link>
@@ -726,8 +726,8 @@ function PublicBlock({ block, index = 0 }: { block: Block; index?: number }) {
           </div>
           {block.caption && (
             <figcaption className="mt-4 flex justify-between items-start border-b border-gray-100 dark:border-white/5 pb-4">
-              <span className="text-xs text-brand-text-muted dark:text-gray-400 italic leading-relaxed max-w-[80%]">{block.caption}</span>
-              <span className="text-[8px] text-brand-text-muted dark:text-gray-500 uppercase tracking-widest font-bold shrink-0">Foto / BeritaKarya</span>
+              <span className="text-xs text-brand-text-muted italic leading-relaxed max-w-[80%]">{block.caption}</span>
+              <span className="text-[8px] text-brand-text-muted uppercase tracking-widest font-bold shrink-0">Foto / BeritaKarya</span>
             </figcaption>
           )}
         </figure>
@@ -750,7 +750,7 @@ function PublicBlock({ block, index = 0 }: { block: Block; index?: number }) {
                 />
               </div>
               {img.caption && (
-                <figcaption className="mt-2 text-xs text-brand-text-muted dark:text-gray-400 italic text-center">
+                <figcaption className="mt-2 text-xs text-brand-text-muted italic text-center">
                   {img.caption}
                 </figcaption>
               )}
@@ -853,7 +853,7 @@ function PublicBlock({ block, index = 0 }: { block: Block; index?: number }) {
                 />
               </div>
               {block.caption && (
-                <figcaption className="mt-2.5 text-xs text-brand-text-muted dark:text-gray-400 italic text-center">
+                <figcaption className="mt-2.5 text-xs text-brand-text-muted italic text-center">
                   {block.caption}
                 </figcaption>
               )}

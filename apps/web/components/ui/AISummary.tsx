@@ -27,7 +27,7 @@ export default function AISummary({ title, content, isVisible = false }: AISumma
         
         <button 
           onClick={() => setIsOpen(false)}
-          className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-brand-text-muted hover:text-white transition-colors"
         >
           <X size={16} />
         </button>
@@ -41,7 +41,7 @@ export default function AISummary({ title, content, isVisible = false }: AISumma
           {title}
         </h4>
         
-        <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-4">
+        <p className="text-brand-text-muted text-sm leading-relaxed mb-4 line-clamp-4">
           {content}
         </p>
 
