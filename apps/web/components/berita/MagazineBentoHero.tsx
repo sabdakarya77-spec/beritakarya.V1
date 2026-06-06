@@ -132,7 +132,7 @@ export function MagazineBentoHero({ articles, site }: { articles: any[], site: s
         </div>
 
         {/* Kanan: Navigasi Menu Vertikal (Hanya tampil di Desktop) */}
-        <div className="hidden lg:flex lg:col-span-4 flex-col gap-3 h-full justify-between">
+        <div className="hidden lg:flex lg:col-span-4 flex-col gap-3 h-full justify-between rounded-2xl bg-slate-900 border border-white/5 p-3">
           {heroArticles.map((article: any, idx: number) => {
             const isActive = idx === activeIndex;
             return (
