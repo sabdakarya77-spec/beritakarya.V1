@@ -38,32 +38,44 @@ export class CategoryService {
     return roots
   }
 
-  // Helper: Deduplicate categories by slug, preferring site-specific over global
+  // Helper: Deduplicate categories by slug AND name, preferring site-specific over global
   deduplicateCategories(categories: any[], siteId: string): any[] {
-    const slugMap = new Map<string, any>()
+    // Dedup by both slug AND name (case-insensitive).
+    // Site-specific wins over global when slugs or names collide.
+    const dedupMap = new Map<string, any>()
     for (const cat of categories) {
-      const existing = slugMap.get(cat.slug)
-      if (!existing || (cat.siteId === siteId && existing.siteId !== siteId)) {
-        slugMap.set(cat.slug, cat)
+      const slugKey = `slug:${cat.slug}`
+      const nameKey = `name:${cat.name.toLowerCase()}`
+
+      for (const key of [slugKey, nameKey]) {
+        const existing = dedupMap.get(key)
+        if (!existing || (cat.siteId === siteId && existing.siteId !== siteId)) {
+          dedupMap.set(key, cat)
+        }
       }
     }
 
-    const deduplicated = Array.from(slugMap.values())
+    // Collect unique categories from name-based dedup (catches cross-slug name dupes)
+    const uniqueById = new Map<string, any>()
+    for (const cat of dedupMap.values()) {
+      if (!uniqueById.has(cat.id)) uniqueById.set(cat.id, cat)
+    }
+    const deduplicated = Array.from(uniqueById.values())
 
+    // Build ID mapping for parentId remapping (old ID → surviving ID)
     const idMapping = new Map<string, string>()
     for (const cat of categories) {
-      const active = slugMap.get(cat.slug)
-      if (active && active.id !== cat.id) {
-        idMapping.set(cat.id, active.id)
+      // Find which category survived for this cat's name
+      const nameKey = `name:${cat.name.toLowerCase()}`
+      const survivor = dedupMap.get(nameKey)
+      if (survivor && survivor.id !== cat.id) {
+        idMapping.set(cat.id, survivor.id)
       }
     }
 
     return deduplicated.map(cat => {
       if (cat.parentId && idMapping.has(cat.parentId)) {
-        return {
-          ...cat,
-          parentId: idMapping.get(cat.parentId)
-        }
+        return { ...cat, parentId: idMapping.get(cat.parentId) }
       }
       return cat
     })
