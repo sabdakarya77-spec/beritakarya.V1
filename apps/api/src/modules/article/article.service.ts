@@ -332,6 +332,11 @@ export async function updateArticle(
 
   let data: any = { ...input }
 
+  // Resolve categoryId from slug to UUID if provided
+  if (input.categoryId !== undefined) {
+    data.categoryId = await resolveCategoryId(input.categoryId, siteId)
+  }
+
   if (input.blocks && !input.metaDescription?.trim()) {
     const withSeo = applySeoDefaults({
       title: input.title || article.title,
