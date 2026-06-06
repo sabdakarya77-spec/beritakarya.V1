@@ -4,24 +4,21 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '../../../../lib/api';
 import { useAuthStore } from '../../../../store/authStore';
 import { useParams } from 'next/navigation';
-import { 
-  Layout, 
-  Image as ImageIcon, 
-  Code as CodeIcon, 
-  Save, 
-  AlertCircle, 
+import {
+  Layout,
+  Image as ImageIcon,
+  Code as CodeIcon,
+  Save,
+  AlertCircle,
   ExternalLink,
   Upload,
   RefreshCw,
   BarChart3,
   Plus,
   Trash2,
-  Calendar,
-  FileText,
   CheckCircle2,
   XCircle,
   CreditCard,
-  DollarSign,
   Wallet,
   Eye,
   ArrowRight
@@ -1546,7 +1543,6 @@ function LeaderboardBannerRow({
   const [linkUrl, setLinkUrl] = useState(ad.linkUrl || '');
   const [code, setCode] = useState(ad.code || '');
   const [mode, setMode] = useState<'image' | 'script'>(ad.imageUrl ? 'image' : 'script');
-  const [isActive, setIsActive] = useState(ad.isActive);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -1567,9 +1563,9 @@ function LeaderboardBannerRow({
 
   const handleSave = () => {
     if (mode === 'image') {
-      onUpdate(ad.id, { imageUrl, linkUrl, code: null, isActive });
+      onUpdate(ad.id, { imageUrl, linkUrl, code: null, isActive: ad.isActive });
     } else {
-      onUpdate(ad.id, { code, imageUrl: null, linkUrl: null, isActive });
+      onUpdate(ad.id, { code, imageUrl: null, linkUrl: null, isActive: ad.isActive });
     }
     setEditing(false);
   };
@@ -1614,8 +1610,8 @@ function LeaderboardBannerRow({
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={cn("text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider", isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-gray-200 text-gray-400")}>
-              {isActive ? 'AKTIF' : 'NONAKTIF'}
+            <span className={cn("text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider", ad.isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-gray-200 text-gray-400")}>
+              {ad.isActive ? 'AKTIF' : 'NONAKTIF'}
             </span>
             <span className="text-[9px] font-mono text-gray-400">#{index + 1}</span>
           </div>
@@ -1634,10 +1630,10 @@ function LeaderboardBannerRow({
         <div className="flex items-center gap-2">
           {/* Toggle active */}
           <button
-            onClick={() => onUpdate(ad.id, { isActive: !isActive })}
-            className={cn("w-10 h-5 rounded-full transition-all relative", isActive ? "bg-emerald-500" : "bg-gray-200 dark:bg-white/10")}
+            onClick={() => onUpdate(ad.id, { isActive: !ad.isActive })}
+            className={cn("w-10 h-5 rounded-full transition-all relative", ad.isActive ? "bg-emerald-500" : "bg-gray-200 dark:bg-white/10")}
           >
-            <div className={cn("w-3 h-3 bg-white rounded-full absolute top-1 transition-all shadow-sm", isActive ? "left-6" : "left-1")} />
+            <div className={cn("w-3 h-3 bg-white rounded-full absolute top-1 transition-all shadow-sm", ad.isActive ? "left-6" : "left-1")} />
           </button>
 
           <button
