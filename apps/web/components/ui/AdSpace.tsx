@@ -70,20 +70,20 @@ export default function AdSpace({
   // Carousel: auto-rotate every 7s (only if multiple ads)
   const isCarousel = ads.length > 1;
 
-  const startRotation = useCallback(() => {
-    if (!isCarousel) return;
-    stopRotation();
-    intervalRef.current = setInterval(() => {
-      setCurrentIndex(prev => (prev + 1) % ads.length);
-    }, 7000);
-  }, [isCarousel, ads.length]);
-
   const stopRotation = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
   }, []);
+
+  const startRotation = useCallback(() => {
+    if (!isCarousel) return;
+    stopRotation();
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % ads.length);
+    }, 7000);
+  }, [isCarousel, ads.length, stopRotation]);
 
   useEffect(() => {
     startRotation();
