@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { ArrowLeft, BookOpen, CalendarDays, Eye, FileText, Flame, Globe, Mail, Tags, User2, Users } from 'lucide-react'
+import { ArrowLeft, CalendarDays, Eye, FileText, Flame, Globe, Mail, Tags, User2, Users } from 'lucide-react'
 import { SITE_MAP } from '@beritakarya/config'
 import PublicSiteLayout from '../../../../components/layout/PublicSiteLayout'
 import { Container } from '../../../../components/layout/Container'

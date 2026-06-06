@@ -337,7 +337,7 @@ export default async function ArticlePage({ params }: Props) {
                               if (quoteBlock && quoteBlock.type === 'quote') {
                                 elements.push(
                                   <div key="visual-break-quote" className="relative my-10 py-8 px-8 md:px-12 border-y-2 border-brand-red/10 bg-brand-red/[0.02] rounded-xl">
-                                    <span className="absolute -top-3 left-6 text-7xl font-serif text-brand-red opacity-10 leading-none select-none">"</span>
+                                    <span className="absolute -top-3 left-6 text-7xl font-serif text-brand-red opacity-10 leading-none select-none">&ldquo;</span>
                                     <blockquote className="relative z-10 font-serif text-xl md:text-2xl italic leading-relaxed text-brand-black dark:text-white/90">
                                       <span dangerouslySetInnerHTML={{ __html: quoteBlock.content || '' }} />
                                     </blockquote>
