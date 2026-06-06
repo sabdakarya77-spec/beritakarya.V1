@@ -238,13 +238,18 @@ function AdSlide({
     return videoExtensions.some(ext => url.toLowerCase().endsWith(ext)) || url.toLowerCase().includes('video');
   };
 
-  // Script ad
+  // Script ad — render in sandboxed iframe for XSS isolation
   if (ad.code) {
     return (
-      <div
-        className="w-full h-full flex items-center justify-center bg-transparent"
-        dangerouslySetInnerHTML={{ __html: ad.code }}
-      />
+      <div className="w-full h-full flex items-center justify-center bg-transparent">
+        <iframe
+          srcDoc={`<!DOCTYPE html><html><head><style>body{margin:0;display:flex;align-items:center;justify-content:center;}</style></head><body>${ad.code}</body></html>`}
+          sandbox="allow-scripts allow-popups"
+          className="w-full h-full border-0"
+          title={label}
+          scrolling="no"
+        />
+      </div>
     );
   }
 

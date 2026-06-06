@@ -200,10 +200,10 @@ authRouter.post('/change-password',
       })
     }
 
-    if (newPassword.length < 6) {
+    if (!authService.validatePassword(newPassword)) {
       return res.status(400).json({
         success: false,
-        error: { code: 'BAD_REQUEST', message: 'Password baru minimal 6 karakter' }
+        error: { code: 'BAD_REQUEST', message: 'Password harus minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter khusus (!@#$%^&*)' }
       })
     }
 
