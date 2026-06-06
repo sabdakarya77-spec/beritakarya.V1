@@ -110,14 +110,20 @@ async function processImage(
     try {
       const currentMeta = await sharp(processedBuffer).metadata()
       const currentW = currentMeta.width || maxW
-      const currentH = currentMeta.height || maxW
       const fontSize = Math.max(14, Math.floor(currentW * 0.02))
-      const boxWidth = Math.max(180, fontSize * 12)
-      const boxHeight = Math.max(32, fontSize * 2.2)
+      const padding = Math.floor(fontSize * 0.8)
+      const text = '© BERITAKARYA.co'
 
+      // Estimate text width: ~0.6 * fontSize per character for sans-serif
+      const charWidth = fontSize * 0.6
+      const textWidth = text.length * charWidth
+      const boxWidth = Math.max(180, textWidth + padding * 2)
+      const boxHeight = Math.max(32, fontSize + padding * 2)
+
+      // Use stroke-based text rendering (no font dependency)
       const watermarkSvg = `<svg width="${boxWidth}" height="${boxHeight}" xmlns="http://www.w3.org/2000/svg">
 <rect width="${boxWidth}" height="${boxHeight}" rx="4" ry="4" fill="rgba(0,0,0,0.65)" />
-<text x="${boxWidth / 2}" y="${boxHeight / 2}" dominant-baseline="middle" text-anchor="middle" fill="rgba(255,255,255,0.95)" font-size="${fontSize}px" font-weight="700" font-family="Noto Sans, DejaVu Sans, Liberation Sans, sans-serif">© BERITAKARYA 2026</text>
+<text x="${boxWidth / 2}" y="${boxHeight / 2}" dominant-baseline="central" text-anchor="middle" fill="white" font-size="${fontSize}" font-weight="bold" font-family="sans-serif" letter-spacing="1">© BERITAKARYA.co</text>
 </svg>`
 
       pipeline = pipeline.composite([{ input: Buffer.from(watermarkSvg), gravity: 'southeast' }])
