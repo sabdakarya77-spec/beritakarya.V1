@@ -219,10 +219,17 @@ export default function CategoriesDashboard() {
     }
   };
 
-  // Get parent candidates (only top-level categories) for dropdown, excluding self when editing
-  const potentialParents = categories.filter(
-    parent => !parent.parentId && (!editingCategory || parent.id !== editingCategory.id)
-  );
+  // Get parent candidates for dropdown: top-level and subcategories (max depth 3).
+  // Exclude self, descendants of self, and sub-subcategories (to enforce 3-level max).
+  const potentialParents = categories.filter(parent => {
+    if (editingCategory && parent.id === editingCategory.id) return false;
+    // Sub-subcategories (level 3) cannot be parents
+    if (parent.parentId) {
+      const grandparent = categories.find(c => c.id === parent.parentId);
+      if (grandparent?.parentId) return false;
+    }
+    return true;
+  });
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-20 px-4">
@@ -336,17 +343,21 @@ export default function CategoriesDashboard() {
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:border-rose-500 transition-all font-semibold"
                 >
                   <option value="">None (Jadikan Kategori Utama / Induk)</option>
-                  {potentialParents.map(p => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} {p.isGlobal ? '(Global)' : ''}
-                    </option>
-                  ))}
+                  {potentialParents.map(p => {
+                    const isSub = !!p.parentId;
+                    const prefix = isSub ? '  ↳ ' : '';
+                    return (
+                      <option key={p.id} value={p.id}>
+                        {prefix}{p.name} {p.isGlobal ? '(Global)' : ''}
+                      </option>
+                    );
+                  })}
                   {potentialParents.length === 0 && categories.length > 0 && (
                     <option value="" disabled>Semua kategori sudah memiliki induk</option>
                   )}
                 </select>
                 <p className="text-[11px] text-gray-400 mt-2">
-                  Pilih induk jika ingin menjadikan kategori ini sebagai Sub-menu. Hanya kategori utama yang dapat dipilih sebagai induk.
+                  Pilih induk untuk menjadikan kategori ini sebagai Sub-menu. Maksimal 3 level hierarki.
                 </p>
               </div>
 
@@ -497,39 +508,76 @@ export default function CategoriesDashboard() {
                         <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Sub Kategori</h4>
                         
                         {parent.subCategories && parent.subCategories.length > 0 ? (
-                          <div className="flex flex-wrap gap-2">
+                          <div className="space-y-2">
                             {parent.subCategories.map((sub) => (
-                              <div 
-                                key={sub.id}
-                                className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-700/80 rounded-xl text-xs text-gray-750 dark:text-gray-300 font-semibold hover:border-rose-500/30 dark:hover:border-rose-500/30 transition-all"
-                              >
-                                <span>{sub.name}</span>
-                                
-                                {/* Sub Action Buttons */}
-                                <div className="flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity ml-1 border-l border-gray-200 dark:border-gray-700 pl-1.5">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      if (sub.isGlobal && !isGlobalView) {
-                                        showToast('Kategori global hanya dapat diedit di Global View', 'error');
-                                        return;
-                                      }
-                                      startEdit(sub);
-                                    }}
-                                    className="text-[10px] hover:text-rose-600 p-0.5"
-                                    title="Edit Sub"
-                                  >
-                                    ✏️
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteRequest(sub)}
-                                    className="text-[10px] hover:text-rose-600 p-0.5"
-                                    title="Hapus Sub"
-                                  >
-                                    🗑️
-                                  </button>
+                              <div key={sub.id} className="space-y-1">
+                                <div
+                                  className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-700/80 rounded-xl text-xs text-gray-750 dark:text-gray-300 font-semibold hover:border-rose-500/30 dark:hover:border-rose-500/30 transition-all"
+                                >
+                                  <span>{sub.name}</span>
+                                  <div className="flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity ml-1 border-l border-gray-200 dark:border-gray-700 pl-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (sub.isGlobal && !isGlobalView) {
+                                          showToast('Kategori global hanya dapat diedit di Global View', 'error');
+                                          return;
+                                        }
+                                        startEdit(sub);
+                                      }}
+                                      className="text-[10px] hover:text-rose-600 p-0.5"
+                                      title="Edit Sub"
+                                    >
+                                      ✏️
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteRequest(sub)}
+                                      className="text-[10px] hover:text-rose-600 p-0.5"
+                                      title="Hapus Sub"
+                                    >
+                                      🗑️
+                                    </button>
+                                  </div>
                                 </div>
+                                {/* Sub-subcategories */}
+                                {sub.subCategories && sub.subCategories.length > 0 && (
+                                  <div className="ml-4 flex flex-wrap gap-1.5">
+                                    {sub.subCategories.map((subsub) => (
+                                      <div
+                                        key={subsub.id}
+                                        className="group inline-flex items-center gap-1 px-2 py-1 bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 rounded-lg text-[11px] text-gray-600 dark:text-gray-400 font-medium hover:border-rose-500/30 transition-all"
+                                      >
+                                        <span className="text-gray-400 dark:text-gray-600">↳</span>
+                                        <span>{subsub.name}</span>
+                                        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity ml-1">
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              if (subsub.isGlobal && !isGlobalView) {
+                                                showToast('Kategori global hanya dapat diedit di Global View', 'error');
+                                                return;
+                                              }
+                                              startEdit(subsub);
+                                            }}
+                                            className="text-[9px] hover:text-rose-600 p-0.5"
+                                            title="Edit"
+                                          >
+                                            ✏️
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleDeleteRequest(subsub)}
+                                            className="text-[9px] hover:text-rose-600 p-0.5"
+                                            title="Hapus"
+                                          >
+                                            🗑️
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>

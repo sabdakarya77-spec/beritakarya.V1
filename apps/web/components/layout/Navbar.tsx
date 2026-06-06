@@ -249,7 +249,9 @@ export default function Navbar({
             : "h-10 gap-5"
         )}>
           {categories.map((cat, index) => {
-          const isActive = selectedCategory === cat.slug || cat.subCategories?.some(sub => sub.slug === selectedCategory);
+          const isActive = selectedCategory === cat.slug || cat.subCategories?.some(sub =>
+            sub.slug === selectedCategory || sub.subCategories?.some(s => s.slug === selectedCategory)
+          );
           const hasSub = cat.subCategories && cat.subCategories.length > 0;
           return (
             <div 
@@ -306,25 +308,54 @@ export default function Navbar({
                   >
                     {cat.subCategories?.map((sub) => {
                       const isSubActive = selectedCategory === sub.slug;
+                      const hasSubSub = sub.subCategories && sub.subCategories.length > 0;
                       return (
-                        <button
-                          key={sub.slug}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCategoryClick(sub.slug);
-                            setHoveredCategory(null);
-                          }}
-                          className={cn(
-                            "group/sub flex items-center justify-between rounded-lg px-3 py-1.5 text-left text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-slate-800",
-                            isSubActive ? "text-red-500 bg-red-500/5" : "text-slate-400 hover:text-white"
+                        <div key={sub.slug}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCategoryClick(sub.slug);
+                              setHoveredCategory(null);
+                            }}
+                            className={cn(
+                              "group/sub flex items-center justify-between rounded-lg px-3 py-1.5 text-left text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-slate-800",
+                              isSubActive ? "text-red-500 bg-red-500/5" : "text-slate-400 hover:text-white"
+                            )}
+                          >
+                            <span>{sub.name}</span>
+                            <span className={cn(
+                              "w-1 h-1 rounded-full bg-red-500 scale-0 transition-transform group-hover/sub:scale-100",
+                              isSubActive ? "scale-100" : ""
+                            )} />
+                          </button>
+                          {hasSubSub && (
+                            <div className="ml-3 border-l border-slate-800 pl-2 py-0.5">
+                              {sub.subCategories!.map((subsub) => {
+                                const isSubSubActive = selectedCategory === subsub.slug;
+                                return (
+                                  <button
+                                    key={subsub.slug}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCategoryClick(subsub.slug);
+                                      setHoveredCategory(null);
+                                    }}
+                                    className={cn(
+                                      "group/subsub flex items-center justify-between rounded-md px-2.5 py-1 text-left text-[9px] font-bold uppercase tracking-wider transition-colors hover:bg-slate-800 w-full",
+                                      isSubSubActive ? "text-red-500 bg-red-500/5" : "text-slate-500 hover:text-slate-300"
+                                    )}
+                                  >
+                                    <span>{subsub.name}</span>
+                                    <span className={cn(
+                                      "w-0.5 h-0.5 rounded-full bg-red-500 scale-0 transition-transform group-hover/subsub:scale-100",
+                                      isSubSubActive ? "scale-100" : ""
+                                    )} />
+                                  </button>
+                                );
+                              })}
+                            </div>
                           )}
-                        >
-                          <span>{sub.name}</span>
-                          <span className={cn(
-                            "w-1 h-1 rounded-full bg-red-500 scale-0 transition-transform group-hover/sub:scale-100",
-                            isSubActive ? "scale-100" : ""
-                          )} />
-                        </button>
+                        </div>
                       );
                     })}
                   </motion.div>
@@ -343,7 +374,9 @@ export default function Navbar({
             isCollapsed ? "pb-1.5 pt-1.5" : "pb-2.5 pt-2"
           )}>
             {categories.map((cat) => {
-          const isActive = selectedCategory === cat.slug || cat.subCategories?.some(sub => sub.slug === selectedCategory);
+          const isActive = selectedCategory === cat.slug || cat.subCategories?.some(sub =>
+            sub.slug === selectedCategory || sub.subCategories?.some(s => s.slug === selectedCategory)
+          );
           return (
             <button
               key={cat.slug}
@@ -376,7 +409,7 @@ export default function Navbar({
       </div>
 
       {(() => {
-        const activeParent = categories.find(cat => 
+        const activeParent = categories.find(cat =>
           cat.slug === selectedCategory || cat.subCategories?.some(sub => sub.slug === selectedCategory)
         );
         if (activeParent && activeParent.subCategories && activeParent.subCategories.length > 0) {
@@ -405,6 +438,52 @@ export default function Navbar({
                         )}
                       >
                         {sub.name}
+                      </button>
+                    );
+                  })}
+                </nav>
+              </Container>
+            </div>
+          );
+        }
+        return null;
+      })()}
+
+      {/* Mobile: 3rd level subcategory strip */}
+      {(() => {
+        const activeParent = categories.find(cat =>
+          cat.subCategories?.some(sub =>
+            sub.slug === selectedCategory || sub.subCategories?.some(s => s.slug === selectedCategory)
+          )
+        );
+        const activeSub = activeParent?.subCategories?.find(sub =>
+          sub.slug === selectedCategory || sub.subCategories?.some(s => s.slug === selectedCategory)
+        );
+        if (activeSub && activeSub.subCategories && activeSub.subCategories.length > 0) {
+          return (
+            <div className={cn(
+              "border-t border-slate-900/50 bg-slate-950/80 transition-all duration-300 md:hidden",
+              isCollapsed && "border-transparent"
+            )}>
+              <Container className="md:hidden">
+                <nav className={cn(
+                  "flex gap-1.5 overflow-x-auto no-scrollbar transition-all duration-300",
+                  isCollapsed ? "pb-1 pt-0.5" : "pb-2 pt-1"
+                )}>
+                  {activeSub.subCategories.map((subsub) => {
+                    const isSubSubActive = selectedCategory === subsub.slug;
+                    return (
+                      <button
+                        key={subsub.slug}
+                        onClick={() => handleCategoryClick(subsub.slug)}
+                        className={cn(
+                          "shrink-0 whitespace-nowrap rounded-lg px-2 py-0.5 text-[9px] font-medium transition-all",
+                          isSubSubActive
+                            ? "bg-red-500/20 text-red-500 border border-red-500/30"
+                            : "bg-slate-900/50 text-slate-500 border border-slate-800/50"
+                        )}
+                      >
+                        {subsub.name}
                       </button>
                     );
                   })}

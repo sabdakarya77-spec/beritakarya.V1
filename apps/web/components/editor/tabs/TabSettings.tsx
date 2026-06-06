@@ -38,6 +38,11 @@ export function TabSettings() {
       if (cat.subCategories) {
         cat.subCategories.forEach(sub => {
           result.push({ name: sub.name, slug: sub.slug })
+          if (sub.subCategories) {
+            sub.subCategories.forEach(subsub => {
+              result.push({ name: subsub.name, slug: subsub.slug })
+            })
+          }
         })
       }
     })
@@ -278,19 +283,37 @@ export function TabSettings() {
                     </button>
                     {/* Sub Categories */}
                     {cat.subCategories?.map((sub) => (
-                      <button
-                        key={sub.slug}
-                        onClick={() => handleCategorySelect(sub.slug)}
-                        className={cn(
-                          "w-full px-5 py-1.5 text-left text-[11px] hover:bg-panel-elevated transition-colors flex items-center justify-between",
-                          categoryId === sub.slug ? 'text-panel-accent bg-panel-accent/5 font-semibold' : 'text-panel-text-secondary'
-                        )}
-                      >
-                        <span className="flex items-center gap-1">
-                          <span className="text-panel-text-muted/60">↳</span> {sub.name}
-                        </span>
-                        {categoryId === sub.slug && <span className="text-[9px]">✓</span>}
-                      </button>
+                      <div key={sub.slug}>
+                        <button
+                          onClick={() => handleCategorySelect(sub.slug)}
+                          className={cn(
+                            "w-full px-5 py-1.5 text-left text-[11px] hover:bg-panel-elevated transition-colors flex items-center justify-between",
+                            categoryId === sub.slug ? 'text-panel-accent bg-panel-accent/5 font-semibold' : 'text-panel-text-secondary'
+                          )}
+                        >
+                          <span className="flex items-center gap-1">
+                            <span className="text-panel-text-muted/60">↳</span> {sub.name}
+                          </span>
+                          {categoryId === sub.slug && <span className="text-[9px]">✓</span>}
+                        </button>
+                        {/* Sub-Sub Categories */}
+                        {sub.subCategories?.map((subsub) => (
+                          <button
+                            key={subsub.slug}
+                            onClick={() => handleCategorySelect(subsub.slug)}
+                            className={cn(
+                              "w-full py-1 text-left text-[10px] hover:bg-panel-elevated transition-colors flex items-center justify-between",
+                              categoryId === subsub.slug ? 'text-panel-accent bg-panel-accent/5 font-semibold' : 'text-panel-text-muted'
+                            )}
+                            style={{ paddingLeft: '2.75rem' }}
+                          >
+                            <span className="flex items-center gap-1">
+                              <span className="text-panel-text-muted/40">↳</span> {subsub.name}
+                            </span>
+                            {categoryId === subsub.slug && <span className="text-[9px]">✓</span>}
+                          </button>
+                        ))}
+                      </div>
                     ))}
                   </div>
                 ))}

@@ -20,6 +20,9 @@ export const CATEGORY_COLORS: Record<string, string> = {
   nasional: 'text-rose-600 bg-rose-50 dark:text-rose-400 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30',
   daerah: 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30',
   politik: 'text-violet-600 bg-violet-50 dark:text-violet-400 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30',
+  pilkada: 'text-violet-600 bg-violet-50 dark:text-violet-400 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30',
+  pemilu: 'text-violet-600 bg-violet-50 dark:text-violet-400 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30',
+  'dpr-dprd': 'text-violet-600 bg-violet-50 dark:text-violet-400 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30',
   'hukum-keadilan': 'text-slate-600 bg-slate-50 dark:text-slate-400 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-900/30',
   hukum: 'text-slate-600 bg-slate-50 dark:text-slate-400 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-900/30',
   pendidikan: 'text-violet-600 bg-violet-50 dark:text-violet-400 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30',
@@ -31,6 +34,9 @@ export const CATEGORY_COLORS: Record<string, string> = {
   industrial: 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30',
   teknologi: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30',
   'gadget-review': 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30',
+  smartphone: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30',
+  'laptop-pc': 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30',
+  aksesoris: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30',
   'ai-inovasi': 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30',
   'startups-digital': 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30',
   'game-esports': 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30',
@@ -38,6 +44,9 @@ export const CATEGORY_COLORS: Record<string, string> = {
   'piala-dunia': 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30',
   'timnas-garuda': 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30',
   'sepak-bola': 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30',
+  'liga-indonesia': 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30',
+  'liga-eropa': 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30',
+  'transfer-pemain': 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30',
   'ragam-olahraga': 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30',
   opini: 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30',
   'kolom-esai': 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30',
@@ -78,6 +87,7 @@ export function getCategoryColor(categoryName: string = 'umum'): string {
 export interface SubCategory {
   name: string;
   slug: string;
+  subCategories?: SubCategory[];
 }
 
 export interface CategoryItem {
@@ -186,7 +196,15 @@ export const CATEGORIES_CONFIG: CategoryItem[] = [
     name: 'Nasional',
     slug: 'nasional',
     subCategories: [
-      { name: 'Politik', slug: 'politik' },
+      {
+        name: 'Politik',
+        slug: 'politik',
+        subCategories: [
+          { name: 'Pilkada', slug: 'pilkada' },
+          { name: 'Pemilu', slug: 'pemilu' },
+          { name: 'DPR & DPRD', slug: 'dpr-dprd' }
+        ]
+      },
       { name: 'Hukum & Keadilan', slug: 'hukum-keadilan' },
       { name: 'Pendidikan', slug: 'pendidikan' },
       { name: 'Peristiwa', slug: 'peristiwa' }
@@ -220,7 +238,15 @@ export const CATEGORIES_CONFIG: CategoryItem[] = [
     subCategories: [
       { name: 'Piala Dunia', slug: 'piala-dunia' },
       { name: 'Timnas Garuda', slug: 'timnas-garuda' },
-      { name: 'Sepak Bola', slug: 'sepak-bola' },
+      {
+        name: 'Sepak Bola',
+        slug: 'sepak-bola',
+        subCategories: [
+          { name: 'Liga Indonesia', slug: 'liga-indonesia' },
+          { name: 'Liga Eropa', slug: 'liga-eropa' },
+          { name: 'Transfer Pemain', slug: 'transfer-pemain' }
+        ]
+      },
       { name: 'Ragam Olahraga', slug: 'ragam-olahraga' }
     ]
   },
@@ -228,7 +254,15 @@ export const CATEGORIES_CONFIG: CategoryItem[] = [
     name: 'Teknologi',
     slug: 'teknologi',
     subCategories: [
-      { name: 'Gadget & Review', slug: 'gadget-review' },
+      {
+        name: 'Gadget & Review',
+        slug: 'gadget-review',
+        subCategories: [
+          { name: 'Smartphone', slug: 'smartphone' },
+          { name: 'Laptop & PC', slug: 'laptop-pc' },
+          { name: 'Aksesoris', slug: 'aksesoris' }
+        ]
+      },
       { name: 'AI & Inovasi', slug: 'ai-inovasi' },
       { name: 'Startups & Digital', slug: 'startups-digital' },
       { name: 'Game & Esports', slug: 'game-esports' }
