@@ -204,7 +204,7 @@ export default async function AuthorProfilePage({ params }: Props) {
   const featuredArticle = recentArticles[0]
   const remainingArticles = recentArticles.slice(1)
 
-  const sidebarCardClass = 'rounded-2xl border border-black/5 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.03)] dark:border-white/5 dark:bg-white/[0.02] md:p-5'
+  const sidebarCardClass = 'rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/5 dark:bg-white/[0.02] md:p-5'
   const sidebarLabelClass = 'flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400'
 
   return (

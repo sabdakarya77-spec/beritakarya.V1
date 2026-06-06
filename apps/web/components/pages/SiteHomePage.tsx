@@ -304,7 +304,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
 
         {/* ─── AD LEADERBOARD ─── */}
         <Container className="py-4 md:py-5">
-          <div className="flex justify-center rounded-2xl border border-black/5 bg-brand-surface/80 p-3 shadow-[0_12px_30px_rgba(15,23,42,0.03)] dark:border-white/5 dark:bg-white/[0.02] md:p-4">
+          <div className="flex justify-center rounded-2xl border border-gray-200 bg-white p-3 shadow-sm dark:border-white/5 dark:bg-white/[0.02] md:p-4">
             <AdSpace type="leaderboard" />
           </div>
         </Container>
@@ -458,7 +458,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
 
                   {/* Inline Ad */}
                   {showInlineSponsor && (
-                    <div className="rounded-2xl border border-black/5 bg-brand-surface/80 p-5 dark:border-white/5 dark:bg-white/[0.02]">
+                    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-white/5 dark:bg-white/[0.02]">
                       <div className="mb-4 flex items-center justify-between">
                         <span className={sectionEyebrowMutedClass}>Sponsorship</span>
                         <span className="text-[9px] font-medium uppercase tracking-[0.1em] text-gray-400">
@@ -606,7 +606,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
 
               {/* Paling Populer */}
               {popular.length > 0 && (
-                <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.03)] dark:border-white/5 dark:bg-white/[0.02] md:p-5">
+                <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/5 dark:bg-white/[0.02] md:p-5">
                   <div className="mb-4 flex items-center gap-3">
                     <Star size={15} className="fill-brand-red text-brand-red" />
                     <h4 className={`${sectionEyebrowClass} text-brand-black dark:text-white`}>
@@ -649,7 +649,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
               )}
 
               {/* Info Pasar */}
-              <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.03)] dark:border-white/5 dark:bg-white/[0.02]">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/5 dark:bg-white/[0.02]">
                 <div className="mb-4">
                   <span className={`${sectionEyebrowClass} text-brand-red`}>Info Pasar</span>
                 </div>
@@ -680,7 +680,7 @@ export async function SiteHomePage({ siteParam, searchParams }: SiteHomePageProp
               </div>
 
               {/* Video / Partner Placement */}
-              <div className="rounded-2xl border border-black/5 bg-brand-surface/80 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.03)] dark:border-white/5 dark:bg-white/[0.02]">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/5 dark:bg-white/[0.02]">
                 {siteSettings?.featuredVideo ? (
                   <div>
                     <div className="mb-4">

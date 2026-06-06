@@ -203,7 +203,7 @@ export default async function ArticlePage({ params }: Props) {
   const badgeVariant = resolveArticleBadge(article);
   const readingTime = article.readingTimeMin || Math.max(1, Math.ceil((article.wordCount || 0) / 200)) || 3;
   const articleRailClassName = 'xl:grid xl:grid-cols-[minmax(0,1.75fr)_20rem] 2xl:grid-cols-[minmax(0,1.75fr)_22.5rem] xl:justify-between xl:gap-12 2xl:gap-16'
-  const sidebarCardClass = 'rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.03)] dark:border-white/5 dark:bg-white/[0.02]'
+  const sidebarCardClass = 'rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/5 dark:bg-white/[0.02]'
   const sidebarLabelClass = 'flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400'
 
   return (
@@ -355,7 +355,7 @@ export default async function ArticlePage({ params }: Props) {
                             if (paragraphCount === 5 && relatedArticles.length > 0) {
                               const rel = relatedArticles[0];
                               elements.push(
-                                <div key="visual-break-related" className="my-10 rounded-2xl border border-black/5 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.03)] dark:border-white/5 dark:bg-white/[0.02] md:p-5">
+                                <div key="visual-break-related" className="my-10 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/5 dark:bg-white/[0.02] md:p-5">
                                   <div className="flex items-center gap-1.5 mb-3">
                                     <span className="h-1.5 w-1.5 rounded-full bg-brand-red" />
                                     <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-red">Baca Juga</span>

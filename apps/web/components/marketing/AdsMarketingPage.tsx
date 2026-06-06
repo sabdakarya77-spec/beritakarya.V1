@@ -114,7 +114,7 @@ export function AdsMarketingPage({
           {VALUE_PROPS.map((prop, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-white/[0.02] border border-black/5 dark:border-white/5 p-6 md:p-8 rounded-2xl shadow-[0_18px_42px_rgba(15,23,42,0.05)] hover:shadow-[0_24px_48px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1"
+              className="bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/5 p-6 md:p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
             >
               <div className="w-11 h-11 bg-brand-red/10 rounded-xl flex items-center justify-center mb-5">
                 <prop.icon size={20} className="text-brand-red" />
@@ -158,7 +158,7 @@ export function AdsMarketingPage({
                 return packages.map((pkg) => (
                   <div
                     key={pkg.id}
-                    className="bg-white dark:bg-white/[0.02] border border-black/5 dark:border-white/5 p-6 md:p-8 rounded-2xl shadow-[0_18px_42px_rgba(15,23,42,0.05)] flex flex-col justify-between group hover:shadow-[0_24px_48px_rgba(15,23,42,0.08)] transition-all duration-300"
+                    className="bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/5 p-6 md:p-8 rounded-2xl shadow-sm flex flex-col justify-between group hover:shadow-md transition-all duration-300"
                   >
                     <div>
                       <div className="flex items-start justify-between gap-3 mb-4">
@@ -219,7 +219,7 @@ export function AdsMarketingPage({
               })}
             </div>
           ) : (
-            <div className="bg-white dark:bg-white/[0.02] border border-black/5 dark:border-white/5 rounded-2xl p-12 text-center">
+            <div className="bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/5 rounded-2xl p-12 text-center">
               <p className="text-brand-text-muted italic">
                 Paket iklan belum tersedia. Silakan hubungi redaksi {siteConfig.name} untuk informasi
                 lebih lanjut.

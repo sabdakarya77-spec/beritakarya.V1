@@ -68,7 +68,7 @@ export default function SiteFooter({ siteConfig, categories }: SiteFooterProps) 
   ].filter((item) => Boolean(item.href));
 
   return (
-    <footer className="mt-20 border-t border-black/5 bg-white pb-10 pt-12 text-brand-text transition-colors duration-500 sm:mt-24 sm:pb-12 sm:pt-14 dark:border-white/5 dark:bg-[#020617]">
+    <footer className="mt-20 border-t border-gray-200 bg-white pb-10 pt-12 text-brand-text transition-colors duration-500 sm:mt-24 sm:pb-12 sm:pt-14 dark:border-white/5 dark:bg-[#020617]">
       <Container>
         <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
           <div className="col-span-1">
