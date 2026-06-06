@@ -79,8 +79,8 @@ export function PhotoGalleryUpload({ onImagesChange }: PhotoGalleryUploadProps) 
       try {
         const formData = new FormData()
         formData.append('file', img.file)
-        
-        const { data } = await api.post('/media/upload', formData, {
+
+        const { data } = await api.post('/media/upload?purpose=gallery', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
         

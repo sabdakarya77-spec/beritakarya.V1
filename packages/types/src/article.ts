@@ -2,6 +2,8 @@ import type { Block } from './block'
 
 export type ArticleStatus = 'draft' | 'submitted' | 'review' | 'revision' | 'approved' | 'scheduled' | 'published' | 'archived'
 
+export type ContentType = 'article' | 'photo_journalism' | 'video_exclusive'
+
 export interface Article {
   id: string
   title: string
@@ -10,6 +12,7 @@ export interface Article {
   siteId: string
   authorId: string
   blocks: Block[]
+  contentType: ContentType
   status: ArticleStatus
   featuredImage?: string
   featuredImageBlur?: string

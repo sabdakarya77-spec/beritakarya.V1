@@ -1,5 +1,5 @@
 import { prisma } from '../../db/client'
-import type { Prisma, ArticleStatus } from '@prisma/client'
+import type { Prisma, ArticleStatus, ContentType } from '@prisma/client'
 
 /** Active articles only — excludes soft-deleted rows. */
 export const articleNotDeleted: Prisma.ArticleWhereInput = { deletedAt: null }
@@ -70,6 +70,7 @@ export async function findArticlesBySite(
         featuredImage: true, featuredImageBlur: true, featuredImageColor: true,
         viewCount: true, wordCount: true, readingTimeMin: true,
         blocks: true, tags: true, metaTitle: true, metaDescription: true,
+        contentType: true,
         category: { select: { id: true, name: true, slug: true } },
         author: { select: { id: true, name: true, role: true } }
       },
@@ -103,6 +104,7 @@ export async function findArticlesByIds(
       featuredImage: true, featuredImageBlur: true, featuredImageColor: true,
       viewCount: true, wordCount: true, readingTimeMin: true,
       blocks: true, tags: true, metaTitle: true, metaDescription: true,
+      contentType: true,
       category: { select: { id: true, name: true, slug: true } },
       author: { select: { id: true, name: true, role: true } }
     }
@@ -139,6 +141,7 @@ export async function findArticleById(id: string, siteId: string) {
       featuredImage: true, featuredImageBlur: true, featuredImageColor: true,
       viewCount: true, wordCount: true, readingTimeMin: true,
       blocks: true, tags: true, metaTitle: true, metaDescription: true,
+      contentType: true,
       category: { select: { id: true, name: true, slug: true } },
       author: { select: { id: true, name: true, email: true, role: true } }
     }
@@ -155,6 +158,7 @@ export async function findArticleBySlug(slug: string, siteId: string) {
       featuredImage: true, featuredImageBlur: true, featuredImageColor: true,
       viewCount: true, wordCount: true, readingTimeMin: true,
       blocks: true, tags: true, metaTitle: true, metaDescription: true,
+      contentType: true,
       category: { select: { id: true, name: true, slug: true } },
       author: { select: { id: true, name: true, role: true } }
     }
@@ -171,6 +175,7 @@ export async function findPublishedArticleBySlug(slug: string, siteId: string) {
       featuredImage: true, featuredImageBlur: true, featuredImageColor: true,
       viewCount: true, wordCount: true, readingTimeMin: true,
       blocks: true, tags: true, metaTitle: true, metaDescription: true,
+      contentType: true,
       category: { select: { id: true, name: true, slug: true } },
       author: { select: { id: true, name: true, role: true } }
     }
@@ -180,6 +185,7 @@ export async function findPublishedArticleBySlug(slug: string, siteId: string) {
 export async function createArticle(data: {
   title: string; slug: string; excerpt?: string; siteId: string
   authorId: string; categoryId?: string | null; tags?: any; blocks?: any[]
+  contentType?: ContentType;
   metaTitle?: string; metaDescription?: string
   isBreaking?: boolean; isExclusive?: boolean; isFeatured?: boolean;
   featuredImage?: string;
@@ -193,6 +199,7 @@ export async function createArticle(data: {
       featuredImage: true, featuredImageBlur: true, featuredImageColor: true,
       viewCount: true, wordCount: true, readingTimeMin: true,
       blocks: true, tags: true, metaTitle: true, metaDescription: true,
+      contentType: true,
       category: { select: { id: true, name: true, slug: true } },
       author: { select: { id: true, name: true, role: true } }
     }
@@ -201,9 +208,10 @@ export async function createArticle(data: {
 
 export async function updateArticle(
   id: string, siteId: string,
-  data: Partial<{ 
-    title: string; slug: string; excerpt: string; blocks: any[]; metaTitle: string; metaDescription: string; 
+  data: Partial<{
+    title: string; slug: string; excerpt: string; blocks: any[]; metaTitle: string; metaDescription: string;
     status: string; categoryId: string | null; tags: any;
+    contentType: ContentType;
     isBreaking: boolean; isExclusive: boolean; isFeatured: boolean;
     wordCount: number; readingTimeMin: number; publishedAt: Date;
     scheduledAt: Date | null;
@@ -221,6 +229,7 @@ export async function updateArticle(
       featuredImage: true, featuredImageBlur: true, featuredImageColor: true,
       viewCount: true, wordCount: true, readingTimeMin: true,
       blocks: true, tags: true, metaTitle: true, metaDescription: true,
+      contentType: true,
       category: { select: { id: true, name: true, slug: true } },
       author: { select: { id: true, name: true, role: true } }
     }

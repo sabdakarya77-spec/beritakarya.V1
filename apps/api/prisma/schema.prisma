@@ -37,6 +37,12 @@ enum ArticleStatus {
   rejected
 }
 
+enum ContentType {
+  article
+  photo_journalism
+  video_exclusive
+}
+
 model Site {
   id                   String    @id
   name                 String
@@ -209,8 +215,9 @@ model Article {
   siteId     String
   categoryId String?
   authorId   String
-  blocks     Json    @default("[]")
-  tags       Json    @default("[]")
+  blocks      Json        @default("[]")
+  tags        Json        @default("[]")
+  contentType ContentType @default(article) @map("content_type")
 
   // Editorial Workflow
   // Editorial Workflow

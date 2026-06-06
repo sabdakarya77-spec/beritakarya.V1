@@ -200,8 +200,10 @@ mediaRouter.post(
     }
 
     const isLogo = req.query.type === 'logo'
+    const isGallery = req.query.purpose === 'gallery'
+    // Gallery uploads (foto jurnalistik) must ALWAYS have watermark — cannot be skipped
     const skipWatermark =
-      isLogo || req.query.skipWatermark === 'true' || req.query.purpose === 'editorial'
+      !isGallery && (isLogo || req.query.skipWatermark === 'true' || req.query.purpose === 'editorial')
 
     logger.info(
       `[Media] Uploading: ${req.file.originalname} (${req.file.size} bytes), type=${req.query.type || 'standard'}`

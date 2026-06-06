@@ -2,6 +2,10 @@ const MIN_WORDS = 50
 const MAX_BLOCKS = 200
 const MAX_WORDS = 100_000
 
+// Photo journalism specific requirements
+const PHOTO_JOURNALISM_MIN_IMAGES = 3
+const PHOTO_JOURNALISM_MIN_WORDS = 15
+
 export function extractTextFromBlocks(blocks: any[] | undefined): string {
   if (!Array.isArray(blocks)) return ''
   return blocks
@@ -28,9 +32,47 @@ export function trimExcerpt(text: string | undefined, maxLen = 160): string {
   return value.length <= maxLen ? value : `${value.slice(0, maxLen - 3).trim()}...`
 }
 
+/**
+ * Menghitung jumlah foto di gallery block.
+ * Digunakan untuk validasi foto jurnalistik.
+ */
+export function countGalleryImages(blocks: any[] | undefined): number {
+  if (!Array.isArray(blocks)) return 0
+  const gallery = blocks.find((b) => b?.type === 'gallery')
+  if (!gallery || !Array.isArray(gallery.images)) return 0
+  return gallery.images.length
+}
+
+/**
+ * Validasi khusus untuk tipe konten foto jurnalistik.
+ * - Minimal 3 foto di galeri
+ * - Minimal 15 kata (narasi foto)
+ */
+export function validatePhotoJournalismRequirements(blocks: any[] | undefined): void {
+  if (!blocks) return
+
+  const imageCount = countGalleryImages(blocks)
+  if (imageCount < PHOTO_JOURNALISM_MIN_IMAGES) {
+    throw Object.assign(
+      new Error(`Foto Jurnalistik wajib memiliki minimal ${PHOTO_JOURNALISM_MIN_IMAGES} foto di galeri (saat ini: ${imageCount})`),
+      { statusCode: 400 }
+    )
+  }
+
+  const words = countWords(extractTextFromBlocks(blocks))
+  if (words < PHOTO_JOURNALISM_MIN_WORDS) {
+    throw Object.assign(
+      new Error(`Foto Jurnalistik wajib memiliki minimal ${PHOTO_JOURNALISM_MIN_WORDS} kata narasi foto (saat ini: ${words})`),
+      { statusCode: 400 }
+    )
+  }
+}
+
 export type ArticleContentLimitOptions = {
   /** Wajib untuk submit/publish; draft boleh disimpan di bawah batas ini. */
   requireMinWords?: boolean
+  /** Tipe konten artikel. Jika photo_journalism, validasi khusus dijalankan. */
+  contentType?: string
 }
 
 export function validateArticleContentLimits(
@@ -44,6 +86,12 @@ export function validateArticleContentLimits(
       { statusCode: 400 }
     )
   }
+
+  // Validasi khusus foto jurnalistik (berlaku untuk semua status, termasuk draft)
+  if (options.contentType === 'photo_journalism') {
+    validatePhotoJournalismRequirements(blocks)
+  }
+
   const words = countWords(extractTextFromBlocks(blocks))
   if (options.requireMinWords && words < MIN_WORDS) {
     throw Object.assign(

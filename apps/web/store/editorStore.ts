@@ -347,6 +347,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         title: article.title || '',
         excerpt: article.excerpt || '',
         blocks,
+        contentType: article.contentType || 'article',
         status: article.status,
         metaTitle: article.metaTitle || '',
         metaDescription: article.metaDescription || '',
@@ -381,6 +382,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         title: (s.title || 'Tanpa Judul').trim(),
         excerpt: s.excerpt?.trim() || undefined,
         blocks: normalizeArticleBlocks(s.blocks) as unknown as Block[],
+        contentType: s.contentType,
         metaTitle: s.metaTitle?.slice(0, 60) || undefined,
         metaDescription: s.metaDescription?.slice(0, 160) || undefined,
         categoryId: s.categoryId || null,
@@ -483,28 +485,58 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   getMissingRequirements: () => {
     const s = get()
     const missing: string[] = []
-    
+
     if (!s.title?.trim()) missing.push('Judul artikel belum diisi')
     if (!s.excerpt?.trim()) missing.push('Deck / Excerpt belum diisi')
     if (!s.categoryId) missing.push('Kategori belum dipilih')
     if (!s.featuredImage) missing.push('Gambar utama belum diunggah')
-    
-    const paragraphCount = s.blocks.filter(b => b.type === 'paragraph' && (b as any).content?.trim()).length
-    if (paragraphCount < 1) missing.push('Konten artikel masih kosong')
-    
+
+    if (s.contentType === 'photo_journalism') {
+      // Foto Jurnalistik: wajib minimal 3 foto di galeri
+      const gallery = s.blocks.find((b: any) => b.type === 'gallery')
+      const imageCount = (gallery as any)?.images?.length || 0
+      if (imageCount < 3) missing.push(`Galeri foto wajib minimal 3 foto (saat ini: ${imageCount})`)
+
+      // Foto Jurnalistik: wajib minimal 15 kata narasi
+      const textBlocks = s.blocks.filter(b => b.type === 'paragraph' || b.type === 'heading')
+      const wordCount = textBlocks.reduce((acc, b) => {
+        const content = (b as any).content || ''
+        return acc + content.replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length
+      }, 0)
+      if (wordCount < 15) missing.push(`Narasi foto wajib minimal 15 kata (saat ini: ${wordCount})`)
+    } else {
+      // Artikel biasa: wajib minimal 1 paragraf
+      const paragraphCount = s.blocks.filter(b => b.type === 'paragraph' && (b as any).content?.trim()).length
+      if (paragraphCount < 1) missing.push('Konten artikel masih kosong')
+    }
+
     return missing
   },
 
   getCompletionScore: () => {
     const s = get()
     let score = 0
-    
+
     if (s.title?.trim()) score += 20
     if (s.excerpt?.trim()) score += 20
     if (s.categoryId) score += 20
     if (s.featuredImage) score += 20
-    if (s.blocks.some(b => b.type === 'paragraph' && (b as any).content?.trim())) score += 20
-    
+
+    if (s.contentType === 'photo_journalism') {
+      // Foto Jurnalistik: cek galeri dan narasi
+      const gallery = s.blocks.find((b: any) => b.type === 'gallery')
+      const imageCount = (gallery as any)?.images?.length || 0
+      const textBlocks = s.blocks.filter(b => b.type === 'paragraph' || b.type === 'heading')
+      const wordCount = textBlocks.reduce((acc, b) => {
+        const content = (b as any).content || ''
+        return acc + content.replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length
+      }, 0)
+      if (imageCount >= 3 && wordCount >= 15) score += 20
+    } else {
+      // Artikel biasa: cek paragraf
+      if (s.blocks.some(b => b.type === 'paragraph' && (b as any).content?.trim())) score += 20
+    }
+
     return score
   }
 }))

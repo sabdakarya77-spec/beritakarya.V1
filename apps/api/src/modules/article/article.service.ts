@@ -5,6 +5,7 @@ import {
   updateArticleWithSlugRetry
 } from './article.slug'
 import type { JWTPayload } from '@beritakarya/types'
+import type { ContentType } from '@prisma/client'
 import { sendNotification } from '../notification/notification.controller'
 import { prisma } from '../../db/client'
 import { recordView } from '../analytics/analytics.service'
@@ -145,12 +146,13 @@ export async function getPublishedArticleBySlug(
 }
 
 export async function createArticle(
-  input: { 
-    title: string; 
+  input: {
+    title: string;
     excerpt?: string;
-    blocks?: any[]; 
-    categoryId?: string | null; 
+    blocks?: any[];
+    categoryId?: string | null;
     tags?: string[];
+    contentType?: string;
     metaTitle?: string;
     metaDescription?: string;
     isBreaking?: boolean;
@@ -193,7 +195,7 @@ export async function createArticle(
         }
         throw err
       }
-      validateArticleContentLimits(input.blocks)
+      validateArticleContentLimits(input.blocks, { contentType: input.contentType })
     }
 
     const withSeo = applySeoDefaults({
@@ -214,6 +216,7 @@ export async function createArticle(
       categoryId: resolvedCategoryId,
       tags: input.tags ?? [],
       blocks: withSeo.blocks ?? [],
+      contentType: (input.contentType as ContentType) ?? 'article',
       metaTitle: input.metaTitle,
       metaDescription: withSeo.metaDescription,
       isBreaking: input.isBreaking ?? false,
@@ -243,9 +246,10 @@ export async function createArticle(
 
 export async function updateArticle(
   id: string, siteId: string,
-  input: Partial<{ 
-    title: string; excerpt: string; blocks: any[]; metaTitle: string; metaDescription: string; 
+  input: Partial<{
+    title: string; excerpt: string; blocks: any[]; metaTitle: string; metaDescription: string;
     categoryId: string | null; tags: string[]; status: string;
+    contentType: string;
     isBreaking: boolean; isExclusive: boolean; isFeatured: boolean;
     featuredImage: string; reviewNotes: string; reviewedBy: string;
   }>,
@@ -322,7 +326,8 @@ export async function updateArticle(
       }
       throw err
     }
-    validateArticleContentLimits(input.blocks, { requireMinWords })
+    const effectiveContentType = input.contentType ?? article.contentType ?? 'article'
+    validateArticleContentLimits(input.blocks, { requireMinWords, contentType: effectiveContentType })
   }
 
   let data: any = { ...input }
@@ -473,7 +478,7 @@ export async function publishArticle(
   assertCanPublish(article, user, options?.forcePublish)
   validateArticleContentLimits(
     Array.isArray(article.blocks) ? (article.blocks as any[]) : [],
-    { requireMinWords: true }
+    { requireMinWords: true, contentType: (article as any).contentType ?? 'article' }
   )
 
   await saveArticleVersion(id, user.userId, siteId)
