@@ -165,7 +165,7 @@ export function EditorTopbar({
       
       {/* Center: Word Count */}
       <div className="hidden md:flex items-center gap-4 text-xs text-gray-500">
-        <span>{wordCount.toLocaleString()} words</span>
+        <span>{wordCount.toLocaleString()} kata</span>
       </div>
       
       {/* Right: Actions */}

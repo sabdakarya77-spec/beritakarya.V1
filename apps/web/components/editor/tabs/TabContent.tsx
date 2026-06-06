@@ -52,7 +52,7 @@ export function TabContent() {
         {/* Words Card */}
         <div className="p-3 bg-panel-surface border border-panel-border rounded-xl border-l-2 border-l-accent-red relative overflow-hidden group hover:border-panel-border-hover transition-all">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-[10px] font-semibold text-panel-text-secondary">Words</span>
+            <span className="text-[10px] font-semibold text-panel-text-secondary">Kata</span>
             <Type size={12} className="text-panel-text-muted group-hover:text-accent-red transition-colors" />
           </div>
           <div className="text-2xl font-extrabold text-panel-text-primary tracking-tight">

@@ -70,7 +70,7 @@ export function EditorTitleStage({ isFocusMode = false }: EditorTitleStageProps)
         {/* Character Count */}
         <div className="flex items-center justify-between mt-2 text-xs text-gray-400">
           <span className={isTitleValid ? 'text-green-500' : 'text-gray-400'}>
-            {charCount} characters
+            {charCount} karakter
           </span>
           <span>Slug: /{generateSlug(localTitle || 'untitled')}</span>
         </div>
@@ -95,7 +95,7 @@ export function EditorTitleStage({ isFocusMode = false }: EditorTitleStageProps)
         
         {/* Excerpt Character Count */}
         <div className="mt-1 text-xs text-gray-400">
-          {localExcerpt.length}/300 characters
+          {localExcerpt.length}/300 karakter
         </div>
       </div>
     </div>

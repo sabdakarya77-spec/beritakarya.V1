@@ -41,6 +41,10 @@ export function PhotoGalleryUpload({ onImagesChange }: PhotoGalleryUploadProps) 
   const [uploading, setUploading] = useState(false)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
 
+  // Narrative text for photo journalism
+  const existingParagraph = blocks.find(b => b.type === 'paragraph')
+  const [narrativeText, setNarrativeText] = useState((existingParagraph as any)?.content || '')
+
   // Auto-sync images to editor store whenever they change
   useEffect(() => {
     // Only sync if we have images that are fully uploaded (not still uploading)
@@ -66,6 +70,27 @@ export function PhotoGalleryUpload({ onImagesChange }: PhotoGalleryUploadProps) 
       }, 0)
     }
   }, [images, updateBlock, addBlock])
+
+  // Auto-sync narrative text to paragraph block in store
+  useEffect(() => {
+    const currentBlocks = useEditorStore.getState().blocks
+    const paragraphBlock = currentBlocks.find(b => b.type === 'paragraph')
+
+    if (narrativeText.trim()) {
+      if (paragraphBlock) {
+        updateBlock(paragraphBlock.id, { content: narrativeText })
+      } else {
+        addBlock('paragraph')
+        setTimeout(() => {
+          const freshBlocks = useEditorStore.getState().blocks
+          const newParagraph = freshBlocks.find(b => b.type === 'paragraph')
+          if (newParagraph) {
+            updateBlock(newParagraph.id, { content: narrativeText })
+          }
+        }, 0)
+      }
+    }
+  }, [narrativeText, updateBlock, addBlock])
   
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -358,6 +383,29 @@ export function PhotoGalleryUpload({ onImagesChange }: PhotoGalleryUploadProps) 
           </p>
         </div>
       )}
+
+      {/* Narrative Text */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-bold text-panel-text-primary">
+            Narasi Foto
+          </label>
+          <span className="text-[10px] text-panel-text-muted">
+            {(() => {
+              const content = narrativeText.replace(/<[^>]*>/g, '')
+              const count = content.split(/\s+/).filter(Boolean).length
+              return `${count} kata`
+            })()}
+          </span>
+        </div>
+        <textarea
+          value={narrativeText}
+          onChange={(e) => setNarrativeText(e.target.value)}
+          placeholder="Tulis narasi foto jurnalistik di sini... (minimal 15 kata)"
+          rows={6}
+          className="w-full px-4 py-3 bg-panel-surface border border-panel-border rounded-xl text-sm text-panel-text-primary placeholder-panel-text-muted resize-y focus:outline-none focus:ring-2 focus:ring-panel-accent/30 focus:border-panel-accent"
+        />
+      </div>
     </div>
   )
 }
