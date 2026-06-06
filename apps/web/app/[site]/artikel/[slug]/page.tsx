@@ -1,3 +1,4 @@
+import React from 'react'
 import { notFound } from 'next/navigation'
 import { SmartImage } from '../../../../components/ui/SmartImage'
 import Link from 'next/link'
@@ -9,7 +10,8 @@ import ReadingProgress from '../../../../components/ui/ReadingProgress'
 import AdSpace from '../../../../components/ui/AdSpace'
 import EditorialBadge from '../../../../components/ui/EditorialBadge'
 import { resolveArticleBadge } from '../../../../lib/resolveArticleBadge'
-import { BookOpen, CalendarDays, Printer, Sparkles, Tags, User2 } from 'lucide-react'
+import { getCategoryColor } from '../../../../lib/constants'
+import { BookOpen, CalendarDays, Flame, Printer, Sparkles, Tags, User2 } from 'lucide-react'
 import { Metadata } from 'next'
 import CommentSection from '../../../../components/ui/CommentSection'
 import ImageLightboxWrapper from '../../../../components/ui/ImageLightboxWrapper'
@@ -17,6 +19,7 @@ import { Container } from '../../../../components/layout/Container'
 import ArticleShareActions from '../../../../components/ui/ArticleShareActions'
 import ArticleBookmarkButton from '../../../../components/ui/ArticleBookmarkButton'
 import ArticleFloatingTools from '../../../../components/ui/ArticleFloatingTools'
+import FadeInOnScroll from '../../../../components/ui/FadeInOnScroll'
 
 interface Props {
   params: { site: string; slug: string }
@@ -94,6 +97,29 @@ async function getRelatedArticles(site: string, currentSlug: string, category?: 
   }
 }
 
+async function getPopularArticles(site: string, currentSlug: string) {
+  try {
+    const params = new URLSearchParams({
+      site,
+      status: 'published',
+      limit: '5',
+      sort: 'views',
+      order: 'desc'
+    })
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const res = await fetch(
+      `${apiUrl}/api/v1/articles/public?${params.toString()}`,
+      { next: { revalidate: 120 } }
+    )
+    if (!res.ok) return []
+    const json = await res.json()
+    const articles = json.data?.articles || json.data?.items || []
+    return articles.filter((a: any) => a.slug !== currentSlug).slice(0, 4)
+  } catch {
+    return []
+  }
+}
+
 async function getSiteSettings(siteId: string) {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -135,7 +161,10 @@ export default async function ArticlePage({ params }: Props) {
   const article = await getArticle(siteParam, slugParam)
   if (!article || article.status !== 'published') notFound()
 
-  const relatedArticles = await getRelatedArticles(siteParam, slugParam, article.category?.name)
+  const [relatedArticles, popularArticles] = await Promise.all([
+    getRelatedArticles(siteParam, slugParam, article.category?.name),
+    getPopularArticles(siteParam, slugParam)
+  ])
   const coverImage = article.featuredImage || article.blocks.find((b: any) => b.type === 'image')?.url || '/placeholder.jpg'
   const coverImageBlock = article.blocks.find((b: any) => b.type === 'image' && b.url === coverImage)
     || article.blocks.find((b: any) => b.type === 'image')
@@ -183,122 +212,98 @@ export default async function ArticlePage({ params }: Props) {
       <JsonLd id="ld-breadcrumb" data={breadcrumbSchema} />
       <ReadingProgress />
       <ImageLightboxWrapper>
-        <article className="min-h-screen bg-[var(--bg-main)] dark:bg-[#020617]">
-          {/* --- HEADER SECTION --- */}
-          <header className="w-full pt-6 pb-6 md:pt-8 md:pb-8 border-b border-gray-100 dark:border-white/5">
-            <Container>
-              <div className="max-w-5xl 2xl:max-w-[68rem]">
-                <div className="flex flex-col items-start gap-3.5 mb-6 md:mb-8">
-                  <div className="flex flex-wrap items-center gap-3 md:gap-4">
+        <article className="min-h-screen">
+          {/* --- FULL-BLEED HERO --- */}
+          <section className="relative w-full h-[50vh] min-h-[400px] max-h-[600px] md:h-[55vh] lg:h-[60vh]">
+            <div className="absolute inset-0">
+              <SmartImage
+                src={coverImage}
+                blur={article.featuredImageBlur}
+                dominantColor={article.featuredImageColor}
+                context="hero_lead"
+                alt={article.title}
+                fill
+                priority
+                className="object-cover"
+              />
+            </div>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent" />
+            <div className="relative flex h-full items-end">
+              <Container>
+                <div className="max-w-4xl pb-8 md:pb-12">
+                  <div className="flex flex-wrap items-center gap-2.5 mb-4">
                     {badgeVariant && (
                       <EditorialBadge
                         variant={badgeVariant}
                         size="sm"
-                        className="rounded-full px-2.5 py-0.5 shadow-sm shadow-black/5"
+                        className="rounded-full px-2.5 py-0.5 shadow-sm shadow-black/10"
                       />
                     )}
-                    <div className="flex items-center gap-2.5 text-[10px] font-semibold uppercase tracking-wide">
-                      <span className="text-brand-red">
-                        {article.category?.name || 'NASIONAL'}
-                      </span>
-                      <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-white/20" />
-                      <span className="text-brand-text-muted">
-                        {new Date(article.publishedAt).toLocaleDateString('id-ID', {
-                          day: 'numeric', month: 'long', year: 'numeric'
-                        })}
-                      </span>
-                    </div>
+                    <span className={`rounded-sm px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] ${getCategoryColor(article.category?.name)}`}>
+                      {article.category?.name || 'NASIONAL'}
+                    </span>
+                    <span className="h-1 w-1 rounded-full bg-white/30" />
+                    <span className="text-[10px] font-semibold text-white/70">
+                      {new Date(article.publishedAt).toLocaleDateString('id-ID', {
+                        day: 'numeric', month: 'long', year: 'numeric'
+                      })}
+                    </span>
                   </div>
-                </div>
 
-                <h1 className="text-xl md:text-3xl lg:text-[2.2rem] font-sans font-extrabold text-brand-black dark:text-white leading-[1.15] tracking-tight mb-6 md:mb-8">
-                  {article.title}
-                </h1>
+                  <h1 className="text-2xl md:text-4xl lg:text-5xl font-sans font-extrabold text-white leading-[1.1] tracking-tight mb-5 md:mb-6 drop-shadow-lg">
+                    {article.title}
+                  </h1>
 
-                <div className="border-t border-gray-100 pt-6 dark:border-white/10 md:pt-8">
-                  <div className="space-y-4 md:space-y-5">
-                    <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between xl:gap-10">
-                      <div className="flex items-start gap-3.5 md:gap-4 xl:min-w-[19rem]">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-red text-md font-sans font-bold text-white shadow-md">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-sm font-sans font-bold text-white">
                         {article.author?.name?.[0] || 'R'}
-                        </div>
-                        <div className="min-w-0 text-left">
-                          <div className="text-[10px] font-bold text-brand-black dark:text-white">{article.author?.name || 'Redaksi'}</div>
-                          <div className="mt-0.5 text-[9px] font-medium text-brand-text-muted">Staf Redaksi BeritaKarya</div>
-                          {article.author?.id && (
-                            <Link
-                              href={`/${siteParam}/penulis/${article.author.id}`}
-                              className="mt-1.5 inline-flex text-[9px] font-bold uppercase tracking-[0.16em] text-brand-red transition-colors hover:text-brand-black dark:hover:text-white"
-                            >
-                              Lihat Profil
-                            </Link>
-                          )}
-                        </div>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2.5 md:gap-3 xl:ml-auto xl:flex-nowrap xl:justify-end">
-                        <div className="inline-flex h-9 items-center gap-2 rounded-lg border border-black/[0.06] bg-white/80 px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text-muted shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:text-gray-300 dark:shadow-none">
-                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-red/10 text-brand-red dark:bg-brand-red/15">
-                            <BookOpen size={11} />
-                          </span>
-                          <span>{readingTime} Menit Baca</span>
-                        </div>
-                        <div className="inline-flex h-9 items-center gap-2 rounded-lg border border-black/[0.06] bg-white/80 px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text-muted shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:text-gray-300 dark:shadow-none">
-                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-red/10 text-brand-red dark:bg-brand-red/15">
-                            <Printer size={11} />
-                          </span>
-                          <span>{article.wordCount || 0} Kata</span>
-                        </div>
-                        <ArticleBookmarkButton
-                          article={article}
-                          site={siteParam}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-black/[0.06] bg-white/80 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none"
-                          activeClassName="border-brand-red/40 bg-brand-red/6 text-brand-red"
-                          idleClassName="text-brand-text-muted hover:text-brand-red hover:border-brand-red/30"
-                          iconSize={14}
-                        />
+                      <div>
+                        <div className="text-[11px] font-bold text-white">{article.author?.name || 'Redaksi'}</div>
+                        <div className="text-[9px] font-medium text-white/60">Staf Redaksi BeritaKarya</div>
                       </div>
                     </div>
-
+                    <div className="flex items-center gap-2.5">
+                      <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-sm px-3 py-1.5 text-[9px] font-bold text-white/90">
+                        <BookOpen size={10} />
+                        {readingTime} menit baca
+                      </div>
+                      <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-sm px-3 py-1.5 text-[9px] font-bold text-white/90">
+                        <Printer size={10} />
+                        {(article.wordCount || 0).toLocaleString('id-ID')} kata
+                      </div>
+                      <ArticleBookmarkButton
+                        article={article}
+                        site={siteParam}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-white/80 transition-all hover:bg-white/25"
+                        activeClassName="bg-brand-red/80 text-white"
+                        idleClassName="text-white/80 hover:text-white"
+                        iconSize={14}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Container>
-          </header>
+              </Container>
+            </div>
+          </section>
 
-          {/* --- HERO IMAGE --- */}
-          <div className="mb-10 md:mb-12">
-            <Container>
-              <figure className="mx-auto max-w-2xl space-y-3">
-                <div className="rounded-xl border border-black/[0.06] bg-white/95 p-1.5 shadow-[0_12px_30px_rgba(15,23,42,0.04)] dark:border-white/[0.08] dark:bg-white/[0.03] md:p-2">
-                  <div className="relative w-full overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-900">
-                    <SmartImage 
-                      src={coverImage} 
-                      blur={article.featuredImageBlur}
-                      dominantColor={article.featuredImageColor}
-                      context="article_cover"
-                      alt={article.title}
-                      fill={false}
-                      width={750}
-                      height={450}
-                      className="w-full h-auto object-contain"
-                      priority
-                    />
-                    <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/[0.04] dark:ring-white/[0.08]" />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/18 to-transparent dark:from-black/28" />
-                  </div>
-                </div>
-                <figcaption className="mt-2.5 grid gap-1.5 text-brand-text-muted dark:text-gray-400 md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-4">
-                  <p className="text-xs italic leading-relaxed">
-                    {coverImageCaption || ''}
+          {/* --- HERO CAPTION --- */}
+          {coverImageCaption && (
+            <div className="border-b border-gray-100 dark:border-white/5">
+              <Container>
+                <div className="py-3 flex items-center justify-between gap-4 max-w-5xl">
+                  <p className="text-[11px] text-brand-text-muted dark:text-gray-400 italic leading-relaxed">
+                    {coverImageCaption}
                   </p>
-                  <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 md:justify-self-end">
+                  <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 shrink-0">
                     Foto / Dokumentasi Redaksi
                   </span>
-                </figcaption>
-              </figure>
-            </Container>
-          </div>
+                </div>
+              </Container>
+            </div>
+          )}
 
           {/* --- CONTENT SECTION --- */}
           <Container>
@@ -311,13 +316,82 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
                 </div>
                 <div className="min-w-0">
+                  <FadeInOnScroll>
                   <div className="space-y-8">
                     <div className="article-content max-w-[40rem] space-y-8 text-left transition-all duration-300 xl:max-w-none 2xl:max-w-none">
-                      {(article.blocks as Block[]).map((block: Block, i: number) => (
-                        <PublicBlock key={i} block={block} />
-                      ))}
+                      {(() => {
+                        const blocks = article.blocks as Block[];
+                        let paragraphCount = 0;
+                        const elements: React.ReactNode[] = [];
+
+                        for (let i = 0; i < blocks.length; i++) {
+                          const block = blocks[i];
+                          elements.push(<PublicBlock key={`block-${i}`} block={block} index={i} />);
+
+                          if (block.type === 'paragraph') {
+                            paragraphCount++;
+
+                            // After 3rd paragraph: insert pull quote highlight
+                            if (paragraphCount === 3) {
+                              const quoteBlock = blocks.find((b: Block) => b.type === 'quote');
+                              if (quoteBlock && quoteBlock.type === 'quote') {
+                                elements.push(
+                                  <div key="visual-break-quote" className="relative my-10 py-8 px-8 md:px-12 border-y-2 border-brand-red/10 bg-brand-red/[0.02] rounded-xl">
+                                    <span className="absolute -top-3 left-6 text-7xl font-serif text-brand-red opacity-10 leading-none select-none">"</span>
+                                    <blockquote className="relative z-10 font-serif text-xl md:text-2xl italic leading-relaxed text-brand-black dark:text-white/90">
+                                      <span dangerouslySetInnerHTML={{ __html: quoteBlock.content || '' }} />
+                                    </blockquote>
+                                    {quoteBlock.attribution && (
+                                      <footer className="mt-4 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-red">
+                                        — {quoteBlock.attribution}
+                                      </footer>
+                                    )}
+                                  </div>
+                                );
+                              }
+                            }
+
+                            // After 5th paragraph: insert inline related article
+                            if (paragraphCount === 5 && relatedArticles.length > 0) {
+                              const rel = relatedArticles[0];
+                              elements.push(
+                                <div key="visual-break-related" className="my-10 rounded-2xl border border-black/5 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.03)] dark:border-white/5 dark:bg-white/[0.02] md:p-5">
+                                  <div className="flex items-center gap-1.5 mb-3">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-brand-red" />
+                                    <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-red">Baca Juga</span>
+                                  </div>
+                                  <Link href={`/${siteParam}/artikel/${rel.slug}`} className="group flex gap-4">
+                                    <div className="relative w-28 h-20 md:w-36 md:h-24 shrink-0 overflow-hidden rounded-xl bg-gray-100 dark:bg-white/5">
+                                      <SmartImage
+                                        src={rel.featuredImage || rel.blocks?.find((b: any) => b.type === 'image')?.url}
+                                        context="card"
+                                        alt={rel.title}
+                                        fill
+                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                      />
+                                    </div>
+                                    <div className="min-w-0 flex flex-col justify-center">
+                                      <span className={`inline-block w-fit rounded-sm px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.14em] mb-1.5 ${getCategoryColor(rel.category?.name)}`}>
+                                        {rel.category?.name || 'Umum'}
+                                      </span>
+                                      <h4 className="line-clamp-2 font-sans text-sm font-extrabold leading-snug tracking-tight text-brand-black dark:text-white group-hover:text-brand-red transition-colors">
+                                        {rel.title}
+                                      </h4>
+                                      <span className="mt-1.5 text-[9px] font-semibold text-gray-500 dark:text-gray-400">
+                                        {rel.author?.name || 'Redaksi'} · {rel.readingTimeMin || 3} min baca
+                                      </span>
+                                    </div>
+                                  </Link>
+                                </div>
+                              );
+                            }
+                          }
+                        }
+                        return elements;
+                      })()}
                     </div>
                   </div>
+                  </FadeInOnScroll>
 
                   {/* Share & Save Section (Inline at the end of article) */}
                   <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-y border-gray-100 py-4 dark:border-white/5">
@@ -344,7 +418,7 @@ export default async function ArticlePage({ params }: Props) {
                       <Link 
                         key={tag} 
                         href={`/${siteParam}?q=${encodeURIComponent(tag)}`}
-                        className="px-3.5 py-1.5 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-[9px] font-bold text-brand-text-muted dark:text-gray-400 uppercase tracking-[0.2em] hover:bg-brand-red hover:text-white hover:border-brand-red transition-all rounded-md"
+                        className="inline-flex items-center rounded-full border border-black/5 bg-white px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-gray-500 transition-colors hover:border-brand-red/40 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-400"
                       >
                         #{tag}
                       </Link>
@@ -357,11 +431,12 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
 
                   {/* Recommended Articles */}
+                  <FadeInOnScroll>
                   <section className="mt-10 border-t border-gray-100 pt-8 dark:border-white/5 md:mt-12 md:pt-10">
                     <div className="mb-6 flex items-center gap-2.5">
                       <div className="h-5 w-0.75 bg-brand-red" />
                       <div>
-                        <h3 className="text-lg font-bold uppercase tracking-tight text-brand-black dark:text-white">
+                        <h3 className="text-lg md:text-xl font-sans font-extrabold tracking-tight text-brand-black dark:text-white">
                           Rekomendasi Artikel
                         </h3>
                         <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-gray-400">
@@ -370,20 +445,40 @@ export default async function ArticlePage({ params }: Props) {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-                      {relatedArticles.length > 0 ? (
-                        relatedArticles.map((rel: any) => (
-                          <NewsCard key={rel.id} article={rel} variant="medium" site={siteParam} />
-                        ))
-                      ) : (
-                        <div className="col-span-full rounded-2xl border border-dashed border-gray-200 px-4 py-8 text-center dark:border-white/10">
-                          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
-                            Belum ada rekomendasi artikel terkait.
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                    {relatedArticles.length > 0 ? (
+                      <div className="space-y-5">
+                        {/* Hero row: 2 horizontal cards */}
+                        {relatedArticles.length >= 2 && (
+                          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                            {relatedArticles.slice(0, 2).map((rel: any) => (
+                              <NewsCard key={rel.id} article={rel} variant="horizontal" site={siteParam} />
+                            ))}
+                          </div>
+                        )}
+                        {/* Medium cards below */}
+                        {relatedArticles.length > 2 && (
+                          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                            {relatedArticles.slice(2).map((rel: any) => (
+                              <NewsCard key={rel.id} article={rel} variant="medium" site={siteParam} />
+                            ))}
+                          </div>
+                        )}
+                        {/* Fallback: if only 1 article, show as medium */}
+                        {relatedArticles.length === 1 && (
+                          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                            <NewsCard key={relatedArticles[0].id} article={relatedArticles[0]} variant="medium" site={siteParam} />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="col-span-full rounded-2xl border border-dashed border-gray-200 px-4 py-8 text-center dark:border-white/10">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                          Belum ada rekomendasi artikel terkait.
+                        </p>
+                      </div>
+                    )}
                   </section>
+                  </FadeInOnScroll>
                 </div>
               </div>
 
@@ -510,6 +605,36 @@ export default async function ArticlePage({ params }: Props) {
                     </div>
                   </div>
 
+                  {popularArticles.length > 0 && (
+                    <div className={cn(sidebarCardClass, 'space-y-3.5')}>
+                      <div className={sidebarLabelClass}>
+                        <Flame size={12} className="text-brand-red" />
+                        Paling Populer
+                      </div>
+                      <div className="space-y-3">
+                        {popularArticles.map((pop: any, idx: number) => (
+                          <Link
+                            key={pop.id}
+                            href={`/${siteParam}/artikel/${pop.slug}`}
+                            className="group flex items-start gap-3"
+                          >
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-[11px] font-black text-gray-400 group-hover:bg-brand-red group-hover:text-white transition-colors dark:bg-white/5 dark:text-gray-500 dark:group-hover:bg-brand-red">
+                              {String(idx + 1).padStart(2, '0')}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="line-clamp-2 text-[11px] font-bold leading-snug text-brand-black dark:text-white group-hover:text-brand-red transition-colors">
+                                {pop.title}
+                              </p>
+                              <p className="mt-1 text-[9px] font-semibold text-gray-400">
+                                {pop.author?.name || 'Redaksi'} · {pop.readingTimeMin || 3} min
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {(article.tags || []).length > 0 && (
                     <div className={cn(sidebarCardClass, 'space-y-3.5')}>
                       <div className={sidebarLabelClass}>
@@ -521,7 +646,7 @@ export default async function ArticlePage({ params }: Props) {
                           <Link
                             key={tag}
                             href={`/${siteParam}?q=${encodeURIComponent(tag)}`}
-                            className="rounded-md border border-gray-100 bg-gray-50 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-gray-500 transition-colors hover:border-brand-red/20 hover:bg-brand-red/5 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-300"
+                            className="inline-flex items-center rounded-full border border-black/5 bg-white px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-gray-500 transition-colors hover:border-brand-red/40 hover:text-brand-red dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-400"
                           >
                             #{tag}
                           </Link>
@@ -542,15 +667,19 @@ export default async function ArticlePage({ params }: Props) {
     </PublicSiteLayout>
   )
 }
-function PublicBlock({ block }: { block: Block }) {
+function PublicBlock({ block, index = 0 }: { block: Block; index?: number }) {
   const bodyTextClass =
     'font-sans text-[calc(1rem*var(--article-font-scale,1))] leading-[calc(1.75rem*var(--article-font-scale,1))] antialiased text-left md:text-[calc(1.05rem*var(--article-font-scale,1))] md:leading-[calc(1.85rem*var(--article-font-scale,1))]';
 
   switch (block.type) {
     case 'paragraph':
+      const isLeadParagraph = index === 0
       return (
-        <p 
-          className={bodyTextClass}
+        <p
+          className={isLeadParagraph
+            ? 'font-sans text-lg md:text-xl font-medium leading-relaxed text-brand-black/90 dark:text-white/90 antialiased'
+            : bodyTextClass
+          }
           dangerouslySetInnerHTML={{ __html: block.content || '' }}
         />
       )
