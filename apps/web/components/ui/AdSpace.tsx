@@ -147,7 +147,7 @@ export default function AdSpace({
           target="_blank" 
           rel="noopener noreferrer"
           className={cn(
-            "block relative overflow-hidden group border border-gray-100 dark:border-white/10 bg-white dark:bg-black",
+            "block relative overflow-hidden group border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-black",
             styles[type],
             className
           )}
