@@ -87,7 +87,7 @@ function RegisterForm() {
           <h2 className="text-xl font-serif font-black text-brand-black dark:text-white uppercase tracking-tight mb-2">
             {isAdvertiser ? 'Pendaftaran Mitra Pengiklan' : 'Buat Akun Baru'}
           </h2>
-          <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-8">
+          <p className="text-xs text-brand-text-muted font-bold uppercase tracking-widest mb-8">
             {isAdvertiser ? 'Daftar untuk pasang & kelola iklan mandiri Anda' : 'Daftar untuk mengakses portal penuh'}
           </p>
 
@@ -152,12 +152,12 @@ function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-black dark:hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-text-muted hover:text-brand-black dark:hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
               </div>
-              <p className="text-[9px] text-gray-400 dark:text-gray-500 font-medium leading-normal">
+              <p className="text-[9px] text-brand-text-muted font-medium leading-normal">
                 * Minimal 8 karakter dengan huruf kapital, angka, & simbol
               </p>
             </div>
@@ -181,7 +181,7 @@ function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-black dark:hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-text-muted hover:text-brand-black dark:hover:text-white transition-colors"
                 >
                   {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
@@ -208,7 +208,7 @@ function RegisterForm() {
           </form>
           
           <div className="mt-6 text-center border-t border-gray-100 dark:border-slate-800 pt-4">
-            <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+            <p className="text-xs text-brand-text-muted font-bold uppercase tracking-widest">
               Sudah punya akun?{' '}
               <Link href="/login" className="text-brand-red hover:text-brand-black dark:hover:text-white transition-colors">
                 Masuk di sini
@@ -217,7 +217,7 @@ function RegisterForm() {
           </div>
         </div>
         
-        <p className="text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-6">
+        <p className="text-center text-[10px] text-brand-text-muted font-bold uppercase tracking-widest mt-6">
           &copy; {new Date().getFullYear()} BeritaKarya Nusantara
         </p>
       </div>

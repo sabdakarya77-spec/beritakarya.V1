@@ -66,7 +66,7 @@ export default function LoginPage() {
         {/* Login Box */}
         <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-6 sm:p-8 shadow-2xl shadow-black/5 rounded-2xl">
           <h2 className="text-xl font-serif font-black text-brand-black dark:text-white uppercase tracking-tight mb-2">Masuk ke Portal</h2>
-          <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-8">Silakan masukkan kredensial Anda</p>
+          <p className="text-xs text-brand-text-muted font-bold uppercase tracking-widest mb-8">Silakan masukkan kredensial Anda</p>
 
           {error && (
             <div className="mb-6 p-4 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 flex items-start gap-3 rounded-sm">
@@ -120,7 +120,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-black dark:hover:text-white transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-text-muted hover:text-brand-black dark:hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -147,7 +147,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center border-t border-gray-100 dark:border-slate-800 pt-4">
-            <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+            <p className="text-xs text-brand-text-muted font-bold uppercase tracking-widest">
               Belum punya akun?{' '}
               <Link href="/register" className="text-brand-red hover:text-brand-black dark:hover:text-white transition-colors">
                 Daftar di sini
@@ -156,7 +156,7 @@ export default function LoginPage() {
           </div>
         </div>
         
-        <p className="text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-6">
+        <p className="text-center text-[10px] text-brand-text-muted font-bold uppercase tracking-widest mt-6">
           &copy; {new Date().getFullYear()} BeritaKarya Nusantara
         </p>
       </div>

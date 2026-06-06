@@ -106,7 +106,7 @@ export function PWAInstallPrompt({
         {/* Tombol Tutup (X) di Pojok Kanan Atas */}
         <button
           onClick={handleDismiss}
-          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-400 dark:text-gray-500 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-brand-text-muted transition-colors"
           title="Tutup"
         >
           <X size={16} />
@@ -128,7 +128,7 @@ export function PWAInstallPrompt({
             <h4 className="text-sm sm:text-base font-black text-gray-900 dark:text-white leading-tight">
               Instal {siteName}
             </h4>
-            <p className="text-xs text-gray-500 dark:text-gray-400 leading-snug">
+            <p className="text-xs text-brand-text-muted leading-snug">
               Tambahkan ke layar utama untuk akses portal berita lebih cepat dan lancar.
             </p>
           </div>

@@ -97,7 +97,7 @@ export function PremiumHero({ article, site }: PremiumHeroProps) {
               </Link>
 
               <div className="max-w-md">
-                <p className="text-lg md:text-xl text-brand-text-muted dark:text-gray-400 font-light leading-relaxed line-clamp-3 mb-8">
+                <p className="text-lg md:text-xl text-brand-text-muted font-light leading-relaxed line-clamp-3 mb-8">
                   {excerpt}
                 </p>
 
@@ -107,13 +107,13 @@ export function PremiumHero({ article, site }: PremiumHeroProps) {
                       {article.author?.name?.[0] || 'B'}
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Penulis</p>
+                      <p className="text-[10px] font-black text-brand-text-muted uppercase tracking-widest">Penulis</p>
                       <p className="text-xs font-bold text-brand-black dark:text-white">{article.author?.name || 'Redaksi'}</p>
                     </div>
                   </div>
                   
                   <div className="flex flex-col">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Waktu Baca</p>
+                    <p className="text-[10px] font-black text-brand-text-muted uppercase tracking-widest">Waktu Baca</p>
                     <p className="text-xs font-bold text-brand-black dark:text-white flex items-center gap-1.5">
                       <Clock size={12} className="text-brand-red" /> {article.readingTimeMin || 5} mnt
                     </p>
@@ -136,7 +136,7 @@ export function PremiumHero({ article, site }: PremiumHeroProps) {
                       aria-label={shareState === 'idle' ? 'Bagikan artikel utama' : shareState === 'shared' ? 'Artikel dibagikan' : 'Tautan artikel tersalin'}
                       title={shareState === 'idle' ? 'Bagikan artikel utama' : shareState === 'shared' ? 'Artikel dibagikan' : 'Tautan artikel tersalin'}
                       className={`p-4 transition-colors ${
-                        shareState === 'idle' ? 'text-gray-400 hover:text-brand-red' : 'text-brand-red'
+                        shareState === 'idle' ? 'text-brand-text-muted hover:text-brand-red' : 'text-brand-red'
                       }`}
                     >
                       {shareState === 'idle' ? <Share2 size={18} /> : <Check size={18} />}

@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
               <Mail size={28} className="text-brand-red" />
             </div>
             <h2 className="text-xl font-serif font-black text-brand-black dark:text-white uppercase tracking-tight mb-2">Lupa Password?</h2>
-            <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+            <p className="text-xs text-brand-text-muted font-bold uppercase tracking-widest">
               Masukkan email Anda untuk reset password
             </p>
           </div>
@@ -85,7 +85,7 @@ export default function ForgotPasswordPage() {
                 </div>
               </div>
               
-              <p className="text-xs text-gray-500 mb-4">
+              <p className="text-xs text-brand-text-muted mb-4">
                 Tidak menerima email? Periksa folder spam atau{' '}
                 <button 
                   onClick={() => {
@@ -146,7 +146,7 @@ export default function ForgotPasswordPage() {
               </form>
 
               <div className="mt-6 text-center border-t border-gray-100 dark:border-slate-800 pt-4">
-                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+                <p className="text-xs text-brand-text-muted font-bold uppercase tracking-widest">
                   Ingat password?{' '}
                   <Link href="/login" className="text-brand-red hover:text-brand-black dark:hover:text-white transition-colors">
                     Masuk di sini
@@ -157,7 +157,7 @@ export default function ForgotPasswordPage() {
           )}
         </div>
         
-        <p className="text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-6">
+        <p className="text-center text-[10px] text-brand-text-muted font-bold uppercase tracking-widest mt-6">
           &copy; {new Date().getFullYear()} BeritaKarya Nusantara
         </p>
       </div>

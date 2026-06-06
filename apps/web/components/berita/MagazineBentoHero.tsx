@@ -150,7 +150,7 @@ export function MagazineBentoHero({ articles, site }: { articles: any[], site: s
                 <div className="mb-1.5 flex items-center justify-between">
                   <span className={cn(
                     "text-[8px] xl:text-[9px] font-extrabold uppercase tracking-widest",
-                    isActive ? "text-brand-red" : "text-gray-400"
+                    isActive ? "text-brand-red" : "text-brand-text-muted"
                   )}>
                     {article.category?.name || 'Headline'}
                   </span>

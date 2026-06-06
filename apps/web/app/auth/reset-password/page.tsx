@@ -105,7 +105,7 @@ function ResetPasswordForm() {
                 <CheckCircle size={32} className="text-green-600 dark:text-green-400" />
               </div>
               <h2 className="text-xl font-serif font-black text-brand-black dark:text-white uppercase tracking-tight mb-2">Password Berhasil Diubah!</h2>
-              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-6">
+              <p className="text-xs text-brand-text-muted font-bold uppercase tracking-widest mb-6">
                 Password Anda telah berhasil direset. Silakan masuk dengan password baru.
               </p>
 
@@ -124,7 +124,7 @@ function ResetPasswordForm() {
                   <Key size={28} className="text-brand-red" />
                 </div>
                 <h2 className="text-xl font-serif font-black text-brand-black dark:text-white uppercase tracking-tight mb-2">Reset Password</h2>
-                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+                <p className="text-xs text-brand-text-muted font-bold uppercase tracking-widest">
                   Masukkan password baru untuk akun Anda
                 </p>
               </div>
@@ -157,7 +157,7 @@ function ResetPasswordForm() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-black dark:hover:text-white transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-text-muted hover:text-brand-black dark:hover:text-white transition-colors"
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -184,7 +184,7 @@ function ResetPasswordForm() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-black dark:hover:text-white transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-text-muted hover:text-brand-black dark:hover:text-white transition-colors"
                     >
                       {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -211,7 +211,7 @@ function ResetPasswordForm() {
               </form>
 
               <div className="mt-6 text-center border-t border-gray-100 dark:border-slate-800 pt-4">
-                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+                <p className="text-xs text-brand-text-muted font-bold uppercase tracking-widest">
                   Ingat password?{' '}
                   <Link href="/login" className="text-brand-red hover:text-brand-black dark:hover:text-white transition-colors">
                     Masuk di sini
@@ -222,7 +222,7 @@ function ResetPasswordForm() {
           )}
         </div>
         
-        <p className="text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-6">
+        <p className="text-center text-[10px] text-brand-text-muted font-bold uppercase tracking-widest mt-6">
           &copy; {new Date().getFullYear()} BeritaKarya Nusantara
         </p>
       </div>
