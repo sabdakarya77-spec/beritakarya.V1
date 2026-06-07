@@ -124,17 +124,16 @@ export function validateArticleContentLimits(
     )
   }
 
-  // Validasi khusus foto jurnalistik (berlaku untuk semua status, termasuk draft)
-  if (options.contentType === 'photo_journalism') {
+  // Validasi khusus foto jurnalistik — hanya saat submit/publish (requireMinWords = true)
+  // Draft boleh disimpan tanpa syarat ini agar auto-save tidak terblokir
+  if (options.contentType === 'photo_journalism' && options.requireMinWords) {
     validatePhotoJournalismRequirements(blocks)
-    // Foto jurnalistik punya aturan sendiri, skip validasi 50 kata standar
     return
   }
 
-  // Validasi khusus video eksklusif (berlaku untuk semua status, termasuk draft)
-  if (options.contentType === 'video_exclusive') {
+  // Validasi khusus video eksklusif — hanya saat submit/publish (requireMinWords = true)
+  if (options.contentType === 'video_exclusive' && options.requireMinWords) {
     validateVideoExclusiveRequirements(blocks)
-    // Video eksklusif punya aturan sendiri, skip validasi 50 kata standar
     return
   }
 
