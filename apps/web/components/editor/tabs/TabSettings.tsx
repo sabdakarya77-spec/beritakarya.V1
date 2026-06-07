@@ -1,16 +1,23 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useEditorStore } from '../../../store/editorStore'
 import { CATEGORIES_CONFIG, CategoryItem } from '../../../lib/constants'
+import { api } from '../../../lib/api'
 import { MediaLibraryModal } from '../MediaLibraryModal'
 import { type MediaItem } from '../../../hooks/useMediaLibrary'
 import { Image as ImageIconIcon, Tag, Flag, Zap, Star, Sparkles, ChevronDown, Upload, ImageIcon, X, FolderOpen, AlertCircle, FileText, Camera, Video } from 'lucide-react'
 import { useImageUpload } from '../../../hooks/useImageUpload'
 import { cn } from '../../../lib/utils'
 
+interface EditorCategoryItem extends CategoryItem {
+  id?: string
+  subCategories?: EditorCategoryItem[]
+}
+
 export function TabSettings() {
   const { 
+    siteId,
     categoryId, 
     tags, 
     featuredImage,
@@ -24,34 +31,61 @@ export function TabSettings() {
 
   const { upload, uploading, reset: resetUpload } = useImageUpload()
 
+  const [categories, setCategories] = useState<EditorCategoryItem[]>(CATEGORIES_CONFIG)
   const [localTags, setLocalTags] = useState<string[]>(tags)
   const [tagInput, setTagInput] = useState('')
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
   const [showMediaLibrary, setShowMediaLibrary] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
 
+  useEffect(() => {
+    setLocalTags(tags)
+  }, [tags])
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadCategories = async () => {
+      try {
+        const { data } = await api.get('/categories/tree', {
+          params: siteId ? { site: siteId } : undefined
+        })
+
+        if (!cancelled && Array.isArray(data?.data) && data.data.length > 0) {
+          setCategories(data.data)
+        }
+      } catch (error) {
+        console.error('Gagal memuat kategori editor:', error)
+      }
+    }
+
+    void loadCategories()
+
+    return () => {
+      cancelled = true
+    }
+  }, [siteId])
+
   // Get flat list of categories for dropdown
   const flatCategories = useMemo(() => {
-    const result: CategoryItem[] = []
-    CATEGORIES_CONFIG.forEach(cat => {
-      result.push(cat)
-      if (cat.subCategories) {
-        cat.subCategories.forEach(sub => {
-          result.push({ name: sub.name, slug: sub.slug })
-          if (sub.subCategories) {
-            sub.subCategories.forEach(subsub => {
-              result.push({ name: subsub.name, slug: subsub.slug })
-            })
-          }
-        })
-      }
-    })
+    const result: EditorCategoryItem[] = []
+
+    const collect = (items: EditorCategoryItem[]) => {
+      items.forEach(item => {
+        result.push(item)
+        if (item.subCategories?.length) {
+          collect(item.subCategories)
+        }
+      })
+    }
+
+    collect(categories)
     return result
-  }, [])
+  }, [categories])
 
   // Find selected category name
   const selectedCategoryName = useMemo(() => {
-    const found = flatCategories.find(c => c.slug === categoryId)
+    const found = flatCategories.find(c => c.slug === categoryId || c.id === categoryId)
     return found?.name || 'Pilih kategori...'
   }, [categoryId, flatCategories])
 
@@ -268,7 +302,7 @@ export function TabSettings() {
                 >
                   Hapus Pilihan
                 </button>
-                {CATEGORIES_CONFIG.map((cat) => (
+                {categories.map((cat) => (
                   <div key={cat.slug} className="border-b border-panel-border/30 last:border-0">
                     {/* Parent Category */}
                     <button
