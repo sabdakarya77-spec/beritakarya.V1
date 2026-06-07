@@ -89,13 +89,6 @@ export function TabSettings() {
     return found?.name || 'Pilih kategori...'
   }, [categoryId, flatCategories])
 
-  useEffect(() => {
-    const matched = flatCategories.find(c => c.slug === categoryId || c.id === categoryId)
-    // #region debug-point C:category-dropdown-match
-    fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"article-category-submit",runId:"pre-fix",hypothesisId:"C",location:"apps/web/components/editor/tabs/TabSettings.tsx:category-match",msg:"[DEBUG] category dropdown match state",data:{siteId,categoryId,selectedCategoryName,matchedCategoryId:matched?.id ?? null,matchedCategorySlug:matched?.slug ?? null,matchedCategoryName:matched?.name ?? null,categoryCount:flatCategories.length},ts:Date.now()})}).catch(()=>{})
-    // #endregion
-  }, [siteId, categoryId, selectedCategoryName, flatCategories])
-
   const handleAddTag = () => {
     if (tagInput.trim() && !localTags.includes(tagInput.trim())) {
       const newTags = [...localTags, tagInput.trim()]
@@ -119,9 +112,6 @@ export function TabSettings() {
   }
 
   const handleCategorySelect = (slug: string) => {
-    // #region debug-point E:handle-category-select
-    fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"article-category-submit",runId:"pre-fix",hypothesisId:"E",location:"apps/web/components/editor/tabs/TabSettings.tsx:handleCategorySelect",msg:"[DEBUG] handleCategorySelect",data:{siteId,prevCategoryId:categoryId,nextCategoryId:slug || null},ts:Date.now()})}).catch(()=>{})
-    // #endregion
     updateArticleData({ categoryId: slug || null })
     setShowCategoryDropdown(false)
   }
