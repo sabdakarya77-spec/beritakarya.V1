@@ -1,15 +1,4 @@
-import fs from 'fs'
-import path from 'path'
-
-// Load font once at module init — lazy-loaded on first use
-let fontBase64: string | null = null
-
-function getFontBase64(): string {
-  if (fontBase64) return fontBase64
-  const fontPath = path.join(__dirname, '..', 'assets', 'fonts', 'Inter-Bold.ttf')
-  fontBase64 = fs.readFileSync(fontPath).toString('base64')
-  return fontBase64
-}
+import { INTER_BOLD_BASE64 } from './font-data'
 
 /**
  * Creates an SVG buffer with embedded font for watermark text.
@@ -35,14 +24,12 @@ export function createWatermarkSvg(
     borderRadius = 4
   } = options
 
-  const font = getFontBase64()
-
   const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <style>
       @font-face {
         font-family: 'WatermarkFont';
-        src: url("data:font/ttf;base64,${font}") format('truetype');
+        src: url("data:font/ttf;base64,${INTER_BOLD_BASE64}") format('truetype');
         font-weight: bold;
       }
     </style>
@@ -74,22 +61,17 @@ export function createTiledWatermarkSvg(
   const {
     tileWidth,
     tileHeight,
-    imageWidth,
-    imageHeight,
     fontSize,
     opacity = 0.35,
     color = `rgba(220,38,38,${opacity})`
   } = options
 
-  const font = getFontBase64()
-
-  // Create a single tile
-  const tileSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tileWidth}" height="${tileHeight}">
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tileWidth}" height="${tileHeight}">
   <defs>
     <style>
       @font-face {
         font-family: 'WatermarkFont';
-        src: url("data:font/ttf;base64,${font}") format('truetype');
+        src: url("data:font/ttf;base64,${INTER_BOLD_BASE64}") format('truetype');
         font-weight: bold;
       }
     </style>
@@ -100,7 +82,7 @@ export function createTiledWatermarkSvg(
         transform="rotate(-35, ${tileWidth / 2}, ${tileHeight / 2})">${text}</text>
 </svg>`
 
-  return Buffer.from(tileSvg)
+  return Buffer.from(svg)
 }
 
 /**
@@ -128,14 +110,12 @@ export function createStampWatermarkSvg(
     textColor = 'white'
   } = options
 
-  const font = getFontBase64()
-
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
   <defs>
     <style>
       @font-face {
         font-family: 'WatermarkFont';
-        src: url("data:font/ttf;base64,${font}") format('truetype');
+        src: url("data:font/ttf;base64,${INTER_BOLD_BASE64}") format('truetype');
         font-weight: bold;
       }
     </style>
