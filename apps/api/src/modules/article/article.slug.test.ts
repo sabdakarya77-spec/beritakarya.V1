@@ -37,6 +37,19 @@ describe('resolveUniqueSlug', () => {
     const slug = await resolveUniqueSlug('Judul Berita', 'bandung')
     expect(slug).toBe('judul-berita-2')
   })
+
+  it('keeps incrementing until the first available slug', async () => {
+    vi.mocked(repo.slugExists)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(false)
+
+    const slug = await resolveUniqueSlug('Wanita', 'pusat')
+    expect(slug).toBe('wanita-6')
+  })
 })
 
 describe('createArticleWithSlugRetry', () => {

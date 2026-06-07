@@ -252,7 +252,6 @@ export async function slugExists(slug: string, siteId: string, excludeId?: strin
     where: {
       slug,
       siteId,
-      ...articleNotDeleted,
       ...(excludeId && { id: { not: excludeId } })
     },
     select: { id: true }
