@@ -439,6 +439,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   updateArticleData: (data) => {
+    if ('categoryId' in data || 'status' in data) {
+      // #region debug-point E:update-article-data
+      fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"article-category-submit",runId:"pre-fix",hypothesisId:"E",location:"apps/web/store/editorStore.ts:updateArticleData",msg:"[DEBUG] updateArticleData called",data:{prevCategoryId:get().categoryId,nextCategoryId:('categoryId' in data ? data.categoryId : get().categoryId) ?? null,prevStatus:get().status,nextStatus:('status' in data ? data.status : get().status) ?? null,siteId:get().siteId},ts:Date.now()})}).catch(()=>{})
+      // #endregion
+    }
     set({ ...data, isDirty: true })
     scheduleAutoSave(get)
   },

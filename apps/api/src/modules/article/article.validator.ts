@@ -91,7 +91,7 @@ export function parseArticleBlocks(blocks: unknown) {
 }
 
 const optionalCategoryId = z.preprocess(
-  (val) => (val === '' || val === undefined ? null : val),
+  (val) => (val === '' ? null : val),
   z.string().nullable().optional()
 )
 

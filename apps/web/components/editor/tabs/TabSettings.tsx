@@ -119,6 +119,9 @@ export function TabSettings() {
   }
 
   const handleCategorySelect = (slug: string) => {
+    // #region debug-point E:handle-category-select
+    fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"article-category-submit",runId:"pre-fix",hypothesisId:"E",location:"apps/web/components/editor/tabs/TabSettings.tsx:handleCategorySelect",msg:"[DEBUG] handleCategorySelect",data:{siteId,prevCategoryId:categoryId,nextCategoryId:slug || null},ts:Date.now()})}).catch(()=>{})
+    // #endregion
     updateArticleData({ categoryId: slug || null })
     setShowCategoryDropdown(false)
   }
