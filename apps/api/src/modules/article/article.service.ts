@@ -205,9 +205,7 @@ export async function createArticle(
       metaDescription: input.metaDescription
     })
 
-    console.log('[createArticle] input categoryId:', input.categoryId, 'siteId:', siteId)
     const resolvedCategoryId = await resolveCategoryId(input.categoryId, siteId)
-    console.log('[createArticle] resolvedCategoryId:', resolvedCategoryId)
     const slug = await resolveUniqueSlug(input.title, siteId)
     const article = await createArticleWithSlugRetry({
       title: input.title,
@@ -336,11 +334,7 @@ export async function updateArticle(
 
   // Resolve categoryId from slug to UUID if provided
   if (input.categoryId !== undefined) {
-    console.log('[updateArticle] Resolving categoryId:', input.categoryId, 'siteId:', siteId)
     data.categoryId = await resolveCategoryId(input.categoryId, siteId)
-    console.log('[updateArticle] Resolved categoryId:', data.categoryId)
-  } else {
-    console.log('[updateArticle] categoryId is undefined, skipping resolution')
   }
 
   if (input.blocks && !input.metaDescription?.trim()) {
@@ -697,17 +691,12 @@ export async function indexGoogleArticle(id: string, siteId: string) {
 }
 
 async function resolveCategoryId(categoryId: string | null | undefined, siteId: string): Promise<string | null> {
-  console.log('[resolveCategoryId] Input:', categoryId, 'siteId:', siteId)
-  if (!categoryId) {
-    console.log('[resolveCategoryId] categoryId is null/undefined, returning null')
-    return null
-  }
+  if (!categoryId) return null
 
   // Check if it's a UUID
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(categoryId)
 
   if (isUuid) {
-    console.log('[resolveCategoryId] categoryId is UUID, looking up by ID')
     const cat = await prisma.category.findUnique({
       where: { id: categoryId }
     })
@@ -719,7 +708,6 @@ async function resolveCategoryId(categoryId: string | null | undefined, siteId: 
   }
 
   // Otherwise, try to find by slug (case-insensitive)
-  console.log('[resolveCategoryId] categoryId is slug, looking up by slug')
   const catBySlug = await prisma.category.findFirst({
     where: {
       slug: { equals: categoryId, mode: 'insensitive' },
@@ -730,7 +718,6 @@ async function resolveCategoryId(categoryId: string | null | undefined, siteId: 
     }
   })
 
-  console.log('[resolveCategoryId] Found by slug:', catBySlug ? { id: catBySlug.id, name: catBySlug.name } : 'NOT FOUND')
   if (catBySlug) return catBySlug.id
 
   // Slug tidak ditemukan — throw error agar tidak silent null

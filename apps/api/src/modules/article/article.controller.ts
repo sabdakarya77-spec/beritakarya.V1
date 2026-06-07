@@ -55,14 +55,12 @@ articleRouter.get('/:id', ...withSite, asyncHandler(async (req: Request, res: Re
 
 articleRouter.post('/', articleWriteLimiter, ...withSite, asyncHandler(async (req: Request, res: Response) => {
   const input = createArticleSchema.parse(req.body)
-  console.log('[API] createArticle input categoryId:', input.categoryId, 'contentType:', input.contentType)
   const article = await service.createArticle(input, req.user!, req.site!)
   res.status(201).json({ success: true, data: article })
 }))
 
 articleRouter.put('/:id', articleUpdateLimiter, ...withSite, asyncHandler(async (req: Request, res: Response) => {
   const input = updateArticleSchema.parse(req.body)
-  console.log('[API] updateArticle input categoryId:', input.categoryId, 'contentType:', input.contentType)
   const article = await service.updateArticle(req.params.id, req.site!, input, req.user!)
   res.json({ success: true, data: article })
 }))

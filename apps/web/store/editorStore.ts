@@ -392,7 +392,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         isExclusive: s.isExclusive,
         isFeatured: s.isFeatured
       }
-      console.log('[saveArticle] payload categoryId:', payload.categoryId, 'contentType:', payload.contentType)
       const params = s.siteId ? { params: { site: s.siteId } } : undefined
 
       if (s.articleId) {
