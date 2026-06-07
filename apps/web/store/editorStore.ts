@@ -341,6 +341,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         : [createInitialParagraphBlock()]
       // Use category slug for frontend compatibility (frontend uses slug, not UUID)
       const resolvedCategoryId = article.category?.slug || article.categoryId || null
+      // #region debug-point A:load-article-category
+      fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"article-category-submit",runId:"pre-fix",hypothesisId:"A",location:"apps/web/store/editorStore.ts:loadArticle",msg:"[DEBUG] loadArticle resolved category",data:{articleId:article?.id ?? id,status:article?.status ?? null,categoryId:article?.categoryId ?? null,categorySlug:article?.category?.slug ?? null,categoryName:article?.category?.name ?? null,resolvedCategoryId,siteId},ts:Date.now()})}).catch(()=>{})
+      // #endregion
       
       set({
         articleId: article.id,
@@ -392,6 +395,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         isExclusive: s.isExclusive,
         isFeatured: s.isFeatured
       }
+      // #region debug-point D:save-article-payload
+      fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"article-category-submit",runId:"pre-fix",hypothesisId:"D",location:"apps/web/store/editorStore.ts:saveArticle",msg:"[DEBUG] saveArticle payload",data:{articleId:s.articleId,status:s.status,categoryId:s.categoryId,payloadCategoryId:payload.categoryId,siteId:s.siteId,title:payload.title},ts:Date.now()})}).catch(()=>{})
+      // #endregion
       const params = s.siteId ? { params: { site: s.siteId } } : undefined
 
       if (s.articleId) {
@@ -464,8 +470,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
     // Ensure all current data (including category) is saved before updating status
     await get().saveArticle()
+    // #region debug-point B:submit-before-status-update
+    fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"article-category-submit",runId:"pre-fix",hypothesisId:"B",location:"apps/web/store/editorStore.ts:submitForReview:beforePut",msg:"[DEBUG] submitForReview before status update",data:{articleId:freshId,siteId,status:get().status,categoryId:get().categoryId},ts:Date.now()})}).catch(()=>{})
+    // #endregion
 
     await api.put(`/articles/${freshId}`, { status: 'submitted' }, siteId ? { params: { site: siteId } } : undefined)
+    // #region debug-point B:submit-after-status-update
+    fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"article-category-submit",runId:"pre-fix",hypothesisId:"B",location:"apps/web/store/editorStore.ts:submitForReview:afterPut",msg:"[DEBUG] submitForReview after status update",data:{articleId:freshId,siteId,status:get().status,nextStatus:"submitted",categoryId:get().categoryId},ts:Date.now()})}).catch(()=>{})
+    // #endregion
     set({ status: 'submitted' })
   },
 
