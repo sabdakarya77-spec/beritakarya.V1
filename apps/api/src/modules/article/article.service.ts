@@ -205,7 +205,9 @@ export async function createArticle(
       metaDescription: input.metaDescription
     })
 
+    console.log('[createArticle] input categoryId:', input.categoryId, 'siteId:', siteId)
     const resolvedCategoryId = await resolveCategoryId(input.categoryId, siteId)
+    console.log('[createArticle] resolvedCategoryId:', resolvedCategoryId)
     const slug = await resolveUniqueSlug(input.title, siteId)
     const article = await createArticleWithSlugRetry({
       title: input.title,
