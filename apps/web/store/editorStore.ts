@@ -401,19 +401,22 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         // Create new article
         const { data } = await api.post('/articles', payload, params)
         const newArticle = data.data
-        set({ 
-          articleId: newArticle.id, 
-          saving: false, 
-          lastSaved: new Date(), 
-          isDirty: false 
+        set({
+          articleId: newArticle.id,
+          saving: false,
+          lastSaved: new Date(),
+          isDirty: false
         })
-        
+
         // Update URL to reflect new ID without full reload
         const newUrl = window.location.pathname.replace('/new', `/${newArticle.id}`)
         window.history.replaceState(null, '', newUrl)
       }
+      // Reset error counter on success — auto-save kembali ke interval normal 15s
+      consecutiveSaveErrors = 0
     } catch (err: any) {
       console.error('Failed to save article:', err)
+      consecutiveSaveErrors++
       const apiError = err?.response?.data?.error
       const details = apiError?.details as { field?: string; message?: string }[] | undefined
       const detailText = details?.length
@@ -561,13 +564,15 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 }))
 
 let lastAutoSaveTime = Date.now()
+let consecutiveSaveErrors = 0
+const MAX_BACKOFF = 120000 // 2 menit maksimal backoff
 
 function scheduleAutoSave(get: () => EditorState) {
   if (saveTimer) clearTimeout(saveTimer)
-  
+
   const now = Date.now()
   const timeSinceLastSave = now - lastAutoSaveTime
-  
+
   // Jika pengguna mengetik terus-menerus selama lebih dari 60 detik tanpa jeda diam 15 detik,
   // paksa auto-save sekarang juga untuk melindungi data pengguna dari potensi kehilangan data.
   if (timeSinceLastSave >= 60000) {
@@ -579,11 +584,17 @@ function scheduleAutoSave(get: () => EditorState) {
     }
   }
 
-  // Jika tidak, jalankan auto-save normal dengan debouncing 15 detik
+  // Backoff jika auto-save terus gagal: 15s → 30s → 60s → 120s
+  // Reset ke 15s setelah save berhasil atau user mengubah data signifikan
+  const backoffDelay = consecutiveSaveErrors > 0
+    ? Math.min(15000 * Math.pow(2, consecutiveSaveErrors - 1), MAX_BACKOFF)
+    : 15000
+
+  // Jika tidak, jalankan auto-save normal dengan debouncing
   saveTimer = setTimeout(() => {
     const state = get()
     if (!state.isDirty || state.saving || !hasMeaningfulContent(state)) return
     lastAutoSaveTime = Date.now()
     state.saveArticle()
-  }, 15000)
+  }, backoffDelay)
 }
