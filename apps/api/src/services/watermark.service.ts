@@ -2,6 +2,7 @@ import sharp from 'sharp'
 import fs from 'fs/promises'
 import path from 'path'
 import { logger } from '../lib/logger'
+import { createTiledWatermarkSvg, createStampWatermarkSvg } from '../utils/watermark-svg'
 
 export interface WatermarkOptions {
   text?: string
@@ -35,23 +36,14 @@ export class WatermarkService {
       // Build a tiled watermark: repeat text diagonally across the image
       const tileW = 500
       const tileH = 160
-      const tileSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${tileW}" height="${tileH}">
-          <text
-            x="50%"
-            y="50%"
-            dominant-baseline="middle"
-            text-anchor="middle"
-            font-family="Noto Sans, DejaVu Sans, Liberation Sans, sans-serif"
-            font-size="${fontSize}"
-            font-weight="bold"
-            fill="rgba(220,38,38,${opacity})"
-            transform="rotate(-35, ${tileW / 2}, ${tileH / 2})"
-          >${text}</text>
-        </svg>
-      `
-
-      const tileBuf = Buffer.from(tileSvg)
+      const tileBuf = createTiledWatermarkSvg(text, {
+        tileWidth: tileW,
+        tileHeight: tileH,
+        imageWidth: width,
+        imageHeight: height,
+        fontSize,
+        opacity
+      })
 
       // Tile the watermark to fill the image
       const composites: sharp.OverlayOptions[] = []
@@ -62,26 +54,16 @@ export class WatermarkService {
       }
 
       // Also add a bold bottom-right attribution stamp
-      const stampSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-          <rect
-            x="${width - 420}" y="${height - 42}"
-            width="410" height="34"
-            rx="4" ry="4"
-            fill="rgba(220,38,38,0.75)"
-          />
-          <text
-            x="${width - 210}" y="${height - 20}"
-            dominant-baseline="middle"
-            text-anchor="middle"
-            font-family="Noto Sans, DejaVu Sans, Liberation Sans, sans-serif"
-            font-size="13"
-            font-weight="bold"
-            fill="white"
-          >BERITAKARYA · HANYA UNTUK VERIFIKASI</text>
-        </svg>
-      `
-      composites.push({ input: Buffer.from(stampSvg), top: 0, left: 0, blend: 'over' })
+      const stampBuf = createStampWatermarkSvg('BERITAKARYA · HANYA UNTUK VERIFIKASI', {
+        width,
+        height,
+        boxWidth: 410,
+        boxHeight: 34,
+        fontSize: 13,
+        bgColor: 'rgba(220,38,38,0.75)',
+        textColor: 'white'
+      })
+      composites.push({ input: stampBuf, top: 0, left: 0, blend: 'over' })
 
       // Write watermarked image to a temp file first, then replace original
       // NOTE: fs.rename() GAGAL lintas device (EXDEV) di Docker karena /tmp (tmpfs)

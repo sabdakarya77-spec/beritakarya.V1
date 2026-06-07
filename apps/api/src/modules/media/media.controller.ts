@@ -8,6 +8,7 @@ import * as repo from './media.repository'
 import { AppError } from '../../utils/AppError'
 import { logger } from '../../lib/logger'
 import { StorageService } from '../../services/storage.service'
+import { createWatermarkSvg } from '../../utils/watermark-svg'
 
 export const mediaRouter: Router = Router()
 
@@ -112,28 +113,22 @@ async function processImage(
       const currentW = currentMeta.width || maxW
       const fontSize = Math.max(16, Math.floor(currentW * 0.022))
       const padding = Math.floor(fontSize * 0.8)
-
-      // Create watermark as a simple colored bar with text
-      // Using sharp's text composite which handles fonts internally
       const watermarkText = '© BERITAKARYA.co'
       const charWidth = fontSize * 0.62
       const textWidth = watermarkText.length * charWidth
       const barWidth = Math.ceil(textWidth + padding * 2)
       const barHeight = Math.ceil(fontSize + padding * 2)
 
-      // Create the watermark bar as SVG
-      const svgBuf = Buffer.from(
-        `<svg width="${barWidth}" height="${barHeight}" xmlns="http://www.w3.org/2000/svg">
-          <rect width="${barWidth}" height="${barHeight}" rx="4" fill="rgba(0,0,0,0.7)"/>
-          <text x="${barWidth / 2}" y="${barHeight / 2}" text-anchor="middle" dominant-baseline="central" fill="white" font-size="${fontSize}" font-weight="bold" font-family="monospace">${watermarkText}</text>
-        </svg>`
-      )
+      // Use embedded font SVG — works on Vercel serverless (no system fonts needed)
+      const svgBuf = createWatermarkSvg(watermarkText, {
+        width: barWidth,
+        height: barHeight,
+        fontSize,
+        bgColor: 'rgba(0,0,0,0.65)',
+        textColor: 'white'
+      })
 
-      // Composite the watermark at bottom-right
-      pipeline = pipeline.composite([{
-        input: svgBuf,
-        gravity: 'southeast'
-      }])
+      pipeline = pipeline.composite([{ input: svgBuf, gravity: 'southeast' }])
     } catch (err: any) {
       logger.error('[Media] Failed to add watermark:', err)
       throw new AppError('Gagal menambahkan watermark', 500, 'WATERMARK_FAILED')

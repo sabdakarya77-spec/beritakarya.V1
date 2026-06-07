@@ -383,10 +383,6 @@ export async function updateArticle(
     data.readingTimeMin = Math.max(1, Math.ceil(words / 200))
   }
 
-  if ('categoryId' in input) {
-    data.categoryId = await resolveCategoryId(input.categoryId, siteId)
-  }
-
   const updated = data.slug
     ? await updateArticleWithSlugRetry(id, siteId, data)
     : await repo.updateArticle(id, siteId, data)
@@ -705,6 +701,10 @@ async function resolveCategoryId(categoryId: string | null | undefined, siteId: 
       where: { id: categoryId }
     })
     if (cat) return cat.id
+    throw Object.assign(
+      new Error(`Kategori dengan ID "${categoryId}" tidak ditemukan`),
+      { statusCode: 400 }
+    )
   }
 
   // Otherwise, try to find by slug (case-insensitive)
@@ -720,6 +720,10 @@ async function resolveCategoryId(categoryId: string | null | undefined, siteId: 
 
   if (catBySlug) return catBySlug.id
 
-  return null
+  // Slug tidak ditemukan — throw error agar tidak silent null
+  throw Object.assign(
+    new Error(`Kategori "${categoryId}" tidak ditemukan di database`),
+    { statusCode: 400 }
+  )
 }
 
