@@ -44,7 +44,7 @@ export default function KYCDetailReviewPage() {
   const [submitting, setSubmitting] = useState(false)
   const [notes, setNotes] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [showImage, setShowImage] = useState<string | null>(null)
+  const [showImage, setShowImage] = useState<'idCard' | 'familyCard' | null>(null)
 
   const fetchUser = async () => {
     setLoading(true)
@@ -109,9 +109,7 @@ export default function KYCDetailReviewPage() {
   }
 
   const getFileUrl = (type: 'idCard' | 'familyCard') => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-    const token = localStorage.getItem('accessToken')
-    return `${baseUrl}/api/v1/kyc/view/${userId}/${type}?site=${siteId}&token=${token}`
+    return `/api/v1/kyc/view/${userId}/${type}?site=${encodeURIComponent(siteId)}`
   }
 
   return (
@@ -141,7 +139,7 @@ export default function KYCDetailReviewPage() {
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Foto KTP (Watermarked)</label>
               <div 
                 className="group relative aspect-[3/2] rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 cursor-zoom-in"
-                onClick={() => setShowImage('idCard')}
+                onClick={() => user.idCardPath && setShowImage('idCard')}
               >
                 {user.idCardPath ? (
                   <img src={getFileUrl('idCard')} alt="KTP" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
@@ -269,7 +267,7 @@ export default function KYCDetailReviewPage() {
               onClick={e => e.stopPropagation()}
             >
               <img 
-                src={getFileUrl(showImage as any)} 
+                src={getFileUrl(showImage)} 
                 alt="Document Preview" 
                 className="w-full h-auto rounded-lg shadow-2xl border border-white/10"
               />
