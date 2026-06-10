@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { CATEGORY_TREE_CONFIG } from '@beritakarya/config'
 
 const prisma = new PrismaClient()
 
@@ -41,125 +42,43 @@ async function main() {
 
   console.log('Superadmin user upserted:', superadmin.name)
 
-  // 3. Seed Categories (Parents & Children)
-  const parentsData = [
-    { name: 'Nasional', slug: 'nasional', order: 1, color: 'rose', description: 'Kabar terkini dan kebijakan penting di tingkat nasional.' },
-    { name: 'Daerah', slug: 'daerah', order: 2, color: 'amber', description: 'Informasi lokal dari pelosok nusantara.' },
-    { name: 'Ekonomi', slug: 'ekonomi', order: 3, color: 'emerald', description: 'Analisis pasar, kebijakan finansial, dan bisnis makro.' },
-    { name: 'Olahraga', slug: 'olahraga', order: 4, color: 'orange', description: 'Berita seputar kompetisi olahraga nasional dan internasional, Piala Dunia, serta Timnas Garuda.' },
-    { name: 'Teknologi', slug: 'teknologi', order: 5, color: 'blue', description: 'Perkembangan AI, gadget terbaru, dan riset ilmiah.' },
-    { name: 'Opini', slug: 'opini', order: 6, color: 'indigo', description: 'Kolom analisis, tajuk rencana, dan opini mendalam.' },
-    { name: 'Investigasi', slug: 'investigasi', order: 7, color: 'red', description: 'Laporan investigasi eksklusif dan mendalam.' },
-    { name: 'Gaya Hidup', slug: 'lifestyle', order: 8, color: 'teal', description: 'Ragam informasi wisata, kesehatan, seni budaya, dan otomotif.' },
-    { name: 'Advertorial', slug: 'advertorial', order: 9, color: 'yellow', description: 'Rilis pers resmi dan info bisnis kemitraan.' },
-    { name: 'Video', slug: 'video', order: 10, color: 'sky', description: 'Dokumenter eksklusif, galeri foto jurnalistik, dan rekaman podcast.' }
-  ]
-
+  // 3. Seed Categories dari CATEGORY_TREE_CONFIG (Single Source of Truth)
   const categoriesMap: Record<string, string> = {}
+  let order = 1
 
-  for (const parent of parentsData) {
-    const createdCat = await prisma.category.upsert({
-      where: { id: parent.slug },
-      update: {
-        name: parent.name,
-        slug: parent.slug,
-        description: parent.description,
-        order: parent.order,
-        color: parent.color,
-        parentId: null
-      },
-      create: {
-        id: parent.slug,
-        name: parent.name,
-        slug: parent.slug,
-        description: parent.description,
-        order: parent.order,
-        color: parent.color,
-        isGlobal: true
-      }
+  for (const cat of CATEGORY_TREE_CONFIG) {
+    const parent = await prisma.category.upsert({
+      where: { id: cat.slug },
+      update: { name: cat.name, slug: cat.slug, order, parentId: null },
+      create: { id: cat.slug, name: cat.name, slug: cat.slug, isGlobal: true, order }
     })
-    categoriesMap[parent.slug] = createdCat.id
+    categoriesMap[cat.slug] = parent.id
+
+    let subOrder = 1
+    for (const sub of cat.subCategories ?? []) {
+      const child = await prisma.category.upsert({
+        where: { id: sub.slug },
+        update: { name: sub.name, slug: sub.slug, parentId: parent.id, order: subOrder },
+        create: { id: sub.slug, name: sub.name, slug: sub.slug, isGlobal: true, parentId: parent.id, order: subOrder }
+      })
+      categoriesMap[sub.slug] = child.id
+
+      let subSubOrder = 1
+      for (const subsub of sub.subCategories ?? []) {
+        const grandchild = await prisma.category.upsert({
+          where: { id: subsub.slug },
+          update: { name: subsub.name, slug: subsub.slug, parentId: child.id, order: subSubOrder },
+          create: { id: subsub.slug, name: subsub.name, slug: subsub.slug, isGlobal: true, parentId: child.id, order: subSubOrder }
+        })
+        categoriesMap[subsub.slug] = grandchild.id
+        subSubOrder++
+      }
+      subOrder++
+    }
+    order++
   }
 
-  // Seed Sub-categories
-  const subCategoriesData = [
-    // Nasional
-    { name: 'Politik', slug: 'politik', parentSlug: 'nasional', order: 1, color: 'violet', description: 'Dinamika politik tanah air, legislatif, dan eksekutif.' },
-    { name: 'Hukum & Keadilan', slug: 'hukum-keadilan', parentSlug: 'nasional', order: 2, color: 'slate', description: 'Kasus peradilan, investigasi kriminal, dan penegakan hukum.' },
-    { name: 'Pendidikan', slug: 'pendidikan', parentSlug: 'nasional', order: 3, color: 'emerald', description: 'Kabar pendidikan, riset, dan akademisi.' },
-    { name: 'Peristiwa', slug: 'peristiwa', parentSlug: 'nasional', order: 4, color: 'rose', description: 'Kejadian penting dan berita hangat hari ini.' },
-    // Daerah
-    { name: 'DKI Jakarta & Banten', slug: 'dki-jakarta-banten', parentSlug: 'daerah', order: 1, color: 'blue', description: 'Kabar ibu kota dan wilayah Banten.' },
-    { name: 'Jawa Barat & Tengah', slug: 'jawa-barat-tengah', parentSlug: 'daerah', order: 2, color: 'teal', description: 'Informasi seputar Jawa Barat dan Jawa Tengah.' },
-    { name: 'Jawa Timur & Bali', slug: 'jawa-timur-bali', parentSlug: 'daerah', order: 3, color: 'amber', description: 'Berita Jawa Timur dan Pulau Dewata.' },
-    { name: 'Sumatera & Kalimantan', slug: 'sumatera-kalimantan', parentSlug: 'daerah', order: 4, color: 'orange', description: 'Berita dari wilayah Sumatera dan Kalimantan.' },
-    { name: 'Sulawesi & Papua', slug: 'sulawesi-papua', parentSlug: 'daerah', order: 5, color: 'indigo', description: 'Informasi dari Sulawesi, Maluku, dan Papua.' },
-    { name: 'Kabar Desa', slug: 'kabar-desa', parentSlug: 'daerah', order: 6, color: 'emerald', description: 'Rangkuman aktivitas dan dinamika pedesaan.' },
-    // Ekonomi
-    { name: 'Makro & Keuangan', slug: 'makro-keuangan', parentSlug: 'ekonomi', order: 1, color: 'emerald', description: 'Ekonomi makro, perbankan, dan kebijakan keuangan.' },
-    { name: 'Bisnis & Saham', slug: 'bisnis-saham', parentSlug: 'ekonomi', order: 2, color: 'violet', description: 'Dinamika pasar saham, investasi, dan korporasi.' },
-    { name: 'UMKM', slug: 'umkm', parentSlug: 'ekonomi', order: 3, color: 'amber', description: 'Perkembangan usaha mikro, kecil, dan menengah.' },
-    { name: 'Industrial', slug: 'industrial', parentSlug: 'ekonomi', order: 4, color: 'blue', description: 'Sektor manufaktur, komoditas, dan industri.' },
-    // Olahraga
-    { name: 'Piala Dunia', slug: 'piala-dunia', parentSlug: 'olahraga', order: 1, color: 'amber', description: 'Liputan khusus turnamen akbar sepak bola sejagat.' },
-    { name: 'Timnas Garuda', slug: 'timnas-garuda', parentSlug: 'olahraga', order: 2, color: 'red', description: 'Perjuangan punggawa Tim Nasional Indonesia.' },
-    { name: 'Sepak Bola', slug: 'sepak-bola', parentSlug: 'olahraga', order: 3, color: 'blue', description: 'Kompetisi liga domestik dan internasional.' },
-    { name: 'Ragam Olahraga', slug: 'ragam-olahraga', parentSlug: 'olahraga', order: 4, color: 'slate', description: 'Berita bulutangkis, otomotif, basket, dan lainnya.' },
-    // Teknologi
-    { name: 'Gadget & Review', slug: 'gadget-review', parentSlug: 'teknologi', order: 1, color: 'blue', description: 'Ulasan gawai, smartphone, dan perangkat cerdas terbaru.' },
-    { name: 'AI & Inovasi', slug: 'ai-inovasi', parentSlug: 'teknologi', order: 2, color: 'purple', description: 'Kecerdasan buatan, riset ilmiah, dan robotika.' },
-    { name: 'Startups & Digital', slug: 'startups-digital', parentSlug: 'teknologi', order: 3, color: 'teal', description: 'Ekosistem startup dan bisnis digital tanah air.' },
-    { name: 'Game & Esports', slug: 'game-esports', parentSlug: 'teknologi', order: 4, color: 'violet', description: 'Dunia gaming, turnamen esports, dan konsol game.' },
-    // Opini
-    { name: 'Kolom & Esai', slug: 'kolom-esai', parentSlug: 'opini', order: 1, color: 'indigo', description: 'Sumbangan tulisan dari para pemikir dan akademisi.' },
-    { name: 'Tajuk Rencana', slug: 'tajuk-rencana', parentSlug: 'opini', order: 2, color: 'slate', description: 'Sikap redaksi terhadap isu-isu krusial nasional.' },
-    { name: 'Wawancara', slug: 'wawancara', parentSlug: 'opini', order: 3, color: 'rose', description: 'Tanya jawab mendalam dengan tokoh inspiratif.' },
-    // Investigasi
-    { name: 'Laporan Investigasi', slug: 'laporan-investigasi', parentSlug: 'investigasi', order: 1, color: 'red', description: 'Laporan eksklusif hasil investigasi tim redaksi.' },
-    { name: 'Sorotan Khusus', slug: 'sorotan-khusus', parentSlug: 'investigasi', order: 2, color: 'amber', description: 'Liputan mendalam mengenai isu sosial kemasyarakatan.' },
-    // Gaya Hidup (lifestyle)
-    { name: 'Wisata & Kuliner', slug: 'wisata-kuliner', parentSlug: 'lifestyle', order: 1, color: 'teal', description: 'Rekomendasi destinasi wisata dan petualangan rasa kuliner.' },
-    { name: 'Kesehatan & Wellness', slug: 'kesehatan-wellness', parentSlug: 'lifestyle', order: 2, color: 'green', description: 'Tips hidup sehat, nutrisi, dan kebugaran mental.' },
-    { name: 'Seni, Film & Fesyen', slug: 'seni-film-fesyen', parentSlug: 'lifestyle', order: 3, color: 'rose', description: 'Resensi seni pertunjukan, perfilman, dan gaya busana.' },
-    { name: 'Otomotif', slug: 'otomotif', parentSlug: 'lifestyle', order: 4, color: 'slate', description: 'Modifikasi, review kendaraan baru, dan tren transportasi.' },
-    // Advertorial
-    { name: 'Info Bisnis', slug: 'info-bisnis', parentSlug: 'advertorial', order: 1, color: 'yellow', description: 'Ulasan produk and strategi perkembangan bisnis.' },
-    { name: 'Rilis Pers', slug: 'rilis-pers', parentSlug: 'advertorial', order: 2, color: 'orange', description: 'Pernyataan resmi perusahaan dan lembaga.' },
-    // Video
-    { name: 'Dokumenter & Reportase', slug: 'dokumenter-reportase', parentSlug: 'video', order: 1, color: 'sky', description: 'Liputan audio-visual eksklusif di lapangan.' },
-    { name: 'Foto Jurnalistik', slug: 'foto-jurnalistik', parentSlug: 'video', order: 2, color: 'pink', description: 'Karya jurnalistik dalam lensa fotografi.' },
-    { name: 'Podcast & Audio', slug: 'podcast-audio', parentSlug: 'video', order: 3, color: 'indigo', description: 'Obrolan santai dan informatif seputar isu terhangat.' }
-  ]
-
-  for (const sub of subCategoriesData) {
-    const parentId = categoriesMap[sub.parentSlug]
-    if (!parentId) continue
-
-    const createdSubCat = await prisma.category.upsert({
-      where: { id: sub.slug },
-      update: {
-        name: sub.name,
-        slug: sub.slug,
-        description: sub.description,
-        parentId: parentId,
-        order: sub.order,
-        color: sub.color
-      },
-      create: {
-        id: sub.slug,
-        name: sub.name,
-        slug: sub.slug,
-        description: sub.description,
-        parentId: parentId,
-        order: sub.order,
-        color: sub.color,
-        isGlobal: true
-      }
-    })
-    categoriesMap[sub.slug] = createdSubCat.id
-  }
-
-  console.log('Categories seeded:', Object.keys(categoriesMap))
+  console.log('Categories seeded from @beritakarya/config:', Object.keys(categoriesMap))
 
   // 4. Clean existing mock articles (to avoid duplication on repeated seed runs)
   await prisma.article.deleteMany({

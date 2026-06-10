@@ -1,6 +1,6 @@
 import { prisma } from '../../db/client'
 import { getSiteAssignmentFilter } from '../site/site-category.utils'
-import { GLOBAL_CATEGORIES_SEED } from './global-categories.seed-data'
+import { CATEGORY_TREE_CONFIG } from '@beritakarya/config'
 
 const categoryInclude = {
   site: true,
@@ -60,7 +60,18 @@ export class CategoryService {
     for (const cat of dedupMap.values()) {
       if (!uniqueById.has(cat.id)) uniqueById.set(cat.id, cat)
     }
-    const deduplicated = Array.from(uniqueById.values())
+
+    // Defensive: second-pass dedup by name — prevents two entries with same name
+    // but different slugs (e.g. 'gaya-hidup' vs 'lifestyle') from both surviving.
+    const uniqueByName = new Map<string, any>()
+    for (const cat of uniqueById.values()) {
+      const nameKey = cat.name.toLowerCase()
+      const existing = uniqueByName.get(nameKey)
+      if (!existing || (cat.siteId === siteId && existing.siteId !== siteId)) {
+        uniqueByName.set(nameKey, cat)
+      }
+    }
+    const deduplicated = Array.from(uniqueByName.values())
 
     // Build ID mapping for parentId remapping (old ID → surviving ID)
     const idMapping = new Map<string, string>()
@@ -410,7 +421,7 @@ export class CategoryService {
     let created = 0
     let order = 1
 
-    for (const category of GLOBAL_CATEGORIES_SEED) {
+    for (const category of CATEGORY_TREE_CONFIG) {
       const { id: parentId, created: parentNew } = await this.ensureGlobalCategory({
         name: category.name,
         slug: category.slug,
@@ -433,6 +444,30 @@ export class CategoryService {
             color: null
           })
           if (subNew) created++
+
+          // Handle 3rd-level sub-subcategories
+          if (sub.subCategories) {
+            let subSubOrder = 1
+            const subId = (await this.ensureGlobalCategory({
+              name: sub.name,
+              slug: sub.slug,
+              parentId,
+              description: null,
+              order: subOrder - 1,
+              color: null
+            })).id
+            for (const subsub of sub.subCategories) {
+              const { created: subSubNew } = await this.ensureGlobalCategory({
+                name: subsub.name,
+                slug: subsub.slug,
+                parentId: subId,
+                description: null,
+                order: subSubOrder++,
+                color: null
+              })
+              if (subSubNew) created++
+            }
+          }
         }
       }
     }

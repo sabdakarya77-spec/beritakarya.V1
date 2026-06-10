@@ -1,3 +1,6 @@
+import type { CategoryConfigItem } from '@beritakarya/config'
+import { CATEGORY_NAV_CONFIG } from '@beritakarya/config'
+
 export const ROLE_LABELS: Record<string, string> = {
   superadmin: 'Pimred (CEO) / Admin IT',
   wapimred: 'Wakil Pemimpin Redaksi (Wapimred)',
@@ -76,7 +79,6 @@ export const CATEGORY_COLORS: Record<string, string> = {
   'sulawesi-papua': 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30',
   'kabar-desa': 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30',
   gaya_hidup: 'text-teal-600 bg-teal-50 dark:text-teal-400 dark:bg-teal-950/20 border border-teal-100 dark:border-teal-900/30',
-  lifestyle: 'text-teal-600 bg-teal-50 dark:text-teal-400 dark:bg-teal-950/20 border border-teal-100 dark:border-teal-900/30',
 }
 
 export function getCategoryColor(categoryName: string = 'umum'): string {
@@ -84,17 +86,8 @@ export function getCategoryColor(categoryName: string = 'umum'): string {
   return CATEGORY_COLORS[key] || CATEGORY_COLORS[categoryName.toLowerCase().replace(/\s+/g, '_').replace(/^-|-$/g, '').trim()] || 'text-rose-600 bg-rose-50 dark:text-rose-400 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30'
 }
 
-export interface SubCategory {
-  name: string;
-  slug: string;
-  subCategories?: SubCategory[];
-}
-
-export interface CategoryItem {
-  name: string;
-  slug: string;
-  subCategories?: SubCategory[];
-}
+export type SubCategory = CategoryConfigItem
+export type CategoryItem = CategoryConfigItem
 
 export type AdSlotId = 'leaderboard' | 'rectangle' | 'rectangle_secondary' | 'in_feed'
 
@@ -190,127 +183,4 @@ export function getAdSlotDefinition(slot: string): AdSlotDefinition | null {
   return AD_SLOT_MAP[slot as AdSlotId] || null
 }
 
-export const CATEGORIES_CONFIG: CategoryItem[] = [
-  { name: 'Terbaru', slug: 'terbaru' },
-  {
-    name: 'Nasional',
-    slug: 'nasional',
-    subCategories: [
-      {
-        name: 'Politik',
-        slug: 'politik',
-        subCategories: [
-          { name: 'Pilkada', slug: 'pilkada' },
-          { name: 'Pemilu', slug: 'pemilu' },
-          { name: 'DPR & DPRD', slug: 'dpr-dprd' }
-        ]
-      },
-      { name: 'Hukum & Keadilan', slug: 'hukum-keadilan' },
-      { name: 'Pendidikan', slug: 'pendidikan' },
-      { name: 'Peristiwa', slug: 'peristiwa' }
-    ]
-  },
-  {
-    name: 'Daerah',
-    slug: 'daerah',
-    subCategories: [
-      { name: 'DKI Jakarta & Banten', slug: 'dki-jakarta-banten' },
-      { name: 'Jawa Barat & Tengah', slug: 'jawa-barat-tengah' },
-      { name: 'Jawa Timur & Bali', slug: 'jawa-timur-bali' },
-      { name: 'Sumatera & Kalimantan', slug: 'sumatera-kalimantan' },
-      { name: 'Sulawesi & Papua', slug: 'sulawesi-papua' },
-      { name: 'Kabar Desa', slug: 'kabar-desa' }
-    ]
-  },
-  {
-    name: 'Ekonomi',
-    slug: 'ekonomi',
-    subCategories: [
-      { name: 'Makro & Keuangan', slug: 'makro-keuangan' },
-      { name: 'Bisnis & Saham', slug: 'bisnis-saham' },
-      { name: 'UMKM', slug: 'umkm' },
-      { name: 'Industrial', slug: 'industrial' }
-    ]
-  },
-  {
-    name: 'Olahraga',
-    slug: 'olahraga',
-    subCategories: [
-      { name: 'Piala Dunia', slug: 'piala-dunia' },
-      { name: 'Timnas Garuda', slug: 'timnas-garuda' },
-      {
-        name: 'Sepak Bola',
-        slug: 'sepak-bola',
-        subCategories: [
-          { name: 'Liga Indonesia', slug: 'liga-indonesia' },
-          { name: 'Liga Eropa', slug: 'liga-eropa' },
-          { name: 'Transfer Pemain', slug: 'transfer-pemain' }
-        ]
-      },
-      { name: 'Ragam Olahraga', slug: 'ragam-olahraga' }
-    ]
-  },
-  {
-    name: 'Teknologi',
-    slug: 'teknologi',
-    subCategories: [
-      {
-        name: 'Gadget & Review',
-        slug: 'gadget-review',
-        subCategories: [
-          { name: 'Smartphone', slug: 'smartphone' },
-          { name: 'Laptop & PC', slug: 'laptop-pc' },
-          { name: 'Aksesoris', slug: 'aksesoris' }
-        ]
-      },
-      { name: 'AI & Inovasi', slug: 'ai-inovasi' },
-      { name: 'Startups & Digital', slug: 'startups-digital' },
-      { name: 'Game & Esports', slug: 'game-esports' }
-    ]
-  },
-  {
-    name: 'Opini',
-    slug: 'opini',
-    subCategories: [
-      { name: 'Kolom & Esai', slug: 'kolom-esai' },
-      { name: 'Tajuk Rencana', slug: 'tajuk-rencana' },
-      { name: 'Wawancara', slug: 'wawancara' }
-    ]
-  },
-  {
-    name: 'Investigasi',
-    slug: 'investigasi',
-    subCategories: [
-      { name: 'Laporan Investigasi', slug: 'laporan-investigasi' },
-      { name: 'Sorotan Khusus', slug: 'sorotan-khusus' }
-    ]
-  },
-  {
-    name: 'Gaya Hidup',
-    slug: 'gaya-hidup',
-    subCategories: [
-      { name: 'Wisata & Kuliner', slug: 'wisata-kuliner' },
-      { name: 'Kesehatan & Wellness', slug: 'kesehatan-wellness' },
-      { name: 'Seni, Film & Fesyen', slug: 'seni-film-fesyen' },
-      { name: 'Otomotif', slug: 'otomotif' }
-    ]
-  },
-  {
-    name: 'Advertorial',
-    slug: 'advertorial',
-    subCategories: [
-      { name: 'Info Bisnis', slug: 'info-bisnis' },
-      { name: 'Rilis Pers', slug: 'rilis-pers' }
-    ]
-  },
-  {
-    name: 'Video',
-    slug: 'video',
-    subCategories: [
-      { name: 'Dokumenter & Reportase', slug: 'dokumenter-reportase' },
-      { name: 'Foto Jurnalistik', slug: 'foto-jurnalistik' },
-      { name: 'Podcast & Audio', slug: 'podcast-audio' }
-    ]
-  },
-  { name: 'Tersimpan', slug: 'tersimpan' }
-];
+export const CATEGORIES_CONFIG: CategoryItem[] = CATEGORY_NAV_CONFIG
