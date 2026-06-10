@@ -172,7 +172,7 @@ export default function KYCPage() {
 
         <button 
           onClick={() => setStatus('none')}
-          className="mt-8 bg-brand-black text-white px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg hover:bg-brand-red transition-all"
+          className="mt-8 bg-slate-900 text-white px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg hover:bg-brand-red dark:bg-brand-red dark:hover:bg-red-500 transition-all"
         >
           Ajukan Ulang Verifikasi
         </button>
