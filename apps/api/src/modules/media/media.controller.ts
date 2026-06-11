@@ -8,7 +8,7 @@ import * as repo from './media.repository'
 import { AppError } from '../../utils/AppError'
 import { logger } from '../../lib/logger'
 import { StorageService } from '../../services/storage.service'
-import { createWatermarkSvg } from '../../utils/watermark-svg'
+import { createMediaWatermarkSvg } from '../../utils/watermark-svg'
 
 export const mediaRouter: Router = Router()
 
@@ -111,22 +111,13 @@ async function processImage(
     try {
       const currentMeta = await sharp(processedBuffer).metadata()
       const currentW = currentMeta.width || maxW
-      const fontSize = Math.max(16, Math.floor(currentW * 0.022))
-      const padding = Math.floor(fontSize * 0.8)
-      const watermarkText = '© BERITAKARYA.co'
-      const charWidth = fontSize * 0.62
-      const textWidth = watermarkText.length * charWidth
-      const barWidth = Math.ceil(textWidth + padding * 2)
-      const barHeight = Math.ceil(fontSize + padding * 2)
+      // Font size scales with image width: ~2% of width, min 14px, max 48px
+      const fontSize = Math.min(48, Math.max(14, Math.floor(currentW * 0.020)))
+      const watermarkText = '\u00A9 BERITAKARYA.co'
 
-      // Use embedded font SVG — works on Vercel serverless (no system fonts needed)
-      const svgBuf = createWatermarkSvg(watermarkText, {
-        width: barWidth,
-        height: barHeight,
-        fontSize,
-        bgColor: 'rgba(0,0,0,0.65)',
-        textColor: 'white'
-      })
+      // Professional text-only watermark with drop shadow (no background box)
+      // Matches global media agency standard: Reuters, AFP, AP style
+      const svgBuf = createMediaWatermarkSvg(watermarkText, { fontSize })
 
       pipeline = pipeline.composite([{ input: svgBuf, gravity: 'southeast' }])
     } catch (err: any) {
@@ -137,7 +128,19 @@ async function processImage(
 
   let fullBuffer: Buffer
   try {
-    fullBuffer = await pipeline.webp({ quality: 82 }).toBuffer()
+    // Embed EXIF copyright metadata — persistent even if watermark is cropped
+    // Follows IPTC/XMP standard used by Reuters, AFP, Getty
+    fullBuffer = await pipeline
+      .withMetadata({
+        exif: {
+          IFD0: {
+            Copyright: `\u00A9 ${new Date().getFullYear()} BERITAKARYA.co. All rights reserved. Unauthorized use prohibited.`,
+            Artist: 'BERITAKARYA Editorial'
+          }
+        }
+      })
+      .webp({ quality: 82 })
+      .toBuffer()
   } catch (err: any) {
     logger.error('[Media] Failed to convert to WebP:', err)
     throw new AppError('Gagal mengkonversi gambar ke format WebP', 500, 'WEBP_CONVERSION_FAILED')

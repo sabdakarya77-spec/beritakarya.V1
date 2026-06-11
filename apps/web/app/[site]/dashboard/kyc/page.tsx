@@ -45,6 +45,10 @@ export default function KYCPage() {
   const [idPreview, setIdPreview] = useState<string | null>(null)
   const [familyPreview, setFamilyPreview] = useState<string | null>(null)
 
+  // Resolusi warnings (tidak memblokir submit)
+  const [idLowRes, setIdLowRes] = useState(false)
+  const [familyLowRes, setFamilyLowRes] = useState(false)
+
   const bioLength = bio.trim().length
   const isBioTooShort = bioLength > 0 && bioLength < BIO_MIN_LENGTH
   const isBioTooLong = bio.length > BIO_MAX_LENGTH
@@ -70,12 +74,25 @@ export default function KYCPage() {
       return
     }
 
+    // Cek resolusi secara client-side — hanya sebagai warning, tidak memblokir
+    const img = new Image()
+    const objectUrl = URL.createObjectURL(file)
+    img.onload = () => {
+      const isLowRes = img.naturalWidth < 640 || img.naturalHeight < 480
+      if (type === 'id') {
+        setIdLowRes(isLowRes)
+      } else {
+        setFamilyLowRes(isLowRes)
+      }
+    }
+    img.src = objectUrl
+
     if (type === 'id') {
       setIdCard(file)
-      setIdPreview(URL.createObjectURL(file))
+      setIdPreview(objectUrl)
     } else {
       setFamilyCard(file)
-      setFamilyPreview(URL.createObjectURL(file))
+      setFamilyPreview(objectUrl)
     }
     setError(null)
   }
@@ -303,6 +320,12 @@ export default function KYCPage() {
                   className="hidden" 
                   onChange={(e) => handleFileChange(e, 'id')}
                 />
+                {/* Warning resolusi rendah KTP */}
+                {idLowRes && (
+                  <p className="mt-2 text-[10px] text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
+                    <span>⚠</span> Resolusi foto mungkin terlalu rendah. Dokumen tetap bisa dikirim, namun disarankan foto ulang dengan kualitas lebih baik.
+                  </p>
+                )}
               </div>
 
               {/* KK Upload */}
@@ -338,6 +361,12 @@ export default function KYCPage() {
                   className="hidden" 
                   onChange={(e) => handleFileChange(e, 'family')}
                 />
+                {/* Warning resolusi rendah KK */}
+                {familyLowRes && (
+                  <p className="mt-2 text-[10px] text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
+                    <span>⚠</span> Resolusi foto mungkin terlalu rendah. Dokumen tetap bisa dikirim, namun disarankan foto ulang.
+                  </p>
+                )}
               </div>
             </div>
 

@@ -39,8 +39,16 @@ export class FileValidator {
         return { valid: false, error: `Tipe file tidak diizinkan: ${mime}` }
       }
 
-      if (metadata.width < 1000 || metadata.height < 800) {
-        return { valid: false, error: 'Resolusi terlalu rendah. Minimal 1000x800px' }
+      // Resolusi rendah hanya dicatat sebagai warning — tidak memblokir upload.
+      // Keputusan akhir tetap di tangan admin saat review KYC.
+      const LOW_RES_WIDTH = 640
+      const LOW_RES_HEIGHT = 480
+      const lowResolution = metadata.width < LOW_RES_WIDTH || metadata.height < LOW_RES_HEIGHT
+      if (lowResolution) {
+        logger.warn(
+          `File resolusi rendah: ${metadata.width}x${metadata.height} ` +
+          `(minimum disarankan ${LOW_RES_WIDTH}x${LOW_RES_HEIGHT}). Diterima sebagai peringatan.`
+        )
       }
 
       if (process.env.CLAMAV_ENABLED === 'true') {
@@ -53,7 +61,15 @@ export class FileValidator {
 
       return {
         valid: true,
-        metadata: { mime, width: metadata.width, height: metadata.height, format: metadata.format, size: stats.size }
+        metadata: {
+          mime,
+          width: metadata.width,
+          height: metadata.height,
+          format: metadata.format,
+          size: stats.size,
+          // Flag ini dikirim ke lapisan atas agar admin dapat melihat peringatan di panel review
+          lowResolution
+        }
       }
     } catch (error: any) {
       logger.error('File validation error:', error)

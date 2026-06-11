@@ -11,7 +11,8 @@ import {
   AlertCircle,
   FileText,
   Eye,
-  Lock
+  Lock,
+  AlertTriangle
 } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -185,6 +186,26 @@ export default function KYCDetailReviewPage() {
               &ldquo;{user.bio || 'Pengguna tidak memberikan biografi.'}&rdquo;
             </p>
           </div>
+
+          {/* Low Resolution Warning */}
+          {user.kycNotes?.includes('PERINGATAN') && (
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-3xl p-5 flex items-start gap-4">
+              <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400 mb-1">Peringatan Kualitas Dokumen</p>
+                <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
+                  {user.kycNotes
+                    .split(' | ')
+                    .filter(n => n.includes('PERINGATAN'))
+                    .map(n => n.replace(/\[|\]/g, ''))
+                    .join(' • ')}
+                </p>
+                <p className="text-[10px] text-amber-600/70 dark:text-amber-400/60 mt-2">
+                  Dokumen tetap dapat diproses. Persetujuan akhir ada di tangan Anda sebagai reviewer.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar Action Column */}

@@ -21,8 +21,8 @@ export class WatermarkService {
    */
   static async applyWatermark(imagePath: string, options: WatermarkOptions = {}): Promise<void> {
     const {
-      text = 'ONLY FOR BERITAKARYA VERIFICATION',
-      opacity = 0.35,
+      text = 'HANYA UNTUK VERIFIKASI BERITAKARYA',
+      opacity = 0.42,
       fontSize = 22
     } = options
 
@@ -54,13 +54,13 @@ export class WatermarkService {
       }
 
       // Also add a bold bottom-right attribution stamp
-      const stampBuf = createStampWatermarkSvg('BERITAKARYA · HANYA UNTUK VERIFIKASI', {
+      const stampBuf = createStampWatermarkSvg('BERITAKARYA \u00B7 RAHASIA \u00B7 HANYA UNTUK VERIFIKASI', {
         width,
         height,
-        boxWidth: 410,
-        boxHeight: 34,
+        boxWidth: 450,
+        boxHeight: 36,
         fontSize: 13,
-        bgColor: 'rgba(220,38,38,0.75)',
+        bgColor: 'rgba(170,25,25,0.90)',
         textColor: 'white'
       })
       composites.push({ input: stampBuf, top: 0, left: 0, blend: 'over' })
@@ -70,7 +70,19 @@ export class WatermarkService {
       // dan bind-mounted volume dianggap filesystem berbeda.
       // fs.copyFile() + fs.unlink() bekerja di semua kondisi.
       const tmpPath = `${imagePath}.wm.tmp`
-      await sharp(imageBuffer).composite(composites).toFile(tmpPath)
+      await sharp(imageBuffer)
+        .composite(composites)
+        // Embed EXIF copyright — persistent metadata for legal traceability
+        .withMetadata({
+          exif: {
+            IFD0: {
+              Copyright: `\u00A9 ${new Date().getFullYear()} BERITAKARYA.co - DOKUMEN RAHASIA KYC`,
+              Artist: 'BERITAKARYA Verification System',
+              ImageDescription: 'KYC Document - Confidential'
+            }
+          }
+        })
+        .toFile(tmpPath)
       await fs.copyFile(tmpPath, imagePath)
       await fs.unlink(tmpPath).catch(() => {})
 
@@ -88,7 +100,7 @@ export class WatermarkService {
     try {
       await sharp(sourcePath)
         .resize(300, 200, { fit: 'cover', position: 'centre' })
-        .jpeg({ quality: 72 })
+        .jpeg({ quality: 80, mozjpeg: true })
         .toFile(thumbPath)
 
       logger.info(`[WatermarkService] Thumbnail generated: ${path.basename(thumbPath)}`)

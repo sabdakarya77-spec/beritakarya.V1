@@ -247,6 +247,10 @@ kycRouter.post('/submit',
       return res.status(400).json({ success: false, error: { message: idCardValidation.error } })
     }
 
+    // Flag resolusi rendah (hanya warning, tidak memblokir)
+    const idCardLowRes = idCardValidation.metadata?.lowResolution === true
+    let familyCardLowRes = false
+
     if (familyCard) {
       const familyCardValidation = await FileValidator.validateFile(familyCard.path, familyCard.originalname)
       if (!familyCardValidation.valid) {
@@ -254,6 +258,7 @@ kycRouter.post('/submit',
         await fs.unlink(familyCard.path).catch(() => {})
         return res.status(400).json({ success: false, error: { message: familyCardValidation.error } })
       }
+      familyCardLowRes = familyCardValidation.metadata?.lowResolution === true
     }
 
     // 2. Check if already verified
@@ -350,7 +355,12 @@ kycRouter.post('/submit',
             kycDataExpiresAt: new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000), // 5 years
             isVerified: false,
             kycStatus: 'PENDING',
-            kycNotes: `SUBMITTED at ${new Date().toISOString()}`
+            // Sertakan flag resolusi rendah di kycNotes agar terlihat di panel admin
+            kycNotes: [
+              `SUBMITTED at ${new Date().toISOString()}`,
+              idCardLowRes ? '[PERINGATAN: Resolusi KTP rendah (<640x480px)]' : null,
+              familyCardLowRes ? '[PERINGATAN: Resolusi KK rendah (<640x480px)]' : null
+            ].filter(Boolean).join(' | ')
           }
         })
 
@@ -364,7 +374,13 @@ kycRouter.post('/submit',
               action: 'kyc.submit',
               entityType: 'user',
               entityId: userId,
-              newValue: { hasIdCard: true, hasFamilyCard: !!familyCard }
+              newValue: {
+                hasIdCard: true,
+                hasFamilyCard: !!familyCard,
+                // Catat flag resolusi rendah untuk referensi admin
+                idCardLowRes,
+                familyCardLowRes
+              }
             }
           })
         }
